@@ -6,6 +6,9 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include "PhysicsSystem.h"
+
+#include "PxPhysicsAPI.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -29,6 +32,21 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
+    PhysicsSystem physicsSys;
+
+    // Simulate at 60fps
+    // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
+
+    std::vector<Entity> entityList;
+    entityList.reserve(465);
+
+    for (int i = 0; i < 465; i++) {
+        entityList.emplace_back();
+        entityList.back().name = "box";
+        entityList.back().transform = physicsSys.transformList[i];
+        entityList.back().model = NULL;
+    }
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -175,6 +193,14 @@ int main()
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        physicsSys.gScene->simulate(1.0f / 60.0f);
+        physicsSys.gScene->fetchResults(true);
+        physicsSys.updateTransforms();
+
+        physx::PxVec3 objPos = physicsSys.getPos(50);
+        std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
+        std::cout << entityList[50].transform->pos.y << std::endl;
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
