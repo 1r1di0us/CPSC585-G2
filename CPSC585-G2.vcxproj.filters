@@ -3,5 +3,17 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
+    <ClCompile Include="src\PhysicsSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\shader_s.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader.fs" />
+    <None Include="src\shader.vs" />
   </ItemGroup>
 </Project>
