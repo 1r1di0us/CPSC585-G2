@@ -21,6 +21,18 @@
   <ItemGroup>
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PhysicsSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\shader_s.h" />
+    <ClInclude Include="src\Transform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader.fs" />
+    <None Include="src\shader.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -129,6 +141,13 @@
       <AdditionalLibraryDirectories>$(SolutionDir)physx\debug;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3_mt.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;SnippetRender_static_64.lib;SnippetUtils_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(TargetDir)src"
+
+copy "$(SolutionDir)src\shader.vs" "$(TargetDir)src\shader.vs"
+
+copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,6 +168,13 @@
       <AdditionalLibraryDirectories>$(SolutionDir)physx\release;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3_mt.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PVDRuntime_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;SnippetRender_static_64.lib;SnippetUtils_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(TargetDir)src"
+
+copy "$(SolutionDir)src\shader.vs" "$(TargetDir)src\shader.vs"
+
+copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
