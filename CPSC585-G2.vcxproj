@@ -138,7 +138,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)physx\include;$(SolutionDir)libraries;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.3.9.binWIN64\include;$(SolutionDir)libraries\freetype-2.13.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)physx\include;$(SolutionDir)libraries;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\include;$(SolutionDir)libraries\freetype-2.13.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
