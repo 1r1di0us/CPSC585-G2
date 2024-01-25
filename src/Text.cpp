@@ -12,7 +12,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include <learnopengl/shader.h>
+#include "shader_s.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -90,7 +90,7 @@ int main()
     }
 
     // find path to font
-    std::string font_name = FileSystem::getPath("resources/fonts/Antonio-Bold.ttf");
+    std::string font_name = "./assets/Gaegu-Bold.ttf";
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
