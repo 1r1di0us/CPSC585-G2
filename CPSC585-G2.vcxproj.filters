@@ -4,8 +4,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
-    <ClCompile Include="src\Text.cpp" />
-    <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -13,15 +11,10 @@
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\shader_s.h" />
-    <ClInclude Include="src\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\vertex_shader_text.txt" />
-    <Text Include="src\fragment_shader_text.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="src\assets\Gaegu-Bold.ttf" />
