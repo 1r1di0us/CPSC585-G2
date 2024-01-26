@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "PhysicsSystem.h"
-#include "shader_s.h"
+#include "Shader.h"
 
 #include "PxPhysicsAPI.h"
 
