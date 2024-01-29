@@ -15,6 +15,8 @@ public:
 
 	void updateTransforms();
 
+	void updatePhysics();
+
 	std::vector<physx::PxRigidDynamic*> rigidDynamicList; // make sure to add this!
 	std::vector<Transform*> transformList;
 

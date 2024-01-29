@@ -21,6 +21,13 @@ void PhysicsSystem::updateTransforms() {
 	}
 }
 
+void PhysicsSystem::updatePhysics() {
+
+	this->gScene->simulate(1.0f / 60.0f);
+	this->gScene->fetchResults(true);
+	this->updateTransforms();
+}
+
 PhysicsSystem::PhysicsSystem() { // Constructor
 
 	// Initialize PhysX
