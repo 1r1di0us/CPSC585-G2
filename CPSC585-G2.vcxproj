@@ -20,11 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Boilerplate\glad.c" />
+    <ClCompile Include="src\Components\InputComponent.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Components\InputComponent.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\shader_s.h" />

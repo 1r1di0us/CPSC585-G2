@@ -4,6 +4,8 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Components\InputComponent.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -11,6 +13,8 @@
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\shader_s.h" />
+    <ClInclude Include="src\Components\InputComponent.h" />
+    <ClInclude Include="src\InputSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shader.fs" />
