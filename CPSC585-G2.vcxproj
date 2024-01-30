@@ -146,7 +146,13 @@
 
 copy "$(SolutionDir)src\shader.vs" "$(TargetDir)src\shader.vs"
 
-copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"</Command>
+copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"
+
+mkdir "$(TargetDir)assets"
+
+mkdir "$(TargetDir)assets\Models"
+
+copy "$(SolutionDir)assets\Models\tank.obj" "$(TargetDir)assets\Models\tank.obj"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
