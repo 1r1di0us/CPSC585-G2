@@ -116,7 +116,8 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        physicsSys.updatePhysics();
+        //physicsSys.updatePhysics();
+        physicsSys.stepPhysics();
 
         physx::PxVec3 objPos = physicsSys.getPos(50);
         std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
