@@ -1,5 +1,23 @@
 #include "PhysicsSystem.h"
 
+//custom collision callback system
+class ContactReportCallback : public PxSimulationEventCallback {
+	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
+		PX_UNUSED(pairHeader);
+		PX_UNUSED(pairs);
+		PX_UNUSED(nbPairs);
+
+		std::cout << "Callback system: Stop colliding with me!" << std::endl;
+	}
+	void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
+	void onWake(physx::PxActor** actors, physx::PxU32 count) {}
+	void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
+	void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
+	void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
+		const physx::PxTransform* poseBuffer,
+		const physx::PxU32 count) {}
+};
+
 physx::PxVec3 PhysicsSystem::getPos(int i) {
 	physx::PxVec3 position = rigidDynamicList[i]->getGlobalPose().p;
 	return position;
@@ -41,7 +59,11 @@ void PhysicsSystem::initPhysX() {
 	PxU32 numWorkers = 1;
 	gDispatcher = PxDefaultCpuDispatcherCreate(numWorkers);
 	sceneDesc.cpuDispatcher = gDispatcher;
-	sceneDesc.filterShader = VehicleFilterShader;	//CHANGE THE FILTER SHADER
+	sceneDesc.filterShader = VehicleFilterShader;
+
+	//assigning the custom callback system to our scene
+	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
+	sceneDesc.simulationEventCallback = gContactReportCallback;
 
 	gScene = gPhysics->createScene(sceneDesc);
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
@@ -53,7 +75,7 @@ void PhysicsSystem::initPhysX() {
 	}
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	PxInitVehicleExtension(*gFoundation); //INITIALIZE VEHICLE EXTENSION
+	PxInitVehicleExtension(*gFoundation);
 }
 
 void PhysicsSystem::initGroundPlane() {
@@ -102,6 +124,21 @@ bool PhysicsSystem::initVehicles() {
 	PxTransform pose(PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity));
 	gVehicle.setUpActor(*gScene, pose, gVehicleName);
 
+	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
+
+	//making all parts of the vehicle have collisions with the outside world
+	PxU32 shapes = gVehicle.mPhysXState.physxActor.rigidBody->getNbShapes();
+	for (PxU32 i = 0; i < shapes; i++) {
+		PxShape* shape = NULL;
+		gVehicle.mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
+
+		shape->setSimulationFilterData(vehicleFilter);
+
+		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+	}
+
 	//Set the vehicle in 1st gear.
 	gVehicle.mEngineDriveState.gearboxState.currentGear = gVehicle.mEngineDriveParams.gearBoxParams.neutralGear + 1;
 	gVehicle.mEngineDriveState.gearboxState.targetGear = gVehicle.mEngineDriveParams.gearBoxParams.neutralGear + 1;
@@ -123,17 +160,6 @@ bool PhysicsSystem::initVehicles() {
 	gVehicleSimulationContext.gravity = gGravity;
 	gVehicleSimulationContext.physxScene = gScene;
 	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
-
-	//making all parts of the vehicle have collisions with the outside world
-	PxU32 shapes = gVehicle.mPhysXState.physxActor.rigidBody->getNbShapes();
-	for (PxU32 i = 0; i < shapes; i++) {
-		PxShape* shape = NULL;
-		gVehicle.mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
-
-		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-	}
 
 	return true;
 }
@@ -190,6 +216,10 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 	physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(halfLen, halfLen, halfLen), *gMaterial);
 	physx::PxU32 size = 30;
 	physx::PxTransform tran(physx::PxVec3(0));
+
+	//creating collision flags for each box
+	PxFilterData boxFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
+	shape->setSimulationFilterData(boxFilter);
 
 	// Create a pyramid of physics-enabled boxes
 	for (physx::PxU32 i = 0; i < size; i++)

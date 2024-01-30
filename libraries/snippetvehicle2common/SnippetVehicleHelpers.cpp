@@ -53,9 +53,16 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
-	return PxFilterFlag::eDEFAULT;
-}
+	//if a obstacle collides with the car body or the car body collides with an obstacle
+	if ((filterData0.word0 == COLLISION_FLAG_CHASSIS && filterData1.word0 == COLLISION_FLAG_OBSTACLE)
+		|| (filterData1.word0 == COLLISION_FLAG_CHASSIS && filterData0.word0 == COLLISION_FLAG_OBSTACLE)) {
+		
+		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
+		printf("Car chassis hit obstacle.\n");
+	}
 
+	return physx::PxFilterFlags();
+}
 
 bool parseVehicleDataPath(int argc, const char *const* argv, const char* snippetName,
 	const char*& vehicleDataPath)
