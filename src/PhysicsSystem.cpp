@@ -64,7 +64,7 @@ void PhysicsSystem::initGroundPlane() {
 		PxShape* shape = NULL;
 		gGroundPlane->getShapes(&shape, 1, i);
 		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
 	gScene->addActor(*gGroundPlane);
@@ -99,7 +99,7 @@ bool PhysicsSystem::initVehicles() {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform pose(PxVec3(0.000000000f, -0.0500000119f, -1.59399998f), PxQuat(PxIdentity));
+	PxTransform pose(PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity));
 	gVehicle.setUpActor(*gScene, pose, gVehicleName);
 
 	//Set the vehicle in 1st gear.
@@ -123,6 +123,18 @@ bool PhysicsSystem::initVehicles() {
 	gVehicleSimulationContext.gravity = gGravity;
 	gVehicleSimulationContext.physxScene = gScene;
 	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
+
+	//making all parts of the vehicle have collisions with the outside world
+	PxU32 shapes = gVehicle.mPhysXState.physxActor.rigidBody->getNbShapes();
+	for (PxU32 i = 0; i < shapes; i++) {
+		PxShape* shape = NULL;
+		gVehicle.mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
+
+		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+	}
+
 	return true;
 }
 
