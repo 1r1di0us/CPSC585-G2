@@ -69,10 +69,9 @@ public:
 	PxU32 gNbPhysXMaterialFrictions = 0;
 	PxReal gPhysXDefaultMaterialFriction = 1.0f;
 
-	//Give the vehicle a name so it can be identified in PVD.
-	const char gVehicleName[12] = "engineDrive";
-
 	const PxU32 gTargetGearCommand = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
+	
+	//I have a feeling this will be the key to having controls for car
 	Command gCommands[5] =
 	{
 		{0.5f, 0.0f, 0.0f, gTargetGearCommand, 2.0f},	//brake on and come to rest for 2 seconds
@@ -94,20 +93,20 @@ public:
 
 	void updateTransforms();
 
-	void updatePhysics();
-
 	//physx basic setup
 	void initPhysX();
 	void initGroundPlane();
 	void initMaterialFrictionTable();
-	bool initVehicles();
+	bool initVehicle(PxVec3 spawnPosition, PxQuat spawnRotation, const char vehicleName[]);
 
 	void createBoxes();
 
 	void stepPhysics();
 
-	std::vector<physx::PxRigidDynamic*> rigidDynamicList; // make sure to add this!
+	std::vector<physx::PxRigidDynamic*> rigidDynamicList;
 	std::vector<Transform*> transformList;
 
 	PhysicsSystem(); // Constructor
+
+	void cleanPhysicsSystem();
 };

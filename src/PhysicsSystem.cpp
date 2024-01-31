@@ -18,11 +18,13 @@ class ContactReportCallback : public PxSimulationEventCallback {
 		const physx::PxU32 count) {}
 };
 
+//gets the position of a rigid dynamic actor given index in the master list
 physx::PxVec3 PhysicsSystem::getPos(int i) {
 	physx::PxVec3 position = rigidDynamicList[i]->getGlobalPose().p;
 	return position;
 }
 
+//updates the positions and rotations of each object using the rigid body list
 void PhysicsSystem::updateTransforms() {
 	for (int i = 0; i < transformList.size(); i++) {
 		// store positions
@@ -38,13 +40,7 @@ void PhysicsSystem::updateTransforms() {
 	}
 }
 
-void PhysicsSystem::updatePhysics() {
-
-	this->gScene->simulate(TIMESTEP);
-	this->gScene->fetchResults(true);
-	this->updateTransforms();
-}
-
+//initializes physx
 void PhysicsSystem::initPhysX() {
 
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
@@ -78,6 +74,7 @@ void PhysicsSystem::initPhysX() {
 	PxInitVehicleExtension(*gFoundation);
 }
 
+//creates the ground
 void PhysicsSystem::initGroundPlane() {
 
 	gGroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
@@ -104,7 +101,8 @@ void PhysicsSystem::initMaterialFrictionTable() {
 	gNbPhysXMaterialFrictions = 1;
 }
 
-bool PhysicsSystem::initVehicles() {
+//initializes the vehicle in the physics system
+bool PhysicsSystem::initVehicle(PxVec3 spawnPosition, PxQuat spawnRotation, const char vehicleName[]) {
 
 	//Load the params from json or set directly.
 	readBaseParamsFromJsonFile(gVehicleDataPath, "Base.json", gVehicle.mBaseParams);
@@ -121,8 +119,8 @@ bool PhysicsSystem::initVehicles() {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform pose(PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity));
-	gVehicle.setUpActor(*gScene, pose, gVehicleName);
+	PxTransform pose(spawnPosition, spawnRotation);
+	gVehicle.setUpActor(*gScene, pose, vehicleName);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
 
@@ -164,6 +162,7 @@ bool PhysicsSystem::initVehicles() {
 	return true;
 }
 
+//simulates one step of physics for all objects in scene
 void PhysicsSystem::stepPhysics() {
 
 	/*if (gNbCommands == gCommandProgress)
@@ -193,6 +192,9 @@ void PhysicsSystem::stepPhysics() {
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
+	//update the transforms of each object
+	this->updateTransforms();
+
 	//Increment the time spent on the current command.
 	//Move to the next command in the list if enough time has lapsed.
 	gCommandTime += TIMESTEP;
@@ -203,6 +205,7 @@ void PhysicsSystem::stepPhysics() {
 	}
 }
 
+//creates falling boxes
 void PhysicsSystem::createBoxes() {
 
 	// Define a box
@@ -247,7 +250,17 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 	initPhysX();
 	initGroundPlane();
 	initMaterialFrictionTable();
-	initVehicles();
+	initVehicle(PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), "playerCar");
+	
+	//TODO: second vehicle currently does not work. gVehicle related
+	initVehicle(PxVec3(5.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), "AICar1");
 
-	createBoxes();	
+	//creates the boxes
+	createBoxes();
+}
+
+//TODO: ask matt if needed
+void PhysicsSystem::cleanPhysicsSystem() {
+
+	gPhysics->release();
 }
