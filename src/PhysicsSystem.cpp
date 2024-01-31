@@ -203,13 +203,7 @@ void PhysicsSystem::stepPhysics() {
 	}
 }
 
-PhysicsSystem::PhysicsSystem() { // Constructor
-
-	//physx setup
-	initPhysX();
-	initGroundPlane();
-	initMaterialFrictionTable();
-	initVehicles();
+void PhysicsSystem::createBoxes() {
 
 	// Define a box
 	float halfLen = 0.5f;
@@ -244,4 +238,16 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 
 	// Clean up
 	shape->release();
+
+}
+
+PhysicsSystem::PhysicsSystem() { // Constructor
+
+	//physx setup
+	initPhysX();
+	initGroundPlane();
+	initMaterialFrictionTable();
+	initVehicles();
+
+	createBoxes();	
 }

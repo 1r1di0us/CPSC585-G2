@@ -102,6 +102,8 @@ public:
 	void initMaterialFrictionTable();
 	bool initVehicles();
 
+	void createBoxes();
+
 	void stepPhysics();
 
 	std::vector<physx::PxRigidDynamic*> rigidDynamicList; // make sure to add this!
