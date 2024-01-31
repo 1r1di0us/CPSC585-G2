@@ -22,12 +22,15 @@
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\RenderingSystem.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Text.h" />
     <ClInclude Include="src\Transform.h" />
@@ -37,7 +40,12 @@
     <None Include="src\vertex_shader.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
     <Font Include="src\assets\Gaegu-Bold.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\fragment_shader_text.txt" />
+    <Text Include="src\vertex_shader_text.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
