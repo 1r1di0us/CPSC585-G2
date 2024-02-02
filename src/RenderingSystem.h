@@ -5,11 +5,15 @@
 class RenderingSystem {
 
 public:
+	// settings
+	const unsigned int SCR_WIDTH = 800;
+	const unsigned int SCR_HEIGHT = 600;
+
 	// variables
 	GLFWwindow* window;
 	unsigned int VBO, VAO;
-	Shader textShader;
-	Shader shader;
+	//Shader textShader;
+	//Shader shader;
 	//Camera camera;
 
 	RenderingSystem();

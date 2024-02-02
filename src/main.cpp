@@ -26,6 +26,7 @@ int main()
         entityList.back().model = NULL;
     }
 
+    //PhysicsSystem physicsSys;
     RenderingSystem renderingSystem;
 
     while (!glfwWindowShouldClose(renderingSystem.getWindow())) {

@@ -9,26 +9,10 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
-
-
-
-GLFWwindow* window;
+// notes for self, declare variable in header before using in cpp
+// shader.use replaces glshader or whatever
+// make sure to construct your variables
 
 // constructor
 RenderingSystem::RenderingSystem(){
@@ -71,9 +55,6 @@ void RenderingSystem::updateRenderer() {
         1, 2, 3   // second Triangle
     };
 
-    unsigned int VBO, VAO, EBO;
-
-
 
     while (!glfwWindowShouldClose(window))
     {
@@ -86,16 +67,16 @@ void RenderingSystem::updateRenderer() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // be sure to activate the shader
-        glUseProgram(shaderProgram);
+        //glUseProgram(shaderProgram);
 
         // update the uniform color
         float timeValue = glfwGetTime();
         float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        //int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
         // now render the triangle
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // swap buffers and poll IO events
