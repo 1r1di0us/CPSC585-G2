@@ -4,6 +4,7 @@
 #include <iostream>
 #include "PhysicsSystem.h"
 #include "shader_s.h"
+#include "InputSystem.h"
 
 #include "PxPhysicsAPI.h"
 
@@ -17,14 +18,15 @@ const unsigned int SCR_HEIGHT = 600;
 int main()
 {
     PhysicsSystem physicsSys;
-
+    InputSystem inputSys;
     // Simulate at 60fps
     // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
 
     std::vector<Entity> entityList;
     entityList.reserve(465);
 
-    for (int i = 0; i < 465; i++) {
+    for (int i = 0; i < 465; i++)
+    {
         entityList.emplace_back();
         entityList.back().name = "box";
         entityList.back().transform = physicsSys.transformList[i];
@@ -99,8 +101,9 @@ int main()
     {
         // input
         // -----
-        processInput(window);
-
+        //processInput(window);
+        glfwSetKeyCallback(window, inputSys.updateKeyCallbacks);
+            
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -121,8 +124,8 @@ int main()
         physicsSys.updateTransforms();
 
         physx::PxVec3 objPos = physicsSys.getPos(50);
-        std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
-        std::cout << entityList[50].transform->pos.y << std::endl;
+        //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
+        //std::cout << entityList[50].transform->pos.y << std::endl;
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
@@ -138,11 +141,13 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
+//void processInput(GLFWwindow* window)
+//{
+//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//        glfwSetWindowShouldClose(window, true);
+//
+//    if (glfwGetKey)
+//}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------

@@ -5,7 +5,5 @@
 
 class InputSystem {
 public:
-	void update();
-private:
-	std::vector<Entity> entitiesWithInput;
+	static void updateKeyCallbacks(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
