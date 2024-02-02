@@ -7,6 +7,8 @@
 
 #include "PxPhysicsAPI.h"
 
+#include "Car.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -22,13 +24,30 @@ int main()
     // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
 
     std::vector<Entity> entityList;
-    entityList.reserve(465);
+    entityList.reserve(physicsSys.transformList.size());
 
-    for (int i = 0; i < 465; i++) {
+    //creating the player car entity
+    Entity playerCar;
+    playerCar.name = "playerCar";
+    playerCar.physType = PhysicsType::CAR;
+    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+
+    //creating the second car entity
+    Entity car2;
+    car2.name = "car2";
+    car2.physType = PhysicsType::CAR;
+    car2.car = new Car(playerCar.name.c_str(), PxVec3(10.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+
+    //adding the car to the entity list
+    entityList.emplace_back(playerCar);
+    entityList.emplace_back(car2);
+
+    for (int i = 0; i < physicsSys.transformList.size(); i++) {
         entityList.emplace_back();
         entityList.back().name = "box";
         entityList.back().transform = physicsSys.transformList[i];
         entityList.back().model = NULL;
+        entityList.back().physType = PhysicsType::PROJECTILE;
     }
 
     // glfw: initialize and configure
@@ -117,11 +136,9 @@ int main()
         glfwPollEvents();
 
         //physicsSys.updatePhysics();
-        physicsSys.stepPhysics();
+        physicsSys.stepPhysics(entityList);
 
         physx::PxVec3 objPos = physicsSys.getPos(50);
-        std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
-        std::cout << entityList[50].transform->pos.y << std::endl;
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
