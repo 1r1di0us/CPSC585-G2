@@ -144,9 +144,6 @@ void PhysicsSystem::createBoxes() {
 //does all the logic for doing one step through every vehicle movement component
 void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 
-	PxReal gCommandTime = 0.0f;			//Time spent on current command
-	PxU32 gCommandProgress = 0;			//The id of the current command.
-
 	//goes through each vehicles movement component and updates them one at a time
 	for (Car* car : carList) {
 
@@ -161,10 +158,10 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 			// playerCar.vehicleMovement->commandVector.erase(playerCar.vehicleMovement->commandVector.begin());
 
 			//constant forward driving (gCommands in the .h)
-		gCommandProgress = 1;
+		car->gCommandProgress = 1;
 
 		//Apply the brake, throttle and steer to the command state of the vehicle.
-		const Command& command = car->gCommands[gCommandProgress];
+		const Command& command = car->gCommands[car->gCommandProgress];
 		gVehicle.mCommandState.brakes[0] = command.brake;
 		gVehicle.mCommandState.nbBrakes = 1;
 		gVehicle.mCommandState.throttle = command.throttle;
@@ -183,11 +180,11 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 		//Increment the time spent on the current command.
 		//Move to the next command in the list if enough time has lapsed.
 			//THERE MIGHT BE A BUG HERE WITH WHERE I DEFINE THE COMMAND TIME
-		gCommandTime += TIMESTEP;
-		if (gCommandTime > car->gCommands[gCommandProgress].duration)
+		car->gCommandTime += TIMESTEP;
+		if (car->gCommandTime > car->gCommands[car->gCommandProgress].duration)
 		{
-			gCommandProgress++;
-			gCommandTime = 0.0f;
+			car->gCommandProgress++;
+			car->gCommandTime = 0.0f;
 		}
 	}
 
@@ -201,12 +198,7 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	for (Entity entity : entityList) {
 
 		if (entity.physType == PhysicsType::CAR) {
-
-			std::cout << entity.name << std::endl;
-
 			carList.emplace_back(entity.car);
-
-			std::cout << carList.size() << std::endl;
 		}
 	}
 
