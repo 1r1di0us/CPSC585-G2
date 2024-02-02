@@ -24,7 +24,9 @@
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Text.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -32,7 +34,9 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Text.h" />
+    <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
   <ItemGroup>

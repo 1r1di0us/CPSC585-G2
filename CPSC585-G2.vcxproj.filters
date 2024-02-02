@@ -7,6 +7,8 @@
     <ClCompile Include="src\Text.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -16,6 +18,8 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Text.h" />
     <ClInclude Include="src\RenderingSystem.h" />
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />

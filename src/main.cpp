@@ -26,19 +26,10 @@ int main()
         entityList.back().model = NULL;
     }
 
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
     RenderingSystem renderingSystem;
-    if (renderingSystem.getWindow() == nullptr) {
-        std::cerr << "Failed to create GLFW window in RenderingSystem" << std::endl;
-        return -1;
-    }
 
     while (!glfwWindowShouldClose(renderingSystem.getWindow())) {
-        renderingSystem.render();
+        renderingSystem.updateRenderer();
 
         // You can add other game loop logic here
         physicsSys.gScene->simulate(1.0f / 60.0f);
@@ -53,16 +44,4 @@ int main()
         glfwPollEvents();
     }
 }
-    // need to give the window somehow
-    //while(!glfwWindowShouldClose(window)){
-
-    //    physicsSys.gScene->simulate(1.0f / 60.0f);
-    //    physicsSys.gScene->fetchResults(true);
-    //    physicsSys.updateTransforms();
-
-    //    physx::PxVec3 objPos = physicsSys.getPos(50);
-    //    std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
-    //    std::cout << entityList[50].transform->pos.y << std::endl;
-    //}
-
 
