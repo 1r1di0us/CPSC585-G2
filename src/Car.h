@@ -56,10 +56,16 @@ public:
 	PxReal gCommandTime = 0.0f;			//Time spent on current command
 	PxU32 gCommandProgress = 0;			//The id of the current command.
 
+	//the forward direction of the car
+	PxVec3 carFowardDirection;
+
 	//function outlines
 	Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics* gPhysics, PxScene* gScene, PxVec3 gGravity, PxMaterial* gMaterial);
 
 	void DestroyCar();
+
+	//TODO: potentially rework to just a setter for car direction, depending on if need more vars here
+	void updateCarData();
 
 	//TODO: figure out how moving the car works with commands n shit
 		//this will be the function that deals with converting IO to movement

@@ -56,6 +56,12 @@ void Car::DestroyCar() {
 
 }
 
+//updates car variables that are needed for other things
+void Car::updateCarData() {
+
+	carFowardDirection = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+}
+
 //function that takes in IO and gives the appropriate command to the car
 void Car::MoveCar() {
 
