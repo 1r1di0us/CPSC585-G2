@@ -105,16 +105,16 @@ void PhysicsSystem::initMaterialFrictionTable() {
 void PhysicsSystem::createBoxes() {
 
 	// Define a box
-	float halfLen = 0.5f;
+	float radius = 0.5f;
 	physx::PxU32 size = 30;
 
 	// Create a pyramid of physics-enabled boxes
 	for (physx::PxU32 i = 0; i < size; i++) {
 		for (physx::PxU32 j = 0; j < size - i; j++) {
 
-			Projectile* box = new Projectile(gPhysics, gScene, halfLen, halfLen, gMaterial, physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 - 1), 0) * halfLen);
+			Projectile* ball = new Projectile(gPhysics, gScene, radius, gMaterial, physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 - 1), 0) * radius);
 
-			rigidDynamicList.push_back(box->body);
+			rigidDynamicList.push_back(ball->body);
 
 			transformList.push_back(new Transform()); // Add one for each box
 		}
