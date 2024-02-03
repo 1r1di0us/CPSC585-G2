@@ -5,10 +5,6 @@
 #include "PhysicsSystem.h"
 #include "shader_s.h"
 
-#include "PxPhysicsAPI.h"
-
-#include "Car.h"
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 

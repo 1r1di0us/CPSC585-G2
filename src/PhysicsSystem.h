@@ -1,7 +1,6 @@
 #pragma once
 #include "PxPhysicsAPI.h"
-#include "Entity.h"  
-#include "Car.h"
+#include "Entity.h"
 #include <vector>
 #include <iostream>
 
