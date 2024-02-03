@@ -22,7 +22,7 @@ RenderingSystem::RenderingSystem(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    window = glfwCreateWindow(800, 600, "Commander P Scrapyard Challenge", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander P Scrapyard Challenge", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -43,11 +43,9 @@ void RenderingSystem::updateRenderer() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+        -0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         0.0f,  0.5f, 0.0f
     };
 
     unsigned int indices[] = {  // note that we start from 0!
@@ -55,34 +53,17 @@ void RenderingSystem::updateRenderer() {
         1, 2, 3   // second Triangle
     };
 
+    // input
+    processInput(window);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        // input
-        processInput(window);
+    // render
+    // clear the colorbuffer
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        // render
-        // clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // be sure to activate the shader
-        //glUseProgram(shaderProgram);
-
-        // update the uniform color
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        //int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
-        // now render the triangle
-        //glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        // swap buffers and poll IO events
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+    // swap buffers and poll IO events
+    glfwPollEvents();
+    glfwSwapBuffers(window);
 
 }
 
