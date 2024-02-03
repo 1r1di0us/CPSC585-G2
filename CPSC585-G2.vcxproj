@@ -46,6 +46,7 @@
   <ItemGroup>
     <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
     <Font Include="src\assets\Gaegu-Bold.ttf" />
+    <Font Include="src\assets\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\fragment_shader_text.txt" />
