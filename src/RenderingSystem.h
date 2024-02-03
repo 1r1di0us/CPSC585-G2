@@ -11,9 +11,9 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	unsigned int VBO, VAO;
+	//unsigned int VBO, VAO;
 	//Shader textShader;
-	//Shader shader;
+	Shader shader;
 	//Camera camera;
 
 	RenderingSystem();

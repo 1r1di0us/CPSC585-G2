@@ -16,6 +16,7 @@ public:
 
     // constructor reads and builds the shader
     Shader(const char* vertexPath, const char* fragmentPath);
+    Shader();
     // use/activate the shader
     void use();
     // utility uniform functions
@@ -24,6 +25,5 @@ public:
     void setFloat(const std::string& name, float value) const;
     //void setMat4(const std::string& name, glm::mat4 value) const;
     void checkCompileErrors(unsigned int shader, std::string type);
-    unsigned int initVAO(float* vertices, int size);
 };
 #endif // !SHADER_H
