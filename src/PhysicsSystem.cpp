@@ -1,5 +1,4 @@
 #include "PhysicsSystem.h"
-#include "Entity.h"
 
 //custom collision callback system
 class ContactReportCallback : public PxSimulationEventCallback {
@@ -107,37 +106,22 @@ void PhysicsSystem::createBoxes() {
 
 	// Define a box
 	float halfLen = 0.5f;
-	physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(halfLen, halfLen, halfLen), *gMaterial);
 	physx::PxU32 size = 30;
-	physx::PxTransform tran(physx::PxVec3(0));
-
-	//creating collision flags for each box
-	PxFilterData boxFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
-	shape->setSimulationFilterData(boxFilter);
 
 	// Create a pyramid of physics-enabled boxes
-	for (physx::PxU32 i = 0; i < size; i++)
-	{
-		for (physx::PxU32 j = 0; j < size - i; j++)
-		{
-			physx::PxTransform localTran(physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 - 1), 0) * halfLen);
-			physx::PxRigidDynamic* body = gPhysics->createRigidDynamic(tran.transform(localTran));
+	for (physx::PxU32 i = 0; i < size; i++) {
+		for (physx::PxU32 j = 0; j < size - i; j++) {
 
-			rigidDynamicList.push_back(body);
+			Projectile* box = new Projectile(gPhysics, gScene, halfLen, halfLen, gMaterial, physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 - 1), 0) * halfLen);
+
+			rigidDynamicList.push_back(box->body);
 
 			transformList.push_back(new Transform()); // Add one for each box
-
-			body->attachShape(*shape);
-			physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			gScene->addActor(*body);
 		}
 	}
 
 	// Update transform in physics system loop
 	updateTransforms();
-
-	// Clean up
-	shape->release();
 
 }
 

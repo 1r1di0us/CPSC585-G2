@@ -34,6 +34,7 @@
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\shader_s.h" />
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
