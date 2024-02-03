@@ -22,6 +22,7 @@ Projectile::Projectile(physx::PxPhysics* gPhysics, physx::PxScene* gScene, physx
 
 }
 
-void Projectile::pushProjectile(physx::PxVec3 force) {
+void Projectile::shootProjectile(PxVec3 force) {
 
+	body->setLinearVelocity(force);
 }
