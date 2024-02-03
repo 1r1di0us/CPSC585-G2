@@ -21,4 +21,5 @@ public:
 	PhysicsType physType;
 
 	Car* car;
+	Projectile* projectile;
 };

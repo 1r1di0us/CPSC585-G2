@@ -3,7 +3,7 @@
 Projectile::Projectile(physx::PxPhysics* gPhysics, physx::PxScene* gScene, physx::PxReal radius, physx::PxMaterial* gMaterial, physx::PxVec3 spawnPosition) {
 
 	//define a projectile
-	physx::PxShape* shape = gPhysics->createShape(physx::PxCapsuleGeometry(radius, 0.0f), *gMaterial);
+	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(radius), *gMaterial);
 	physx::PxTransform tran(spawnPosition);
 
 	//creating collision flags for each projectile
@@ -14,6 +14,10 @@ Projectile::Projectile(physx::PxPhysics* gPhysics, physx::PxScene* gScene, physx
 
 	body->attachShape(*shape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*body, mass);
+
+	//disables gravity for the projectile
+	body->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+
 	gScene->addActor(*body);
 
 }

@@ -2,6 +2,8 @@
 #include <PxPhysicsAPI.h>
 #include "snippetvehicle2common/SnippetVehicleHelpers.h"
 
+using namespace physx;
+
 class Projectile {
 
 public:
