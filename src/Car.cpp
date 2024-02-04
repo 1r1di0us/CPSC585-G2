@@ -19,8 +19,10 @@ Car::Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform pose(spawnPosition, spawnRotation);
-	gVehicle.setUpActor(*gScene, pose, name);
+	carTransform = PxTransform(spawnPosition, spawnRotation);
+	gVehicle.setUpActor(*gScene, carTransform, name);
+
+	vehicleDepth = gVehicle.mPhysXState.physxActor.rigidBody->getWorldBounds().getDimensions().z;
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
 
@@ -56,10 +58,10 @@ void Car::DestroyCar() {
 
 }
 
-//updates car variables that are needed for other things
-void Car::updateCarData() {
+//updates car transform
+void Car::setCarTransform() {
 
-	carFowardDirection = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+	carTransform = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose();
 }
 
 //function that takes in IO and gives the appropriate command to the car

@@ -57,7 +57,10 @@ public:
 	PxU32 gCommandProgress = 0;			//The id of the current command.
 
 	//the forward direction of the car
-	PxVec3 carFowardDirection;
+	PxTransform carTransform;
+
+	//gets the depth of the bounding box for this vehicle
+	PxReal vehicleDepth;
 
 	//function outlines
 	Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics* gPhysics, PxScene* gScene, PxVec3 gGravity, PxMaterial* gMaterial);
@@ -65,7 +68,7 @@ public:
 	void DestroyCar();
 
 	//TODO: potentially rework to just a setter for car direction, depending on if need more vars here
-	void updateCarData();
+	void setCarTransform();
 
 	//TODO: figure out how moving the car works with commands n shit
 		//this will be the function that deals with converting IO to movement
