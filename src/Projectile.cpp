@@ -1,16 +1,15 @@
 #include "Projectile.h"
 
-Projectile::Projectile(physx::PxPhysics* gPhysics, physx::PxScene* gScene, physx::PxReal radius, physx::PxMaterial* gMaterial, physx::PxVec3 spawnPosition) {
+Projectile::Projectile(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, PxTransform spawnPosition) {
 
 	//define a projectile
 	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(radius), *gMaterial);
-	physx::PxTransform tran(spawnPosition);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
 
-	body = gPhysics->createRigidDynamic(tran);
+	body = gPhysics->createRigidDynamic(spawnPosition);
 
 	body->attachShape(*shape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*body, mass);
@@ -22,7 +21,7 @@ Projectile::Projectile(physx::PxPhysics* gPhysics, physx::PxScene* gScene, physx
 
 }
 
-void Projectile::shootProjectile(PxVec3 force) {
+void Projectile::shootProjectile() {
 
-	body->setLinearVelocity(force);
+	body->setLinearVelocity(shootForce);
 }

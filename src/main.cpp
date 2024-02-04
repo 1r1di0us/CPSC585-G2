@@ -12,9 +12,11 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-int main()
-{
-    PhysicsSystem physicsSys;
+//global vars (ideally temp, idk how that will work tho tbh)
+PhysicsSystem physicsSys;
+Entity playerCar;
+
+int main() {
 
     // Simulate at 60fps
     // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
@@ -23,20 +25,19 @@ int main()
     entityList.reserve(physicsSys.transformList.size());
 
     //creating the player car entity
-    Entity playerCar;
     playerCar.name = "playerCar";
     playerCar.physType = PhysicsType::CAR;
-    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //creating the second car entity
-    Entity car2;
-    car2.name = "car2";
-    car2.physType = PhysicsType::CAR;
-    car2.car = new Car(playerCar.name.c_str(), PxVec3(10.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+    ////creating the second car entity
+    //Entity car2;
+    //car2.name = "car2";
+    //car2.physType = PhysicsType::CAR;
+    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
     //adding the car to the entity list
     entityList.emplace_back(playerCar);
-    entityList.emplace_back(car2);
+    //entityList.emplace_back(car2);
 
     for (int i = 0; i < physicsSys.transformList.size(); i++) {
         entityList.emplace_back();
@@ -131,10 +132,7 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        //physicsSys.updatePhysics();
         physicsSys.stepPhysics(entityList);
-
-        physx::PxVec3 objPos = physicsSys.getPos(50);
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
@@ -150,12 +148,29 @@ int main()
     return 0;
 }
 
+void shoot(Entity* car) {
+
+    Entity* projectile = new Entity();
+    //get the car pos and touch it up a bit to get spawn pos
+    projectile->name = "bullet";
+    projectile->physType = PhysicsType::PROJECTILE;
+    physicsSys.shootProjectile(car, projectile);
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    //will shoot a projectile
+    //FIXME: broken af rn. needs IO to be working to properly test
+    else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        shoot(&playerCar);
+
+    }
+        
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

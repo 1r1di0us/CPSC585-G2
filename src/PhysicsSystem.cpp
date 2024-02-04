@@ -101,30 +101,6 @@ void PhysicsSystem::initMaterialFrictionTable() {
 	gNbPhysXMaterialFrictions = 1;
 }
 
-//creates falling boxes
-void PhysicsSystem::createBoxes() {
-
-	// Define a box
-	float radius = 0.5f;
-	physx::PxU32 size = 30;
-
-	// Create a pyramid of physics-enabled boxes
-	for (physx::PxU32 i = 0; i < size; i++) {
-		for (physx::PxU32 j = 0; j < size - i; j++) {
-
-			Projectile* ball = new Projectile(gPhysics, gScene, radius, gMaterial, physx::PxVec3(physx::PxReal(j * 2) - physx::PxReal(size - i), physx::PxReal(i * 2 - 1), 0) * radius);
-
-			rigidDynamicList.push_back(ball->body);
-
-			transformList.push_back(new Transform()); // Add one for each box
-		}
-	}
-
-	// Update transform in physics system loop
-	updateTransforms();
-
-}
-
 //does all the logic for doing one step through every vehicle movement component
 void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 
@@ -160,6 +136,8 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 		const PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
 		gVehicle.mComponentSequence.setSubsteps(gVehicle.mComponentSequenceSubstepGroupHandle, nbSubsteps);
 		gVehicle.step(TIMESTEP, gVehicleSimulationContext);
+
+		car->setCarTransform();
 
 		//Increment the time spent on the current command.
 		//Move to the next command in the list if enough time has lapsed.
@@ -197,6 +175,17 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	
 }
 
+void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
+
+	//creating the projectile to shoot
+	PxTransform spawnTransform = PxTransform(PxVec3 (car->car->carTransform.p.x, car->car->carTransform.p.y, car->car->carTransform.p.z + car->car->vehicleDepth / 2 + 0.5 + 0.01f), car->car->carTransform.q);
+
+	std::cout << spawnTransform.p.x << ", " << spawnTransform.p.y << ", " << spawnTransform.p.z << std::endl;
+	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, car->car->carTransform);
+
+	projectileToShoot->projectile->shootProjectile();
+}
+
 PhysicsSystem::PhysicsSystem() { // Constructor
 
 	//physx setup
@@ -219,8 +208,6 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 	gVehicleSimulationContext.physxScene = gScene;
 	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
 
-	//creates the boxes
-	createBoxes();
 }
 
 //TODO: ask matt if needed

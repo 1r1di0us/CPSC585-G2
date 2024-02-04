@@ -8,13 +8,16 @@ class Projectile {
 
 public:
 
-	PxReal mass = 10.0f;
+	//constants
+	const PxReal mass = 10.0f;
+	const PxReal radius = 1.0f;
+	const PxVec3 shootForce = PxVec3(1, 0, 1);
 
 	PxRigidDynamic* body;
 
 	//constructor to make a projectile
-	Projectile(PxPhysics* gPhysics, PxScene* gScene, PxReal radius, PxMaterial* gMaterial, PxVec3 spawnPosition);
+	Projectile(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, PxTransform spawnPosition);
 
 	//gives the projectile a force in a direction
-	void shootProjectile(PxVec3 force);
+	void shootProjectile();
 };

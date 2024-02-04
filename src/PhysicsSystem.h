@@ -37,6 +37,7 @@ public:
 	//A ground plane to drive on.
 	PxRigidStatic* gGroundPlane = NULL;
 
+	//NOT SURE IF USEFUL ANYMORE TBH, WAS ONLY REALLY USED IN BALL PYRAMID
 	std::vector<physx::PxRigidDynamic*> rigidDynamicList;
 	std::vector<Transform*> transformList;
 
@@ -53,11 +54,13 @@ public:
 	void initPhysX();
 	void initGroundPlane();
 	void initMaterialFrictionTable();
-	void createBoxes();
 
 	void stepAllVehicleMovementPhysics(std::vector<Car*> carList);
 
 	void stepPhysics(std::vector<Entity> entityList);
+
+	//the projectile has a spawn position by default
+	void shootProjectile(Entity* car, Entity* projectileToShoot);
 
 	PhysicsSystem(); // Constructor
 
