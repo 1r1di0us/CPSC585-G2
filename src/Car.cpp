@@ -22,6 +22,7 @@ Car::Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics
 	carTransform = PxTransform(spawnPosition, spawnRotation);
 	gVehicle.setUpActor(*gScene, carTransform, name);
 
+	//setting the vehicle depth to its z length
 	vehicleDepth = gVehicle.mPhysXState.physxActor.rigidBody->getWorldBounds().getDimensions().z;
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);

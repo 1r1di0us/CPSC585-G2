@@ -178,10 +178,16 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 
 	//creating the projectile to shoot
-	PxTransform spawnTransform = PxTransform(PxVec3 (car->car->carTransform.p.x, car->car->carTransform.p.y, car->car->carTransform.p.z + car->car->vehicleDepth / 2 + 0.5 + 0.01f), car->car->carTransform.q);
+	//TODO: radius of projectile important for formula. i cant get it here because the projectile has not yet been made
+		//TODO: there is a formula that will spawn the projectile perfectly regardless of size. find it
+	// * 3/4 is hardcoded
+	PxTransform spawnTransform = PxTransform(
+		PxVec3 (car->car->carTransform.p.x,
+				car->car->carTransform.p.y + car->car->gVehicle.mPhysXState.physxActor.rigidBody->getWorldBounds().getDimensions().y * 3/4,
+				car->car->carTransform.p.z + car->car->vehicleDepth),
+		car->car->carTransform.q);
 
-	std::cout << spawnTransform.p.x << ", " << spawnTransform.p.y << ", " << spawnTransform.p.z << std::endl;
-	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, car->car->carTransform);
+	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
 
 	projectileToShoot->projectile->shootProjectile();
 }

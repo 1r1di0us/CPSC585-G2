@@ -11,7 +11,7 @@ public:
 	//constants
 	const PxReal mass = 10.0f;
 	const PxReal radius = 1.0f;
-	const PxVec3 shootForce = PxVec3(1, 0, 1);
+	const PxVec3 shootForce = PxVec3(0, 0, 100);
 
 	PxRigidDynamic* body;
 
