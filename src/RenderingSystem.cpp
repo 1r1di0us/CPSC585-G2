@@ -109,38 +109,29 @@ void RenderingSystem::updateRenderer() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // rendering text
     RenderText(textShader, textVAO, textVBO, "hello!", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f), Characters_gaegu);
 
-
-
-    // render the triangle
-    // shader testing
-    //shader.use();
-    //glBindVertexArray(VAO);
-   // glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    //glBindTexture(GL_TEXTURE_2D, woodTex);
-    //glBindVertexArray(VAO);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
-    // render the triangle with texture
-    
-
-    //shader.setInt("texture1", 0);
-    //shader.setInt("texture2", 1);
-    
+    // binding textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    // transformations
+    glm::mat4 trans = glm::mat4(1.0f);
+    //trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
     shader.use();
+    // apply transformation
+    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+    //render objects
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
     //glDrawArrays(GL_TRIANGLES, 0, 6);
-
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
