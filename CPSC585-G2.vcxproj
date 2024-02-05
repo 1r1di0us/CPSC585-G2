@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
+    <Font Include="src\assets\arial.ttf" />
     <Font Include="src\assets\Gaegu-Bold.ttf" />
     <Font Include="src\assets\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>

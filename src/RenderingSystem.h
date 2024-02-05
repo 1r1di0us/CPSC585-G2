@@ -11,10 +11,11 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	unsigned int VAO, VBO;
-	Shader textShader;
+	//unsigned int VAO, VBO;
+	//Shader textShader;
 	Shader shader;
 	//Camera camera;
+	//std::map<char, Character> Characters;
 
 	RenderingSystem();
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
