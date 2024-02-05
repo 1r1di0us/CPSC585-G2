@@ -101,14 +101,13 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
     }
 }
 
-unsigned int initVAO(float* vertices, int size) {
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
+    glGenVertexArrays(1, VAO);
+    glGenBuffers(1, VBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(*VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
     glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 
     //Position vertex attribute
@@ -122,8 +121,6 @@ unsigned int initVAO(float* vertices, int size) {
     //Texture vertex attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
-    return VAO;
 }
 
 void initTextVAO(unsigned int* VAO, unsigned int* VBO) {

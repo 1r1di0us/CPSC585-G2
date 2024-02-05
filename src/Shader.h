@@ -28,7 +28,7 @@ public:
 
 };
 
-unsigned int initVAO(float* vertices, int size);
+void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO);
 void initTextVAO(unsigned int* VAO, unsigned int* VBO);
 
 #endif // !SHADER_H

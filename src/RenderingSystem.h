@@ -13,7 +13,7 @@ public:
 	GLFWwindow* window;
 	//unsigned int VAO, VBO;
 	//Shader textShader;
-	Shader shader;
+	//Shader shader;
 	//Camera camera;
 	//std::map<char, Character> Characters;
 

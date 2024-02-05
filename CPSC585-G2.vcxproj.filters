@@ -35,4 +35,8 @@
     <Text Include="src\vertex_shader_text.txt" />
     <Text Include="src\fragment_shader_text.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Textures\wood.jpg" />
+    <Image Include="src\Textures\cat.jpg" />
+  </ItemGroup>
 </Project>

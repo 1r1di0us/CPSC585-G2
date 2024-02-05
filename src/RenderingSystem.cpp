@@ -10,20 +10,35 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Text.h"
+#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+
+
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
+
+
+unsigned int indices[] = {
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
 };
 
 unsigned int VAO, VBO;
 unsigned int textVAO, textVBO;
 std::map<char, Character> Characters_gaegu;
 Shader textShader;
+Shader shader;
+
+unsigned int texture1, texture2;
+
 
 // notes for self, declare variable in header before using in cpp
 // shader.use replaces glshader or whatever
@@ -54,12 +69,14 @@ RenderingSystem::RenderingSystem(){
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     // geom shader
-    shader = Shader("src/vertex_shader.txt","src/fragment_shader.txt");
+    shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     
+    initVAO(vertices, sizeof(vertices), &VAO, &VBO);
+
+    //// text shader
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // text shader
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
     textShader.use();
@@ -69,23 +86,14 @@ RenderingSystem::RenderingSystem(){
     initTextVAO(&textVAO, &textVBO);
 
 
-    //unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    // texture testing
+    texture1 = generateTexture("src/Textures/wood.jpg", true);
+    stbi_set_flip_vertically_on_load(true); // to vertically flip the image
+    texture2 = generateTexture("src/Textures/cat.jpg", true);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-
+    shader.use();
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
 }
 
 
@@ -103,15 +111,40 @@ void RenderingSystem::updateRenderer() {
 
     RenderText(textShader, textVAO, textVBO, "hello!", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f), Characters_gaegu);
 
+
+
     // render the triangle
+    // shader testing
+    //shader.use();
+    //glBindVertexArray(VAO);
+   // glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    //glBindTexture(GL_TEXTURE_2D, woodTex);
+    //glBindVertexArray(VAO);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+    // render the triangle with texture
+    
+
+    //shader.setInt("texture1", 0);
+    //shader.setInt("texture2", 1);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+
     shader.use();
-    //shader.setFloat("someUniform", 1.0f);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+
 
     // swap buffers and poll IO events
-    glfwPollEvents();
     glfwSwapBuffers(window);
+    glfwPollEvents();
 
 }
 

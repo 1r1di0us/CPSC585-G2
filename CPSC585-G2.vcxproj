@@ -53,6 +53,10 @@
     <Text Include="src\fragment_shader_text.txt" />
     <Text Include="src\vertex_shader_text.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Textures\cat.jpg" />
+    <Image Include="src\Textures\wood.jpg" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
