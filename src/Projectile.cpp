@@ -21,7 +21,7 @@ Projectile::Projectile(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMateri
 
 }
 
-void Projectile::shootProjectile() {
+void Projectile::shootProjectile(PxVec3 directionToShoot) {
 
-	body->setLinearVelocity(shootForce);
+	body->setLinearVelocity(shootForce * directionToShoot);
 }

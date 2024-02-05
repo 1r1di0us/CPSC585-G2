@@ -189,7 +189,7 @@ void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 
 	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
 
-	projectileToShoot->projectile->shootProjectile();
+	projectileToShoot->projectile->shootProjectile(car->car->carTransform.p.getNormalized());
 }
 
 PhysicsSystem::PhysicsSystem() { // Constructor
