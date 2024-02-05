@@ -9,6 +9,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -20,6 +21,7 @@
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />

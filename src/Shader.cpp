@@ -119,8 +119,8 @@ void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
     glEnableVertexAttribArray(1);
 
     //Texture vertex attribute
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 }
 
 void initTextVAO(unsigned int* VAO, unsigned int* VBO) {
