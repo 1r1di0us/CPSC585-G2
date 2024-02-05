@@ -24,16 +24,20 @@ int main() {
     std::vector<Entity> entityList;
     entityList.reserve(physicsSys.transformList.size());
 
+    //y axis rotation in degrees (testing)
+    int angle = 45;
+    PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
+
     //creating the player car entity
     playerCar.name = "playerCar";
     playerCar.physType = PhysicsType::CAR;
-    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
     ////creating the second car entity
     //Entity car2;
     //car2.name = "car2";
     //car2.physType = PhysicsType::CAR;
-    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.000000000f, -0.0500000119f, -10.59399998f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
     //adding the car to the entity list
     entityList.emplace_back(playerCar);
