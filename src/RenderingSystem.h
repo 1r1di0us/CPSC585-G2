@@ -22,5 +22,6 @@ public:
 	void processInput(GLFWwindow* window);
 	void updateRenderer();	
 	GLFWwindow* getWindow() const;
+
 };
 

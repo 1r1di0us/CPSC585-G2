@@ -72,10 +72,10 @@ void Shader::setInt(const std::string& name, int value) const {
 void Shader::setFloat(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
-//void Shader::setMat4(const std::string& name, glm::mat4 value) const {
-//    int modelLoc = glGetUniformLocation(ID, name.c_str());
-//    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(value));
-//}
+void Shader::setMat4(const std::string& name, glm::mat4 value) const {
+    int modelLoc = glGetUniformLocation(ID, name.c_str());
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(value));
+}
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type)
 {
@@ -119,8 +119,8 @@ void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
     glEnableVertexAttribArray(1);
 
     //Texture vertex attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    //glEnableVertexAttribArray(2);
 }
 
 void initTextVAO(unsigned int* VAO, unsigned int* VBO) {
