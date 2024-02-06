@@ -15,13 +15,9 @@ const unsigned int SCR_HEIGHT = 600;
 //global vars (ideally temp, idk how that will work tho tbh)
 PhysicsSystem physicsSys;
 Entity playerCar;
+std::vector<Entity> entityList;
 
 int main() {
-
-    // Simulate at 60fps
-    // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
-
-    std::vector<Entity> entityList;
 
     //y axis rotation in radians
     int angle = PxPiDivFour;
@@ -32,8 +28,10 @@ int main() {
     playerCar.physType = PhysicsType::CAR;
     playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //adds the car to the carlist
+    //adds the car to the carlist and the entity list
+    //TODO: add car to rigid dynamic list
     physicsSys.carList.emplace_back(playerCar.car);
+    entityList.emplace_back(playerCar);
 
     ////creating the second car entity
     //Entity car2;
@@ -149,6 +147,9 @@ int main() {
 void shoot(Entity* car) {
 
     Entity* projectile = new Entity();
+
+    entityList.emplace_back(projectile);
+
     //get the car pos and touch it up a bit to get spawn pos
     projectile->name = "bullet";
     projectile->physType = PhysicsType::PROJECTILE;
