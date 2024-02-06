@@ -101,6 +101,23 @@ void PhysicsSystem::initMaterialFrictionTable() {
 	gNbPhysXMaterialFrictions = 1;
 }
 
+void PhysicsSystem::initVehicleSimContext() {
+	//Set up the simulation context.
+	//The snippet is set up with
+	//a) z as the longitudinal axis
+	//b) x as the lateral axis
+	//c) y as the vertical axis.
+	//d) metres  as the lengthscale.
+	gVehicleSimulationContext.setToDefault();
+	gVehicleSimulationContext.frame.lngAxis = PxVehicleAxes::ePosZ;
+	gVehicleSimulationContext.frame.latAxis = PxVehicleAxes::ePosX;
+	gVehicleSimulationContext.frame.vrtAxis = PxVehicleAxes::ePosY;
+	gVehicleSimulationContext.scale.scale = 1.0f;
+	gVehicleSimulationContext.gravity = gGravity;
+	gVehicleSimulationContext.physxScene = gScene;
+	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
+}
+
 //does all the logic for doing one step through every vehicle movement component
 void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 
@@ -202,21 +219,7 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 	initPhysX();
 	initGroundPlane();
 	initMaterialFrictionTable();
-
-	//Set up the simulation context.
-	//The snippet is set up with
-	//a) z as the longitudinal axis
-	//b) x as the lateral axis
-	//c) y as the vertical axis.
-	//d) metres  as the lengthscale.
-	gVehicleSimulationContext.setToDefault();
-	gVehicleSimulationContext.frame.lngAxis = PxVehicleAxes::ePosZ;
-	gVehicleSimulationContext.frame.latAxis = PxVehicleAxes::ePosX;
-	gVehicleSimulationContext.frame.vrtAxis = PxVehicleAxes::ePosY;
-	gVehicleSimulationContext.scale.scale = 1.0f;
-	gVehicleSimulationContext.gravity = gGravity;
-	gVehicleSimulationContext.physxScene = gScene;
-	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
+	initVehicleSimContext();
 
 }
 

@@ -54,6 +54,7 @@ public:
 	void initPhysX();
 	void initGroundPlane();
 	void initMaterialFrictionTable();
+	void initVehicleSimContext();
 
 	void stepAllVehicleMovementPhysics(std::vector<Car*> carList);
 
