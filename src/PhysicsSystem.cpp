@@ -177,19 +177,23 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 
 void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 
+	// Convert quaternion to a 3x3 rotation matrix
+	PxMat33 rotationMatrix(car->car->carTransform.q);
+
+	// Rotate the forward vector using the rotation matrix (z-axis is OG forward)
+	PxVec3 forwardVector = rotationMatrix.transform(PxVec3(0.0f, 0.0f, 1.0f));
+
 	//creating the projectile to shoot
-	//TODO: radius of projectile important for formula. i cant get it here because the projectile has not yet been made
-		//TODO: there is a formula that will spawn the projectile perfectly regardless of size. find it
-	// * 3/4 is hardcoded
+	//it is offset based on the radius in the projectile constructor
 	PxTransform spawnTransform = PxTransform(
-		PxVec3 (car->car->carTransform.p.x,
-				car->car->carTransform.p.y + car->car->gVehicle.mPhysXState.physxActor.rigidBody->getWorldBounds().getDimensions().y * 3/4,
-				car->car->carTransform.p.z + car->car->vehicleDepth),
+		PxVec3 (car->car->carTransform.p.x + forwardVector.x * 5,
+				car->car->carTransform.p.y,
+				car->car->carTransform.p.z + forwardVector.z * 5),
 		car->car->carTransform.q);
 
 	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
 
-	projectileToShoot->projectile->shootProjectile(car->car->carTransform.p.getNormalized());
+	projectileToShoot->projectile->shootProjectile(forwardVector);
 }
 
 PhysicsSystem::PhysicsSystem() { // Constructor

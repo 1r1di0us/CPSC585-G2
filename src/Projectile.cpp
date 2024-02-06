@@ -9,6 +9,9 @@ Projectile::Projectile(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMateri
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
 
+	spawnTransform.p.y += radius + 0.1f;
+	spawnTransform.p.z += radius;
+
 	body = gPhysics->createRigidDynamic(spawnTransform);
 
 	body->attachShape(*shape);

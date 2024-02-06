@@ -24,8 +24,8 @@ int main() {
     std::vector<Entity> entityList;
     entityList.reserve(physicsSys.transformList.size());
 
-    //y axis rotation in degrees (testing)
-    int angle = 45;
+    //y axis rotation in radians
+    int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
 
     //creating the player car entity

@@ -60,7 +60,7 @@ public:
 	PxTransform carTransform;
 
 	//gets the depth of the bounding box for this vehicle
-	PxReal vehicleDepth;
+	PxVec3 vehicleBodyDimensions;
 
 	//function outlines
 	Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics* gPhysics, PxScene* gScene, PxVec3 gGravity, PxMaterial* gMaterial);
