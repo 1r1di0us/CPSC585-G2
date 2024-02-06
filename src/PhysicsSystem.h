@@ -37,9 +37,12 @@ public:
 	//A ground plane to drive on.
 	PxRigidStatic* gGroundPlane = NULL;
 
-	//NOT SURE IF USEFUL ANYMORE TBH, WAS ONLY REALLY USED IN BALL PYRAMID
+	//for rendering side
 	std::vector<physx::PxRigidDynamic*> rigidDynamicList;
 	std::vector<Transform*> transformList;
+
+	//car list for efficiency
+	std::vector<Car*> carList;
 
 	//Vehicle simulation needs a simulation context
 	//to store global parameters of the simulation such as 

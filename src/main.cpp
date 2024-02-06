@@ -22,7 +22,6 @@ int main() {
     // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
 
     std::vector<Entity> entityList;
-    entityList.reserve(physicsSys.transformList.size());
 
     //y axis rotation in radians
     int angle = PxPiDivFour;
@@ -33,6 +32,9 @@ int main() {
     playerCar.physType = PhysicsType::CAR;
     playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
+    //adds the car to the carlist
+    physicsSys.carList.emplace_back(playerCar.car);
+
     ////creating the second car entity
     //Entity car2;
     //car2.name = "car2";
@@ -42,14 +44,6 @@ int main() {
     //adding the car to the entity list
     entityList.emplace_back(playerCar);
     //entityList.emplace_back(car2);
-
-    for (int i = 0; i < physicsSys.transformList.size(); i++) {
-        entityList.emplace_back();
-        entityList.back().name = "box";
-        entityList.back().transform = physicsSys.transformList[i];
-        entityList.back().model = NULL;
-        entityList.back().physType = PhysicsType::PROJECTILE;
-    }
 
     // glfw: initialize and configure
     // ------------------------------

@@ -56,7 +56,7 @@ public:
 	PxReal gCommandTime = 0.0f;			//Time spent on current command
 	PxU32 gCommandProgress = 0;			//The id of the current command.
 
-	//the forward direction of the car
+	//the transform of the car
 	PxTransform carTransform;
 
 	//gets the depth of the bounding box for this vehicle

@@ -172,15 +172,7 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 //simulates one step of physics for all objects in scene
 void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 
-	std::vector<Car*> carList;
-
-	for (Entity entity : entityList) {
-
-		if (entity.physType == PhysicsType::CAR) {
-			carList.emplace_back(entity.car);
-		}
-	}
-
+	//does one step for each car
 	stepAllVehicleMovementPhysics(carList);
 
 	//Forward integrate the phsyx scene by a single TIMESTEP.
@@ -209,6 +201,9 @@ void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 		car->car->carTransform.q);
 
 	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
+	
+	//adds the projectile to the rigid body dynamic list
+	rigidDynamicList.emplace_back(projectileToShoot->projectile->body);
 
 	projectileToShoot->projectile->shootProjectile(forwardVector);
 }
