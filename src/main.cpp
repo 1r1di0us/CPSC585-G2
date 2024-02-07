@@ -39,8 +39,8 @@ int main() {
     //car2.physType = PhysicsType::CAR;
     //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //adding the car to the entity list
-    entityList.emplace_back(playerCar);
+    //adding the second car to the entity list
+    //physicsSys.carList.emplace_back(car2.car);
     //entityList.emplace_back(car2);
 
     // glfw: initialize and configure
@@ -146,14 +146,14 @@ int main() {
 
 void shoot(Entity* car) {
 
-    Entity* projectile = new Entity();
+    Entity projectile;
 
     entityList.emplace_back(projectile);
 
     //get the car pos and touch it up a bit to get spawn pos
-    projectile->name = "bullet";
-    projectile->physType = PhysicsType::PROJECTILE;
-    physicsSys.shootProjectile(car, projectile);
+    projectile.name = "bullet";
+    projectile.physType = PhysicsType::PROJECTILE;
+    physicsSys.shootProjectile(car, &projectile);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
