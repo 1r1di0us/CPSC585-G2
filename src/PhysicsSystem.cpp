@@ -18,26 +18,40 @@ class ContactReportCallback : public PxSimulationEventCallback {
 		const physx::PxU32 count) {}
 };
 
-//gets the position of a rigid dynamic actor given index in the master list
-physx::PxVec3 PhysicsSystem::getPos(int i) {
-	physx::PxVec3 position = rigidDynamicList[i]->getGlobalPose().p;
-	return position;
-}
-
 //updates the positions and rotations of each object using the rigid body list
 void PhysicsSystem::updateTransforms() {
-	for (int i = 0; i < transformList.size(); i++) {
+	
+	//goes through projectile list and updates all its transforms
+	for (int i = 0; i < projectileList.size(); i++) {
+		
 		// store positions
-		transformList[i]->pos.x = rigidDynamicList[i]->getGlobalPose().p.x;
-		transformList[i]->pos.y = rigidDynamicList[i]->getGlobalPose().p.y;
-		transformList[i]->pos.z = rigidDynamicList[i]->getGlobalPose().p.z;
+		projectileTransformList[i]->pos.x = projectileList[i]->body->getGlobalPose().p.x;
+		projectileTransformList[i]->pos.y = projectileList[i]->body->getGlobalPose().p.y;
+		projectileTransformList[i]->pos.z = projectileList[i]->body->getGlobalPose().p.z;
 
 		// store rotations
-		transformList[i]->rot.x = rigidDynamicList[i]->getGlobalPose().q.x;
-		transformList[i]->rot.y = rigidDynamicList[i]->getGlobalPose().q.y;
-		transformList[i]->rot.z = rigidDynamicList[i]->getGlobalPose().q.z;
-		transformList[i]->rot.w = rigidDynamicList[i]->getGlobalPose().q.w;
+		projectileTransformList[i]->rot.x = projectileList[i]->body->getGlobalPose().q.x;
+		projectileTransformList[i]->rot.y = projectileList[i]->body->getGlobalPose().q.y;
+		projectileTransformList[i]->rot.z = projectileList[i]->body->getGlobalPose().q.z;
+		projectileTransformList[i]->rot.w = projectileList[i]->body->getGlobalPose().q.w;
 	}
+
+	//goes through car list and updates all its transforms
+	for (int i = 0; i < carList.size(); i++) {
+
+		// store positions
+		carTransformList[i]->pos.x = carList[i]->carTransform.p.x;
+		carTransformList[i]->pos.y = carList[i]->carTransform.p.y;
+		carTransformList[i]->pos.z = carList[i]->carTransform.p.z;
+
+		// store rotations
+		carTransformList[i]->rot.x = carList[i]->carTransform.q.x;
+		carTransformList[i]->rot.y = carList[i]->carTransform.q.y;
+		carTransformList[i]->rot.z = carList[i]->carTransform.q.z;
+		carTransformList[i]->rot.w = carList[i]->carTransform.q.w;
+
+	}
+
 }
 
 //initializes physx
@@ -154,6 +168,7 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 		gVehicle.mComponentSequence.setSubsteps(gVehicle.mComponentSequenceSubstepGroupHandle, nbSubsteps);
 		gVehicle.step(TIMESTEP, gVehicleSimulationContext);
 
+		//updating the car's transform
 		car->setCarTransform();
 
 		//Increment the time spent on the current command.
@@ -179,7 +194,7 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
-	//update the transforms of each object
+	//update the transform components of each object
 	this->updateTransforms();
 	
 }
@@ -192,7 +207,7 @@ void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 	// Rotate the forward vector using the rotation matrix (z-axis is OG forward)
 	PxVec3 forwardVector = rotationMatrix.transform(PxVec3(0.0f, 0.0f, 1.0f));
 
-	//creating the projectile to shoot
+	//finding the spawn point for the projectile
 	//it is offset based on the radius in the projectile constructor
 	PxTransform spawnTransform = PxTransform(
 		PxVec3 (car->car->carTransform.p.x + forwardVector.x * 5,
@@ -200,10 +215,11 @@ void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 				car->car->carTransform.p.z + forwardVector.z * 5),
 		car->car->carTransform.q);
 
+	//creating the projectile to shoot and adding it to needed lists
 	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
-	
-	//adds the projectile to the rigid body dynamic list
-	rigidDynamicList.emplace_back(projectileToShoot->projectile->body);
+	projectileToShoot->transform = new Transform();
+	projectileList.emplace_back(projectileToShoot->projectile);
+	projectileTransformList.emplace_back(projectileToShoot->transform);
 
 	projectileToShoot->projectile->shootProjectile(forwardVector);
 }

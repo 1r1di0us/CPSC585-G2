@@ -29,10 +29,10 @@ int main() {
     playerCar.transform = new Transform();
     playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //adds the car to the carlist and the entity list
-    //TODO: add car to rigid dynamic list
+    //adds the car to the all important lists
     physicsSys.carList.emplace_back(playerCar.car);
     entityList.emplace_back(playerCar);
+    physicsSys.carTransformList.emplace_back(playerCar.transform);
 
     ////creating the second car entity
     //Entity car2;
@@ -44,6 +44,7 @@ int main() {
     //adding the second car to the entity list
     //physicsSys.carList.emplace_back(car2.car);
     //entityList.emplace_back(car2);
+    //physicsSys.carTransformList.emplace_back(car2.transform);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -150,6 +151,7 @@ void shoot(Entity* car) {
 
     Entity projectile;
 
+    //adding the projectile to the entity list
     entityList.emplace_back(projectile);
 
     //get the car pos and touch it up a bit to get spawn pos
