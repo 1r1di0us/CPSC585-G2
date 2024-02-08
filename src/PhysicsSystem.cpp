@@ -18,42 +18,6 @@ class ContactReportCallback : public PxSimulationEventCallback {
 		const physx::PxU32 count) {}
 };
 
-//updates the positions and rotations of each object using the rigid body list
-void PhysicsSystem::updateTransforms() {
-	
-	//goes through projectile list and updates all its transforms
-	for (int i = 0; i < projectileList.size(); i++) {
-		
-		// store positions
-		projectileTransformList[i]->pos.x = projectileList[i]->body->getGlobalPose().p.x;
-		projectileTransformList[i]->pos.y = projectileList[i]->body->getGlobalPose().p.y;
-		projectileTransformList[i]->pos.z = projectileList[i]->body->getGlobalPose().p.z;
-
-		// store rotations
-		projectileTransformList[i]->rot.x = projectileList[i]->body->getGlobalPose().q.x;
-		projectileTransformList[i]->rot.y = projectileList[i]->body->getGlobalPose().q.y;
-		projectileTransformList[i]->rot.z = projectileList[i]->body->getGlobalPose().q.z;
-		projectileTransformList[i]->rot.w = projectileList[i]->body->getGlobalPose().q.w;
-	}
-
-	//goes through car list and updates all its transforms
-	for (int i = 0; i < carList.size(); i++) {
-
-		// store positions
-		carTransformList[i]->pos.x = carList[i]->carTransform.p.x;
-		carTransformList[i]->pos.y = carList[i]->carTransform.p.y;
-		carTransformList[i]->pos.z = carList[i]->carTransform.p.z;
-
-		// store rotations
-		carTransformList[i]->rot.x = carList[i]->carTransform.q.x;
-		carTransformList[i]->rot.y = carList[i]->carTransform.q.y;
-		carTransformList[i]->rot.z = carList[i]->carTransform.q.z;
-		carTransformList[i]->rot.w = carList[i]->carTransform.q.w;
-
-	}
-
-}
-
 //initializes physx
 void PhysicsSystem::initPhysX() {
 
@@ -194,8 +158,10 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
-	//update the transform components of each object
-	this->updateTransforms();
+	//update the transform components of each entity
+	for (Entity entity : entityList) {
+		entity.updateTransform();
+	}
 	
 }
 
@@ -218,8 +184,6 @@ void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
 	//creating the projectile to shoot and adding it to needed lists
 	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
 	projectileToShoot->transform = new Transform();
-	projectileList.emplace_back(projectileToShoot->projectile);
-	projectileTransformList.emplace_back(projectileToShoot->transform);
 
 	projectileToShoot->projectile->shootProjectile(forwardVector);
 }

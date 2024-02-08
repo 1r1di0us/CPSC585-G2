@@ -37,10 +37,6 @@ public:
 	//A ground plane to drive on.
 	PxRigidStatic* gGroundPlane = NULL;
 
-	//lists for all differentTypes of components (I HATE THIS, BUT CANT GIVE IT ENTITY LIST CAUSE THAT BREAKS ECS)
-	std::vector<Transform*> carTransformList;
-	std::vector<Transform*> projectileTransformList;
-	std::vector<Projectile*> projectileList;
 	//car list for efficiency
 	std::vector<Car*> carList;
 
@@ -48,8 +44,6 @@ public:
 	//to store global parameters of the simulation such as 
 	//gravitational acceleration.
 	PxVehiclePhysXSimulationContext gVehicleSimulationContext;
-
-	void updateTransforms();
 
 	//physx basic setup
 	void initPhysX();

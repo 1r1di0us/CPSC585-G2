@@ -22,4 +22,7 @@ public:
 
 	Car* car;
 	Projectile* projectile;
+
+	//helper functions
+	void updateTransform();
 };
