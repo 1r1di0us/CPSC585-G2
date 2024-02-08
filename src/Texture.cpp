@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "stb_image.h"
-#include <iostream>
 
 unsigned int generateTexture(const char* imagePath, bool isJPG) {
 	// create and assign

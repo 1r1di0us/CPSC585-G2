@@ -1,19 +1,8 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <iostream>
 #include "RenderingSystem.h">
-#include "Shader.h"
-#include "Texture.h"
-#include "Text.h"
-#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+
 
 // vertices for cubes
 float vertices[] = {
@@ -60,13 +49,21 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
 
 
-unsigned int VAO, VBO;
-unsigned int textVAO, textVBO;
 std::map<char, Character> Characters_gaegu;
-Shader textShader;
-Shader shader;
 
 unsigned int texture1, texture2;
 
@@ -148,15 +145,16 @@ void RenderingSystem::updateRenderer() {
     shader.use();
 
     // camera setup stuff/ 3d transformations
-    glm::mat4 model = glm::mat4(1.0f);
-    // rotating transformation of cube based on time
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-    shader.setMat4("model", model);
+    // this model is for a rotating one
+    //glm::mat4 model = glm::mat4(1.0f);
+    //// rotating transformation of cube based on time
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    //shader.setMat4("model", model);
 
     // view matrix
     glm::mat4 view = glm::mat4(1.0f);
     // note that we're translating the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -7.0f));
 
     // this should be the camera matrix
     glm::mat4 projection = glm::mat4(1.0f);
@@ -166,6 +164,7 @@ void RenderingSystem::updateRenderer() {
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
     
+
     // binding textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -174,7 +173,16 @@ void RenderingSystem::updateRenderer() {
 
     //render objects
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        float angle = 20.0f * i;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        shader.setMat4("model", model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);

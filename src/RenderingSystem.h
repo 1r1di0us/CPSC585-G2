@@ -1,6 +1,17 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <iostream>
+#include <map>
+
 #include "Shader.h"
+#include "Texture.h"
+#include "Text.h"
+#include "stb_image.h"
 
 class RenderingSystem {
 
@@ -11,11 +22,11 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	//unsigned int VAO, VBO;
-	//Shader textShader;
-	//Shader shader;
+	unsigned int VAO, VBO, textVAO, textVBO;
+	Shader textShader;
+	Shader shader;
 	//Camera camera;
-	//std::map<char, Character> Characters;
+	std::map<char, Character> Characters_gaegu;
 
 	RenderingSystem();
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
