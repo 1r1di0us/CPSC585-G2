@@ -10,6 +10,7 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -22,6 +23,7 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="libraries\tinyobjloader\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
@@ -40,5 +42,8 @@
   <ItemGroup>
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="src\assets\models\bed_double_A.obj" />
   </ItemGroup>
 </Project>
