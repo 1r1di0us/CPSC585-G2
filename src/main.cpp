@@ -144,18 +144,6 @@ int main() {
     return 0;
 }
 
-void shoot(Entity* car) {
-
-    Entity projectile;
-
-    entityList.emplace_back(projectile);
-
-    //get the car pos and touch it up a bit to get spawn pos
-    projectile.name = "bullet";
-    projectile.physType = PhysicsType::PROJECTILE;
-    physicsSys.shootProjectile(car, &projectile);
-}
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
@@ -166,8 +154,10 @@ void processInput(GLFWwindow* window)
     //will shoot a projectile
     //FIXME: broken af rn. needs IO to be working to properly test
     else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        shoot(&playerCar);
+        playerCar.car->shootProjectile();
 
+        //making a new transform every time projectile is shot
+        playerCar.projectileTransformList.emplace_back(new Transform());
     }
         
 }

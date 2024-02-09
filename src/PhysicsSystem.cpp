@@ -184,30 +184,6 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	
 }
 
-void PhysicsSystem::shootProjectile(Entity* car, Entity* projectileToShoot) {
-
-	// Convert quaternion to a 3x3 rotation matrix
-	PxMat33 rotationMatrix(car->car->carTransform.q);
-
-	// Rotate the forward vector using the rotation matrix (z-axis is OG forward)
-	PxVec3 forwardVector = rotationMatrix.transform(PxVec3(0.0f, 0.0f, 1.0f));
-
-	//creating the projectile to shoot
-	//it is offset based on the radius in the projectile constructor
-	PxTransform spawnTransform = PxTransform(
-		PxVec3 (car->car->carTransform.p.x + forwardVector.x * 5,
-				car->car->carTransform.p.y,
-				car->car->carTransform.p.z + forwardVector.z * 5),
-		car->car->carTransform.q);
-
-	projectileToShoot->projectile = new Projectile(gPhysics, gScene, gMaterial, spawnTransform);
-	
-	//adds the projectile to the rigid body dynamic list
-	rigidDynamicList.emplace_back(projectileToShoot->projectile->body);
-
-	projectileToShoot->projectile->shootProjectile(forwardVector);
-}
-
 PhysicsSystem::PhysicsSystem() { // Constructor
 
 	//physx setup
