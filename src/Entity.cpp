@@ -16,19 +16,20 @@ void Entity::updateTransform() {
 		this->transform->rot.z = this->car->carTransform.q.z;
 		this->transform->rot.w = this->car->carTransform.q.w;
 
-		break;
-	case PhysicsType::PROJECTILE:
+		//updating the list of projectiles car has fired
+		for (int i = 0; i < this->projectileTransformList.size(); i++) {
 
-		//position
-		this->transform->pos.x = this->projectile->body->getGlobalPose().p.x;
-		this->transform->pos.y = this->projectile->body->getGlobalPose().p.y;
-		this->transform->pos.z = this->projectile->body->getGlobalPose().p.z;
+			//position
+			this->projectileTransformList[i]->pos.x = this->car->projectileBodyList[i]->getGlobalPose().p.x;
+			this->projectileTransformList[i]->pos.y = this->car->projectileBodyList[i]->getGlobalPose().p.y;
+			this->projectileTransformList[i]->pos.z = this->car->projectileBodyList[i]->getGlobalPose().p.z;
 
-		//rotation
-		this->transform->rot.x = this->projectile->body->getGlobalPose().q.x;
-		this->transform->rot.y = this->projectile->body->getGlobalPose().q.y;
-		this->transform->rot.z = this->projectile->body->getGlobalPose().q.z;
-		this->transform->rot.w = this->projectile->body->getGlobalPose().q.w;
+			//rotation
+			this->projectileTransformList[i]->rot.x = this->car->projectileBodyList[i]->getGlobalPose().q.x;
+			this->projectileTransformList[i]->rot.y = this->car->projectileBodyList[i]->getGlobalPose().q.y;
+			this->projectileTransformList[i]->rot.z = this->car->projectileBodyList[i]->getGlobalPose().q.z;
+			this->projectileTransformList[i]->rot.w = this->car->projectileBodyList[i]->getGlobalPose().q.w;
+		}
 
 		break;
 	case PhysicsType::STATIC:
