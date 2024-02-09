@@ -17,7 +17,7 @@ const unsigned int SCR_HEIGHT = 600;
 //global vars (ideally temp, idk how that will work tho tbh)
 PhysicsSystem physicsSys;
 Entity playerCar;
-InputSystem inputSys;
+InputSystem inputSys(&playerCar);
 std::vector<Entity> entityList;
 
 int main() {
@@ -117,8 +117,10 @@ int main() {
         // input
         // -----
         //processInput(window);
-        glfwSetKeyCallback(window, inputSys.updateKeyCallbacks);
         inputSys.getGamePadInput();
+        inputSys.getKeyboardInput(window);
+        //playerCar.car->gVehicle.mCommandState.throttle = 1;
+        //playerCar.car->gVehicle.mCommandState.steer = 1;
         std::cout << std::endl;
             
         // render
@@ -183,9 +185,7 @@ void processInput(GLFWwindow* window)
     //FIXME: broken af rn. needs IO to be working to properly test
     else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         shoot(&playerCar);
-
     }
-        
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

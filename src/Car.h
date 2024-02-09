@@ -70,8 +70,4 @@ public:
 	//TODO: potentially rework to just a setter for car direction, depending on if need more vars here
 	void setCarTransform();
 
-	//TODO: figure out how moving the car works with commands n shit
-		//this will be the function that deals with converting IO to movement
-		//not sure what params yet
-	void MoveCar();
 };

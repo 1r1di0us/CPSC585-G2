@@ -67,10 +67,3 @@ void Car::setCarTransform() {
 
 	carTransform = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose();
 }
-
-//function that takes in IO and gives the appropriate command to the car
-void Car::MoveCar() {
-
-
-
-}

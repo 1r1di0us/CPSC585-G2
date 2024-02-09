@@ -1,44 +1,28 @@
 #include "InputSystem.h"
 
-//this is a static function, as seen in InputSystem.h
-void InputSystem::updateKeyCallbacks(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE) {
-		if (action == GLFW_PRESS) {
-			glfwSetWindowShouldClose(window, true);
-		}
+InputSystem::InputSystem(Entity* pcar) {
+	playerCar = pcar;
+}
+
+void InputSystem::getKeyboardInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		playerCar->car->gVehicle.mCommandState.throttle = 1;
+		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 	}
-	// do not try storing what keys are pressed in any sort of variable unless you are very smart
-	std::cout << "PRESSED: ";
-	if (action == GLFW_PRESS) {
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-			std::cout << "up ";
-		}
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-			std::cout << "down ";
-		}
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-			std::cout << "left ";
-		}
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-			std::cout << "right ";
-		}
+	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
+		playerCar->car->gVehicle.mCommandState.throttle = 0;
+		playerCar->car->gVehicle.mCommandState.nbBrakes = 1;
 	}
-	std::cout << "  RELEASED: ";
-	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-			std::cout << "up ";
-		}
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-			std::cout << "down ";
-		}
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-			std::cout << "left ";
-		}
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-			std::cout << "right ";
-		}
+
+	//will shoot a projectile
+	//FIXME: broken af rn. needs IO to be working to properly test
+	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		//shoot(&playerCar);
 	}
-};
+}
 
 void InputSystem::checkIfGamepadsPresent() {
 	for (int j = 0; j < 16; j++) {

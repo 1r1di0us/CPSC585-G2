@@ -3,12 +3,15 @@
 #include <GLFW/glfw3.h>
 #include <iostream> //for now
 #include <math.h>
+#include "PhysicsSystem.h"
 
 class InputSystem {
 public:
-	static void updateKeyCallbacks(GLFWwindow* window, int key, int scancode, int action, int mods);
+	Entity* playerCar;
+	InputSystem(Entity* pcar);
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
+	void getKeyboardInput(GLFWwindow* window);
 private:
 	bool gpArr[16];
 	const float sens = 0.5f; //controller joystick sensitivity
