@@ -6,8 +6,6 @@
 #include "shader_s.h"
 #include "InputSystem.h"
 
-#include "PxPhysicsAPI.h"
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -15,23 +13,38 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-int main()
-{
-    PhysicsSystem physicsSys;
-    InputSystem inputSys;
-    // Simulate at 60fps
-    // std::cout << physicsSys.rigidDynamicList.size() << std::endl;
 
-    std::vector<Entity> entityList;
-    entityList.reserve(465);
+//global vars (ideally temp, idk how that will work tho tbh)
+PhysicsSystem physicsSys;
+Entity playerCar;
+InputSystem inputSys;
+std::vector<Entity> entityList;
 
-    for (int i = 0; i < 465; i++)
-    {
-        entityList.emplace_back();
-        entityList.back().name = "box";
-        entityList.back().transform = physicsSys.transformList[i];
-        entityList.back().model = NULL;
-    }
+int main() {
+
+    //y axis rotation in radians
+    int angle = PxPiDivFour;
+    PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
+
+    //creating the player car entity
+    playerCar.name = "playerCar";
+    playerCar.physType = PhysicsType::CAR;
+    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+
+    //adds the car to the carlist and the entity list
+    //TODO: add car to rigid dynamic list
+    physicsSys.carList.emplace_back(playerCar.car);
+    entityList.emplace_back(playerCar);
+
+    ////creating the second car entity
+    //Entity car2;
+    //car2.name = "car2";
+    //car2.physType = PhysicsType::CAR;
+    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
+
+    //adding the second car to the entity list
+    //physicsSys.carList.emplace_back(car2.car);
+    //entityList.emplace_back(car2);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -123,13 +136,14 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        physicsSys.gScene->simulate(1.0f / 60.0f);
-        physicsSys.gScene->fetchResults(true);
-        physicsSys.updateTransforms();
+        //physicsSys.gScene->simulate(1.0f / 60.0f);
+        //physicsSys.gScene->fetchResults(true);
+        //physicsSys.updateTransforms();
 
-        physx::PxVec3 objPos = physicsSys.getPos(50);
+        //physx::PxVec3 objPos = physicsSys.getPos(50);
         //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
         //std::cout << entityList[50].transform->pos.y << std::endl;
+        physicsSys.stepPhysics(entityList);
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
@@ -140,18 +154,39 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+
+    physicsSys.cleanPhysicsSystem();
     return 0;
+}
+
+void shoot(Entity* car) {
+
+    Entity projectile;
+
+    entityList.emplace_back(projectile);
+
+    //get the car pos and touch it up a bit to get spawn pos
+    projectile.name = "bullet";
+    projectile.physType = PhysicsType::PROJECTILE;
+    physicsSys.shootProjectile(car, &projectile);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-//void processInput(GLFWwindow* window)
-//{
-//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-//        glfwSetWindowShouldClose(window, true);
-//
-//    if (glfwGetKey)
-//}
+
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    //will shoot a projectile
+    //FIXME: broken af rn. needs IO to be working to properly test
+    else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        shoot(&playerCar);
+
+    }
+        
+}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
