@@ -155,6 +155,9 @@ void processInput(GLFWwindow* window)
     //FIXME: broken af rn. needs IO to be working to properly test
     else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         playerCar.car->shootProjectile();
+
+        //making a new transform every time projectile is shot
+        playerCar.projectileTransformList.emplace_back(new Transform());
     }
         
 }

@@ -104,7 +104,10 @@ void Car::shootProjectile() {
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
 
-	projectileBody = gPhysics->createRigidDynamic(spawnTransform);
+	//creates the rigid dynamic body to be a diff instance for each projectile (cant be sharing that)
+	PxRigidDynamic* projectileBody = gPhysics->createRigidDynamic(spawnTransform);
+
+	projectileBodyList.emplace_back(projectileBody);
 
 	projectileBody->attachShape(*shape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*projectileBody, projectileMass);
