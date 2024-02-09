@@ -3,6 +3,10 @@
 //constructor that intializes a vehicle and spawns it at given coords and rotation
 Car::Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics* gPhysics, PxScene* gScene, PxVec3 gGravity, PxMaterial* gMaterial) {
 
+	this->gPhysics = gPhysics;
+	this->gScene = gScene;
+	this->gMaterial = gMaterial;
+
 	//Load the params from json or set directly.
 	readBaseParamsFromJsonFile(gVehicleDataPath, "Base.json", gVehicle.mBaseParams);
 	setPhysXIntegrationParams(gVehicle.mBaseParams.axleDescription,
@@ -73,4 +77,42 @@ void Car::MoveCar() {
 
 
 
+}
+
+//shoots a projectile forward
+void Car::shootProjectile() {
+
+	//gets the forward vector of the car
+	PxVec3 forwardVector = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+
+	//creating the projectile to shoot
+	//it is offset based on the radius of the projectile
+	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
+	PxTransform spawnTransform = PxTransform(
+		PxVec3(carTransform.p.x + forwardVector.x * 5,
+				carTransform.p.y + projectileRadius + 0.1f,
+				carTransform.p.z + forwardVector.z * 5),
+			carTransform.q);
+
+	//define a projectile
+	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *gMaterial);
+
+	//creating collision flags for each projectile
+	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
+	shape->setSimulationFilterData(projectileFilter);
+
+	//creates the rigid dynamic body to be a diff instance for each projectile (cant be sharing that)
+	PxRigidDynamic* projectileBody = gPhysics->createRigidDynamic(spawnTransform);
+
+	projectileBodyList.emplace_back(projectileBody);
+
+	projectileBody->attachShape(*shape);
+	physx::PxRigidBodyExt::updateMassAndInertia(*projectileBody, projectileMass);
+
+	//disables gravity for the projectile
+	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+
+	gScene->addActor(*projectileBody);
+
+	projectileBody->setLinearVelocity(shootForce * forwardVector);
 }

@@ -55,9 +55,6 @@ public:
 
 	void stepPhysics(std::vector<Entity> entityList);
 
-	//the projectile has a spawn position by default
-	void shootProjectile(Entity* car, Entity* projectileToShoot);
-
 	PhysicsSystem(); // Constructor
 
 	void cleanPhysicsSystem();
