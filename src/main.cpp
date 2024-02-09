@@ -119,8 +119,6 @@ int main() {
         //processInput(window);
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        //playerCar.car->gVehicle.mCommandState.throttle = 1;
-        //playerCar.car->gVehicle.mCommandState.steer = 1;
         std::cout << std::endl;
             
         // render
