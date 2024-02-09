@@ -82,11 +82,8 @@ void Car::MoveCar() {
 //shoots a projectile forward
 void Car::shootProjectile() {
 
-	// Convert quaternion to a 3x3 rotation matrix
-	PxMat33 rotationMatrix(carTransform.q);
-
-	// Rotate the forward vector using the rotation matrix (z-axis is OG forward)
-	PxVec3 forwardVector = rotationMatrix.transform(PxVec3(0.0f, 0.0f, 1.0f));
+	//gets the forward vector of the car
+	PxVec3 forwardVector = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
@@ -94,7 +91,7 @@ void Car::shootProjectile() {
 	PxTransform spawnTransform = PxTransform(
 		PxVec3(carTransform.p.x + forwardVector.x * 5,
 				carTransform.p.y + projectileRadius + 0.1f,
-				carTransform.p.z + forwardVector.z * 5 + projectileRadius),
+				carTransform.p.z + forwardVector.z * 5),
 			carTransform.q);
 
 	//define a projectile
