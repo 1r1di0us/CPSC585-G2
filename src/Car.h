@@ -29,6 +29,34 @@ class Car{
 
 public:
 
+	/*
+	* SHARED INFORMATION
+	*/
+
+	PxPhysics* gPhysics;
+	PxScene* gScene;
+	PxMaterial* gMaterial;
+
+	/*
+	* PROJECTILE PORTION
+	*/
+
+	//constants
+	const PxReal projectileMass = 10.0f;
+	const PxReal projectileRadius = 1.0f;
+	const float shootForce = 100;
+
+	//needs to be a rigid dynamic list as opposed to a transform list for easier deleting (i think)
+	//will be used to update projectile transforms
+	std::vector<PxRigidDynamic*> projectileBodyList;
+
+	//creates and shoots a projectile
+	void shootProjectile();
+
+	/*
+	* CAR PORTION
+	*/
+
 	//The path to the vehicle json files to be loaded.
 	const char* gVehicleDataPath = "assets/vehicledata";
 
@@ -54,6 +82,6 @@ public:
 
 	void DestroyCar();
 
-	//TODO: potentially rework to just a setter for car direction, depending on if need more vars here
+	//updates car transform
 	void setCarTransform();
 };

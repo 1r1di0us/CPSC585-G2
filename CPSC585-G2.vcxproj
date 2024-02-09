@@ -36,7 +36,6 @@
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
-    <ClCompile Include="src\Projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Components\InputComponent.h" />
@@ -56,7 +55,6 @@
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
-    <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\shader_s.h" />
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
