@@ -4,6 +4,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 
+
 // vertices for cubes
 float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -116,6 +117,22 @@ RenderingSystem::RenderingSystem(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // Testing
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    //Transforms world coords to camera coords
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    shader.setMat4("model", model);
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    // Testing
+
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
     textShader.use();
@@ -146,7 +163,7 @@ void RenderingSystem::updateRenderer() {
 
     // camera setup stuff/ 3d transformations
     // this model is for a rotating one
-    //glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 model = glm::mat4(1.0f);
     //// rotating transformation of cube based on time
     //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
     //shader.setMat4("model", model);
@@ -160,9 +177,16 @@ void RenderingSystem::updateRenderer() {
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
+    // Camera things
+    view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    model = glm::translate(model, glm::vec3(0.01f, 0.f, 0.f));
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.0f));
+
     // sending our matrixes to the shader
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
+
+
     
 
     // binding textures
@@ -194,6 +218,44 @@ void RenderingSystem::updateRenderer() {
 // ---------------------------------------------------------------------------------------------------------
 void RenderingSystem::processInput(GLFWwindow* window)
 {
+    GLdouble xPos, yPos;
+    glfwGetCursorPos(window, &xPos, &yPos);
+    glm::vec3 current_pos;
+    current_pos.x = (2.f / (float)800) * xPos - 1.f; // 800 = window width
+    current_pos.y = (2.f / (float)600) * yPos - 1.f; // 600 = window height
+    current_pos.y *= -1.f;
+
+
+
+    float xoffset = (current_pos.x - lastX) * 1000.f;
+    float yoffset = (lastY - current_pos.y) * 1000.f; // reversed since y-coordinates go from bottom to top
+    lastX = current_pos.x;
+    lastY = current_pos.y;
+    float sensitivity = 0.05f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    camera.Yaw += xoffset;
+    camera.Pitch -= yoffset;  // REVERSE UP/DOWN DIRECTION 
+    if (camera.Pitch > 89.0f)
+        camera.Pitch = 89.0f;
+    if (camera.Pitch < -89.0f)
+        camera.Pitch = -89.0f;
+
+    // Camera code (wasd)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.ProcessKeyboard(camera.FORWARD, 0.01);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.ProcessKeyboard(camera.BACKWARD, 0.01);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.ProcessKeyboard(camera.RIGHT, 0.01);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.ProcessKeyboard(camera.LEFT, 0.01);
+    }
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);    
 }

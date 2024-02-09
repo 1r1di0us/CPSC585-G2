@@ -13,12 +13,19 @@
 #include "Text.h"
 #include "stb_image.h"
 
+#include "Camera.h"
+
+Camera camera;
+
 class RenderingSystem {
 
 public:
 	// settings
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
+
+	float lastX = SCR_WIDTH / 2.0f;
+	float lastY = SCR_HEIGHT / 2.0f;
 
 	// variables
 	GLFWwindow* window;
