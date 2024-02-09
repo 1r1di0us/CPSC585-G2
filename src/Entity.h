@@ -4,11 +4,9 @@
 #include "Transform.h"
 #include "Model.h"
 #include "Car.h"
-#include "Projectile.h"
 
 enum class PhysicsType {
 	CAR,
-	PROJECTILE,
 	STATIC
 };
 	
@@ -21,5 +19,4 @@ public:
 	PhysicsType physType;
 
 	Car* car;
-	Projectile* projectile;
 };

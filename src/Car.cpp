@@ -3,6 +3,10 @@
 //constructor that intializes a vehicle and spawns it at given coords and rotation
 Car::Car(const char* name, PxVec3 spawnPosition, PxQuat spawnRotation, PxPhysics* gPhysics, PxScene* gScene, PxVec3 gGravity, PxMaterial* gMaterial) {
 
+	this->gPhysics = gPhysics;
+	this->gScene = gScene;
+	this->gMaterial = gMaterial;
+
 	//Load the params from json or set directly.
 	readBaseParamsFromJsonFile(gVehicleDataPath, "Base.json", gVehicle.mBaseParams);
 	setPhysXIntegrationParams(gVehicle.mBaseParams.axleDescription,
@@ -73,4 +77,42 @@ void Car::MoveCar() {
 
 
 
+}
+
+//shoots a projectile forward
+void Car::shootProjectile() {
+
+	// Convert quaternion to a 3x3 rotation matrix
+	PxMat33 rotationMatrix(carTransform.q);
+
+	// Rotate the forward vector using the rotation matrix (z-axis is OG forward)
+	PxVec3 forwardVector = rotationMatrix.transform(PxVec3(0.0f, 0.0f, 1.0f));
+
+	//creating the projectile to shoot
+	//it is offset based on the radius of the projectile
+	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
+	PxTransform spawnTransform = PxTransform(
+		PxVec3(carTransform.p.x + forwardVector.x * 5,
+				carTransform.p.y + projectileRadius + 0.1f,
+				carTransform.p.z + forwardVector.z * 5 + projectileRadius),
+			carTransform.q);
+
+	//define a projectile
+	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *gMaterial);
+
+	//creating collision flags for each projectile
+	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
+	shape->setSimulationFilterData(projectileFilter);
+
+	projectileBody = gPhysics->createRigidDynamic(spawnTransform);
+
+	projectileBody->attachShape(*shape);
+	physx::PxRigidBodyExt::updateMassAndInertia(*projectileBody, projectileMass);
+
+	//disables gravity for the projectile
+	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+
+	gScene->addActor(*projectileBody);
+
+	projectileBody->setLinearVelocity(shootForce * forwardVector);
 }

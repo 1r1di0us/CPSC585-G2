@@ -28,6 +28,32 @@ class Car{
 
 public:
 
+	/*
+	* SHARED INFORMATION
+	*/
+
+	PxPhysics* gPhysics;
+	PxScene* gScene;
+	PxMaterial* gMaterial;
+
+	/*
+	* PROJECTILE PORTION
+	*/
+
+	//constants
+	const PxReal projectileMass = 10.0f;
+	const PxReal projectileRadius = 1.0f;
+	const float shootForce = 100;
+
+	PxRigidDynamic* projectileBody;
+
+	//creates and shoots a projectile
+	void shootProjectile();
+
+	/*
+	* CAR PORTION
+	*/
+
 	//The path to the vehicle json files to be loaded.
 	const char* gVehicleDataPath = "assets/vehicledata";
 

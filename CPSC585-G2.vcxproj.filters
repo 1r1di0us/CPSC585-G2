@@ -16,7 +16,6 @@
     <ClCompile Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\base\Base.cpp" />
     <ClCompile Include="src\Car.cpp" />
-    <ClCompile Include="src\Projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -36,7 +35,6 @@
     <ClInclude Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
     <ClInclude Include="src\Car.h" />
-    <ClInclude Include="src\Projectile.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shader.fs" />
