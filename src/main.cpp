@@ -99,10 +99,14 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
+
         // input
         // -----
         //processInput(window);
         glfwSetKeyCallback(window, inputSys.updateKeyCallbacks);
+        inputSys.getGamePadInput();
+        std::cout << std::endl;
             
         // render
         // ------
