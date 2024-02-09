@@ -11,6 +11,7 @@
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -23,11 +24,14 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="libraries\tinyobjloader\tiny_obj_loader.h" />
+    <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\tiny_obj_loader.h" />
+    <ClInclude Include="src\OBJ_Loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
+    <None Include="src\assets\models\bed_double_A.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="src\assets\Gaegu-Bold.ttf" />

@@ -23,6 +23,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -31,19 +32,22 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libraries\tinyobjloader\tiny_obj_loader.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\OBJ_Loader.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Text.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\assets\models\bed_double_A.mtl" />
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
   </ItemGroup>

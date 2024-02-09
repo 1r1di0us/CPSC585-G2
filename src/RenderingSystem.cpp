@@ -123,6 +123,8 @@ RenderingSystem::RenderingSystem(){
 
     Characters_gaegu = initFont("src/assets/Gaegu-Bold.ttf");
     initTextVAO(&textVAO, &textVBO);
+
+    int success = ModelLoaderUpdate();
 }
 
 

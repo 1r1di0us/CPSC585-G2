@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include <tinyobjloader/tiny_obj_loader.h>
 #include <stdexcept>
 
 struct Vertex {
@@ -12,11 +11,9 @@ struct Vertex {
 	glm::vec2 uv;
 };
 
+
 class Model {
 public:
-	std::vector<Vertex> verts;
-	glm::mat4 modelMatrix;
 
-	void loadModel(const std::string& filepath);
+	
 };
-
