@@ -2,8 +2,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-
-
+// void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // vertices for cubes
 float vertices[] = {
@@ -88,6 +87,11 @@ RenderingSystem::RenderingSystem(){
         return;
     }
     glfwMakeContextCurrent(window);
+
+    glfwSetCursorPosCallback(window, mouse_callback);
+
+    // tell GLFW to capture our mouse
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -259,6 +263,44 @@ void RenderingSystem::processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);    
 }
+
+void RenderingSystem::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    camera.Yaw += xoffset;
+    camera.Pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (camera.Pitch > 89.0f)
+        camera.Pitch = 89.0f;
+    if (camera.Pitch < -89.0f)
+        camera.Pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
+    front.y = sin(glm::radians(camera.Pitch));
+    front.z = sin(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
+    camera.Front = glm::normalize(front);
+}
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------

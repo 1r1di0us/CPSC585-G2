@@ -26,6 +26,8 @@ public:
 	float lastX = SCR_WIDTH / 2.0f;
 	float lastY = SCR_HEIGHT / 2.0f;
 
+	bool firstMouse = true;
+
 	// variables
 	GLFWwindow* window;
 	unsigned int VAO, VBO, textVAO, textVBO;
@@ -37,7 +39,9 @@ public:
 	RenderingSystem();
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
+	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	void updateRenderer();	
+	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 
 };
