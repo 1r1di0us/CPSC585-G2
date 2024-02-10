@@ -88,7 +88,15 @@ RenderingSystem::RenderingSystem(){
     }
     glfwMakeContextCurrent(window);
 
-    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetWindowUserPointer(window, this);
+
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
+        if (RenderingSystem* instance = static_cast<RenderingSystem*>(glfwGetWindowUserPointer(window))) {
+            instance->mouse_callback(window, x, y);
+        }
+    });
+
+    //glfwSetCursorPosCallback(window, mouse_callback);
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -222,29 +230,27 @@ void RenderingSystem::updateRenderer() {
 // ---------------------------------------------------------------------------------------------------------
 void RenderingSystem::processInput(GLFWwindow* window)
 {
-    GLdouble xPos, yPos;
-    glfwGetCursorPos(window, &xPos, &yPos);
-    glm::vec3 current_pos;
-    current_pos.x = (2.f / (float)800) * xPos - 1.f; // 800 = window width
-    current_pos.y = (2.f / (float)600) * yPos - 1.f; // 600 = window height
-    current_pos.y *= -1.f;
+    //GLdouble xPos, yPos;
+    //glfwGetCursorPos(window, &xPos, &yPos);
+    //glm::vec3 current_pos;
+    //current_pos.x = (2.f / (float)800) * xPos - 1.f; // 800 = window width
+    //current_pos.y = (2.f / (float)600) * yPos - 1.f; // 600 = window height
+    //current_pos.y *= -1.f;
 
+    //float xoffset = (current_pos.x - lastX) * 1000.f;
+    //float yoffset = (lastY - current_pos.y) * 1000.f; // reversed since y-coordinates go from bottom to top
+    //lastX = current_pos.x;
+    //lastY = current_pos.y;
+    //float sensitivity = 0.05f; // change this value to your liking
+    //xoffset *= sensitivity;
+    //yoffset *= sensitivity;
 
-
-    float xoffset = (current_pos.x - lastX) * 1000.f;
-    float yoffset = (lastY - current_pos.y) * 1000.f; // reversed since y-coordinates go from bottom to top
-    lastX = current_pos.x;
-    lastY = current_pos.y;
-    float sensitivity = 0.05f; // change this value to your liking
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    camera.Yaw += xoffset;
-    camera.Pitch -= yoffset;  // REVERSE UP/DOWN DIRECTION 
-    if (camera.Pitch > 89.0f)
-        camera.Pitch = 89.0f;
-    if (camera.Pitch < -89.0f)
-        camera.Pitch = -89.0f;
+    //camera.Yaw += xoffset;
+    //camera.Pitch -= yoffset;  // REVERSE UP/DOWN DIRECTION 
+    //if (camera.Pitch > 89.0f)
+    //    camera.Pitch = 89.0f;
+    //if (camera.Pitch < -89.0f)
+    //    camera.Pitch = -89.0f;
 
     // Camera code (wasd)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
