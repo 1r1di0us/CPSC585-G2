@@ -13,6 +13,7 @@
 #include "Text.h"
 #include "stb_image.h"
 #include "ModelLoader.h"
+#include "vector"
 
 class RenderingSystem {
 
@@ -37,3 +38,4 @@ public:
 
 };
 
+void drawFromModel(std::string modelFilePath);

@@ -31,8 +31,9 @@
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
-    <None Include="assets\models\ball.mtl" />
-    <None Include="assets\models\tank.mtl" />
+    <None Include="src\assets\models\bed_double_A.mtl" />
+    <None Include="src\assets\models\box_A.mtl" />
+    <None Include="src\assets\models\building_E.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />
@@ -48,9 +49,11 @@
   <ItemGroup>
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
+    <Image Include="src\assets\models\furniturebits_texture.png" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="assets\models\tank.obj" />
-    <Object Include="assets\models\ball.obj" />
+    <Object Include="src\assets\models\bed_double_A.obj" />
+    <Object Include="src\assets\models\box_A.obj" />
+    <Object Include="src\assets\models\building_E.obj" />
   </ItemGroup>
 </Project>
