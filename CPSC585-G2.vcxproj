@@ -47,9 +47,10 @@
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\Models\bed_double_A.mtl" />
+    <None Include="assets\Models\box_A.mtl" />
+    <None Include="assets\Models\building_E.mtl" />
     <None Include="src\assets\models\bed_double_A.mtl" />
-    <None Include="src\assets\models\box_A.mtl" />
-    <None Include="src\assets\models\building_E.mtl" />
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
   </ItemGroup>
@@ -65,26 +66,9 @@
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\assets\models\furniturebits_texture.png" />
+    <Image Include="assets\Models\furniturebits_texture.png" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="src\Textures\wood.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="src\assets\models\bed_double_A.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="src\assets\models\box_A.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="src\assets\models\building_E.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="assets\models\tank.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">True</ExcludedFromBuild>
-    </Object>
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
@@ -122,6 +106,20 @@
     <Library Include="physx\release\SimulationController_static_64.lib" />
     <Library Include="physx\release\SnippetRender_static_64.lib" />
     <Library Include="physx\release\SnippetUtils_static_64.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="assets\Models\bed_double_A.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="assets\Models\box_A.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="assets\Models\building_E.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

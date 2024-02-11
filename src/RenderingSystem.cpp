@@ -121,7 +121,7 @@ RenderingSystem::RenderingSystem(){
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
-    Characters_gaegu = initFont("src/assets/Gaegu-Bold.ttf");
+    Characters_gaegu = initFont("./assets/Gaegu-Bold.ttf");
     initTextVAO(&textVAO, &textVBO);
 
 
@@ -183,7 +183,7 @@ void RenderingSystem::updateRenderer() {
     model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
     shader.setMat4("model", model);
 
-    OBJModel OBJmodel = LoadModelFromPath("src/assets/models/bed_double_A.obj");
+    OBJModel OBJmodel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
     renderOBJ(OBJmodel);
     //float* modelVerts = ConvertToFloatArray(model);
     //unsigned int geoVAO, geoVBO;

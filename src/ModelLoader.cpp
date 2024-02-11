@@ -12,7 +12,7 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
     std::vector<tinyobj::material_t> materials;
     std::string warn;
     std::string err;
-    bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, modelFilePath.c_str(), "src/assets/models/");
+    bool success = tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, modelFilePath.c_str(), "./assets/Models/");
 
     if (!warn.empty()) {
         std::cerr << "Warning: " << warn << std::endl;
