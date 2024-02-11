@@ -9,12 +9,11 @@
 
 class InputSystem {
 public:
-	Entity* playerCar;
 	InputSystem();
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	void InputToMovement(Entity* pcar);
+	void InputToMovement(Entity* playerCar);
 private:
 	bool gpArr[16];
 	//make these arrays at some point

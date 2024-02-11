@@ -21,7 +21,7 @@ InputSystem inputSys;
 std::vector<Entity> entityList;
 
 //time related variables
-const double TIMELIMIT = 15.0f;
+const double TIMELIMIT = 180.0f;
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> timePassed;
@@ -141,15 +141,8 @@ int main() {
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwPollEvents(); //these are necessary
 
-        //physicsSys.gScene->simulate(1.0f / 60.0f);
-        //physicsSys.gScene->fetchResults(true);
-        //physicsSys.updateTransforms();
-
-        //physx::PxVec3 objPos = physicsSys.getPos(50);
-        //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
-        //std::cout << entityList[50].transform->pos.y << std::endl;
         physicsSys.stepPhysics(entityList);
 
         //updating how much time has passed
@@ -174,9 +167,6 @@ int main() {
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -185,14 +175,3 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
-
-/*#include <ft2build.h>
-#include FT_FREETYPE_H
-
-FT_Library ftlib;
-
-error = FT_Init_FreeType( &ftlib );
-if (error)
-{
-    ... an error occurred during library initialization ...
-}*/

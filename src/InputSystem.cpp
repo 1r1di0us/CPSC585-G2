@@ -120,8 +120,8 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-void InputSystem::InputToMovement(Entity* pcar) {
-	playerCar = pcar;
+void InputSystem::InputToMovement(Entity* playerCar) {
+	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->car->gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
 	std::vector<int> checkvals = {0};
