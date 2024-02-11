@@ -67,25 +67,6 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    // glfw window creation
-    // --------------------
-    //GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    //if (window == NULL)
-    //{
-    //    std::cout << "Failed to create GLFW window" << std::endl;
-    //    glfwTerminate();
-    //    return -1;
-    //}
-    //glfwMakeContextCurrent(window);
-    //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    //// glad: load all OpenGL function pointers
-    //// ---------------------------------------
-    //if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    //{
-    //    std::cout << "Failed to initialize GLAD" << std::endl;
-    //    return -1;
-    //}
 
     RenderingSystem renderingSystem;
 
@@ -108,14 +89,6 @@ int main() {
       
         renderingSystem.updateRenderer();
 
-        //physx::PxVec3 objPos = physicsSys.getPos(50);
-        //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
-        //std::cout << entityList[50].transform->pos.y << std::endl;
-
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        //glfwSwapBuffers(window);
-        //glfwPollEvents(); //these are necessary
 
         physicsSys.stepPhysics(entityList);
 
@@ -127,11 +100,6 @@ int main() {
 
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
-
-    //// optional: de-allocate all resources once they've outlived their purpose:
-    //// ------------------------------------------------------------------------
-    //glDeleteVertexArrays(1, &VAO);
-    //glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
