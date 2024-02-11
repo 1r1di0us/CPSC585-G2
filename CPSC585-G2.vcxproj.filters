@@ -12,6 +12,20 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
+    <ClCompile Include="libraries\snippetcommon\ClassicMain.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\serialization\SerializationCommon.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\serialization\BaseSerialization.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\serialization\DirectDrivetrainSerialization.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\serialization\EngineDrivetrainSerialization.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\physxintegration\PhysXIntegration.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\enginedrivetrain\EngineDrivetrain.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.cpp" />
+    <ClCompile Include="libraries\snippetvehicle2common\base\Base.cpp" />
+    <ClCompile Include="src\Car.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -27,6 +41,20 @@
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\OBJ_Loader.h" />
+    <ClInclude Include="src\shader_s.h" />
+    <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
+    <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\serialization\SerializationCommon.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\serialization\BaseSerialization.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\serialization\DirectDrivetrainSerialization.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\serialization\EngineDrivetrainSerialization.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\physxintegration\PhysXIntegration.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\enginedrivetrain\EngineDrivetrain.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.h" />
+    <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
+    <ClInclude Include="src\Car.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
