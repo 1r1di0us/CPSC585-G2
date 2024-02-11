@@ -7,8 +7,6 @@
 
 #include "PxPhysicsAPI.h"
 #include "RenderingSystem.h"
-
-#include "shader_s.h"
 #include "InputSystem.h"
 #include <chrono>
 
@@ -71,57 +69,31 @@ int main() {
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    //if (window == NULL)
+    //{
+    //    std::cout << "Failed to create GLFW window" << std::endl;
+    //    glfwTerminate();
+    //    return -1;
+    //}
+    //glfwMakeContextCurrent(window);
+    //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-    // build and compile our shader program
-// ------------------------------------
-    Shader ourShader("./src/shader.vs", "./src/shader.fs");
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-// ------------------------------------------------------------------
-    float vertices[] = {
-        // positions         // colors
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    //for (int i = 0; i < 465; i++) {
-    //    entityList.emplace_back();
-    //    entityList.back().name = "box";
-    //    entityList.back().transform = physicsSys.transformList[i];
-    //    entityList.back().model = NULL;
+    //// glad: load all OpenGL function pointers
+    //// ---------------------------------------
+    //if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    //{
+    //    std::cout << "Failed to initialize GLAD" << std::endl;
+    //    return -1;
     //}
 
     RenderingSystem renderingSystem;
 
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
+
+    GLFWwindow* window;
+    window = renderingSystem.getWindow();
 
     while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
         
@@ -133,8 +105,6 @@ int main() {
         inputSys.InputToMovement(&playerCar);
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
       
         renderingSystem.updateRenderer();
 
@@ -144,8 +114,8 @@ int main() {
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents(); //these are necessary
+        //glfwSwapBuffers(window);
+        //glfwPollEvents(); //these are necessary
 
         physicsSys.stepPhysics(entityList);
 
@@ -158,10 +128,10 @@ int main() {
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    //// optional: de-allocate all resources once they've outlived their purpose:
+    //// ------------------------------------------------------------------------
+    //glDeleteVertexArrays(1, &VAO);
+    //glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
