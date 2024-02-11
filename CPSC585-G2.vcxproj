@@ -260,7 +260,7 @@
 
 copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\shader.vs"
 
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"</Command>
+copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"
       
 copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"
 
@@ -308,7 +308,7 @@ copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\veh
 copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\shader.vs"
 
 
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"</Command>
+copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"
 
 copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"
 
@@ -327,7 +327,6 @@ copy "$(SolutionDir)assets\vehicledata\DirectDrive.json" "$(TargetDir)assets\veh
 copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\vehicledata\EngineDrive.json"
 
 </Command>
-
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
