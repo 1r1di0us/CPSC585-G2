@@ -32,6 +32,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
   </ItemGroup>

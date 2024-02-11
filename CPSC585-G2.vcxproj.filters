@@ -16,6 +16,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\base\Base.cpp" />
     <ClCompile Include="src\Car.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
