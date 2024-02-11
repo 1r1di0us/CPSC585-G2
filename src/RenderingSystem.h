@@ -12,6 +12,8 @@
 #include "Texture.h"
 #include "Text.h"
 #include "stb_image.h"
+#include "ModelLoader.h"
+#include "vector"
 
 #include "Camera.h"
 
@@ -46,3 +48,4 @@ public:
 
 };
 
+void drawFromModel(std::string modelFilePath);

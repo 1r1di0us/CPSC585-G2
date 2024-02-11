@@ -10,6 +10,8 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -22,23 +24,74 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\tiny_obj_loader.h" />
+    <ClInclude Include="src\OBJ_Loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
+    <None Include="src\assets\models\bed_double_A.mtl" />
+    <None Include="assets\Models\bed_double_A.mtl" />
+    <None Include="assets\Models\box_A.mtl" />
+    <None Include="assets\Models\building_E.mtl" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="src\assets\Gaegu-Bold.ttf" />
+    <Font Include="assets\Gaegu-Bold.ttf" />
     <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="src\assets\Nexa-Trial-Heavy.ttf" />
-    <Font Include="src\assets\arial.ttf" />
+    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\arial.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\vertex_shader_text.txt" />
     <Text Include="src\fragment_shader_text.txt" />
+    <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
+    <Image Include="assets\Models\furniturebits_texture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
+    <Library Include="physx\debug\LowLevelDynamics_static_64.lib" />
+    <Library Include="physx\debug\LowLevel_static_64.lib" />
+    <Library Include="physx\debug\PhysXCharacterKinematic_static_64.lib" />
+    <Library Include="physx\debug\PhysXCommon_64.lib" />
+    <Library Include="physx\debug\PhysXCooking_64.lib" />
+    <Library Include="physx\debug\PhysXExtensions_static_64.lib" />
+    <Library Include="physx\debug\PhysXFoundation_64.lib" />
+    <Library Include="physx\debug\PhysXPvdSDK_static_64.lib" />
+    <Library Include="physx\debug\PhysXTask_static_64.lib" />
+    <Library Include="physx\debug\PhysXVehicle2_static_64.lib" />
+    <Library Include="physx\debug\PhysXVehicle_static_64.lib" />
+    <Library Include="physx\debug\PhysX_64.lib" />
+    <Library Include="physx\debug\SceneQuery_static_64.lib" />
+    <Library Include="physx\debug\SimulationController_static_64.lib" />
+    <Library Include="physx\debug\SnippetRender_static_64.lib" />
+    <Library Include="physx\debug\SnippetUtils_static_64.lib" />
+    <Library Include="physx\release\LowLevelAABB_static_64.lib" />
+    <Library Include="physx\release\LowLevelDynamics_static_64.lib" />
+    <Library Include="physx\release\LowLevel_static_64.lib" />
+    <Library Include="physx\release\PhysXCharacterKinematic_static_64.lib" />
+    <Library Include="physx\release\PhysXCommon_64.lib" />
+    <Library Include="physx\release\PhysXCooking_64.lib" />
+    <Library Include="physx\release\PhysXExtensions_static_64.lib" />
+    <Library Include="physx\release\PhysXFoundation_64.lib" />
+    <Library Include="physx\release\PhysXPvdSDK_static_64.lib" />
+    <Library Include="physx\release\PhysXTask_static_64.lib" />
+    <Library Include="physx\release\PhysXVehicle2_static_64.lib" />
+    <Library Include="physx\release\PhysXVehicle_static_64.lib" />
+    <Library Include="physx\release\PhysX_64.lib" />
+    <Library Include="physx\release\PVDRuntime_64.lib" />
+    <Library Include="physx\release\SceneQuery_static_64.lib" />
+    <Library Include="physx\release\SimulationController_static_64.lib" />
+    <Library Include="physx\release\SnippetRender_static_64.lib" />
+    <Library Include="physx\release\SnippetUtils_static_64.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="assets\Models\bed_double_A.obj" />
+    <Object Include="assets\Models\box_A.obj" />
+    <Object Include="assets\Models\building_E.obj" />
   </ItemGroup>
 </Project>

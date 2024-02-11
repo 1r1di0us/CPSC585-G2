@@ -3,6 +3,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void renderOBJ(const OBJModel& model);
 
 // vertices for cubes
 float vertices[] = {
@@ -150,8 +151,10 @@ RenderingSystem::RenderingSystem(){
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
-    Characters_gaegu = initFont("src/assets/Gaegu-Bold.ttf");
+    Characters_gaegu = initFont("./assets/Gaegu-Bold.ttf");
     initTextVAO(&textVAO, &textVBO);
+
+
 }
 
 
@@ -208,23 +211,93 @@ void RenderingSystem::updateRenderer() {
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     //render objects
-    glBindVertexArray(VAO);
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        shader.setMat4("model", model);
+    //glBindVertexArray(VAO);
+    //for (unsigned int i = 0; i < 10; i++)
+    //{
+    //    glm::mat4 model = glm::mat4(1.0f);
+    //    model = glm::translate(model, cubePositions[i]);
+    //    float angle = 20.0f * i;
+    //    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+    //    shader.setMat4("model", model);
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    //    glDrawArrays(GL_TRIANGLES, 0, 36);
+    //}
+    glm::mat4 model = glm::mat4(1.0f);
+    float angle = 45.0f;
+    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+    shader.setMat4("model", model);
+
+    OBJModel OBJmodel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
+    renderOBJ(OBJmodel);
+    //float* modelVerts = ConvertToFloatArray(model);
+    //unsigned int geoVAO, geoVBO;
+  
+    //std::vector<float> modelVector;
+
+    //for (int i = 0; i < model.vertices.size(); i++)
+    //{
+    //    modelVector.push_back(model.vertices[i].x);
+    //    modelVector.push_back(model.vertices[i].y);
+    //    modelVector.push_back(model.vertices[i].z);
+    //    modelVector.push_back(model.textureCoordinates[i].x);
+    //    modelVector.push_back(model.textureCoordinates[i].y);
+    //}
+
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
     glfwPollEvents();
 
 }
+
+void renderOBJ(const OBJModel& model) {
+    // Create and bind VAO
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    // Create VBOs
+    GLuint vertexBuffer, normalBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glGenBuffers(1, &normalBuffer);
+
+    // Bind VBOs and send data
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(glm::vec3), &model.normals[0], GL_STATIC_DRAW);
+
+    // Set up vertex attribute pointers
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+
+    // Unbind VAO
+    glBindVertexArray(0);
+
+    // Rendering
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, model.vertices.size());
+    glBindVertexArray(0);
+
+    // Cleanup
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteBuffers(1, &normalBuffer);
+}
+
+
+//float* ConvertToFloatArray(const OBJModel& objModel) {
+//    
+//
+//    return modelFArray;
+//}
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
