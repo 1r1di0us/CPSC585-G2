@@ -15,12 +15,20 @@
 #include "ModelLoader.h"
 #include "vector"
 
+#include "Camera.h"
+
 class RenderingSystem {
 
 public:
+	Camera camera;
 	// settings
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
+
+	float lastX = SCR_WIDTH / 2.0f;
+	float lastY = SCR_HEIGHT / 2.0f;
+
+	bool firstMouse = true;
 
 	// variables
 	GLFWwindow* window;
@@ -33,7 +41,9 @@ public:
 	RenderingSystem();
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
+	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	void updateRenderer();	
+	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 
 };
