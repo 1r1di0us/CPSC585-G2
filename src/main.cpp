@@ -4,6 +4,7 @@
 #include <iostream>
 #include "PhysicsSystem.h"
 #include "shader_s.h"
+#include <chrono>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -16,6 +17,12 @@ const unsigned int SCR_HEIGHT = 600;
 PhysicsSystem physicsSys;
 Entity playerCar;
 std::vector<Entity> entityList;
+
+//time related variables
+const double TIMELIMIT = 15.0f;
+std::chrono::high_resolution_clock::time_point startTime;
+std::chrono::high_resolution_clock::time_point currentTime;
+std::chrono::duration<double> timePassed;
 
 int main() {
 
@@ -108,8 +115,11 @@ int main() {
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     // glBindVertexArray(0);
 
-    while (!glfwWindowShouldClose(window))
-    {
+    //setting the round timer (will be moved to appropriate place when it is created)
+    startTime = std::chrono::high_resolution_clock::now();
+
+    while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
+
         // input
         // -----
         processInput(window);
@@ -130,7 +140,15 @@ int main() {
         glfwPollEvents();
 
         physicsSys.stepPhysics(entityList);
+
+        //updating how much time has passed
+        currentTime = std::chrono::high_resolution_clock::now();
+        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+        printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
     }
+
+    //game loop ends
+    printf("\nGAME LOOP ENDED\n");
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
