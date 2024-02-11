@@ -18,28 +18,6 @@ class ContactReportCallback : public PxSimulationEventCallback {
 		const physx::PxU32 count) {}
 };
 
-//gets the position of a rigid dynamic actor given index in the master list
-physx::PxVec3 PhysicsSystem::getPos(int i) {
-	physx::PxVec3 position = rigidDynamicList[i]->getGlobalPose().p;
-	return position;
-}
-
-//updates the positions and rotations of each object using the rigid body list
-void PhysicsSystem::updateTransforms() {
-	for (int i = 0; i < transformList.size(); i++) {
-		// store positions
-		transformList[i]->pos.x = rigidDynamicList[i]->getGlobalPose().p.x;
-		transformList[i]->pos.y = rigidDynamicList[i]->getGlobalPose().p.y;
-		transformList[i]->pos.z = rigidDynamicList[i]->getGlobalPose().p.z;
-
-		// store rotations
-		transformList[i]->rot.x = rigidDynamicList[i]->getGlobalPose().q.x;
-		transformList[i]->rot.y = rigidDynamicList[i]->getGlobalPose().q.y;
-		transformList[i]->rot.z = rigidDynamicList[i]->getGlobalPose().q.z;
-		transformList[i]->rot.w = rigidDynamicList[i]->getGlobalPose().q.w;
-	}
-}
-
 //initializes physx
 void PhysicsSystem::initPhysX() {
 
@@ -154,6 +132,7 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 		gVehicle.mComponentSequence.setSubsteps(gVehicle.mComponentSequenceSubstepGroupHandle, nbSubsteps);
 		gVehicle.step(TIMESTEP, gVehicleSimulationContext);
 
+		//updating the car's transform
 		car->setCarTransform();
 
 		//Increment the time spent on the current command.
@@ -179,8 +158,10 @@ void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
-	//update the transforms of each object
-	this->updateTransforms();
+	//update the transform components of each entity
+	for (Entity entity : entityList) {
+		entity.updateTransform();
+	}
 	
 }
 

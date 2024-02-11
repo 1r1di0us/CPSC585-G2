@@ -37,10 +37,6 @@ public:
 	//A ground plane to drive on.
 	PxRigidStatic* gGroundPlane = NULL;
 
-	//for rendering side
-	std::vector<physx::PxRigidDynamic*> rigidDynamicList;
-	std::vector<Transform*> transformList;
-
 	//car list for efficiency
 	std::vector<Car*> carList;
 
@@ -48,10 +44,6 @@ public:
 	//to store global parameters of the simulation such as 
 	//gravitational acceleration.
 	PxVehiclePhysXSimulationContext gVehicleSimulationContext;
-
-	physx::PxVec3 getPos(int i);
-
-	void updateTransforms();
 
 	//physx basic setup
 	void initPhysX();

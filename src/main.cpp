@@ -26,10 +26,10 @@ int main() {
     //creating the player car entity
     playerCar.name = "playerCar";
     playerCar.physType = PhysicsType::CAR;
+    playerCar.transform = new Transform();
     playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //adds the car to the carlist and the entity list
-    //TODO: add car to rigid dynamic list
+    //adds the car to the all important lists
     physicsSys.carList.emplace_back(playerCar.car);
     entityList.emplace_back(playerCar);
 
@@ -37,6 +37,7 @@ int main() {
     //Entity car2;
     //car2.name = "car2";
     //car2.physType = PhysicsType::CAR;
+    //car2.transform = new Transform();
     //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
     //adding the second car to the entity list
