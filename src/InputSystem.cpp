@@ -3,37 +3,44 @@
 InputSystem::InputSystem(Entity* pcar) {
 	playerCar = pcar;
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
+	for (int i = 0; i < 17; i++) {
+		InputSystem::forward[i] = false;
+		InputSystem::backward[i] = false;
+		InputSystem::left[i] = false;
+		InputSystem::right[i] = false;
+		InputSystem::shoot[i] = 0;
+	}
 }
 
 void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		forward = true;
+		forward[0] = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		backward = true;
+		backward[0] = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		left = true;
+		left[0] = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		right = true;
+		right[0] = true;
 	}
 
 	//will shoot a projectile
 	//FIXME: broken af rn. needs IO to be working to properly test
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (shoot == 0) {
-			shoot = 1;
+		if (shoot[0] == 0) {
+			shoot[0] = 1;
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (shoot == 2) {
-			shoot = 0;
+		if (shoot[0] == 2) {
+			shoot[0] = 0;
 		}
 	}
 }
@@ -58,16 +65,16 @@ void InputSystem::getGamePadInput() {
 				float x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 				float y = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 				if (x > 0.9f) {
-					right = true;
+					right[j+1] = true;
 				}
 				else if (x < -sens) {
-					left = true;
+					left[j+1] = true;
 				}
 				if (y > sens) {
-					backward = true;
+					backward[j+1] = true;
 				}
 				else if (y < -sens) {
-					forward = true;
+					forward[j+1] = true;
 				}
 				//camera
 				//x = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
@@ -93,13 +100,13 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (gpshoot == 0) {
-						gpshoot = 1;
+					if (shoot[j+1] == 0) {
+						shoot[j+1] = 1;
 					}
 				}
 				else if (x < -sens) {
-					if (gpshoot == 2) {
-						gpshoot = 0;
+					if (shoot[j+1] == 2) {
+						shoot[j+1] = 0;
 					}
 				}
 				if (y >= sens) { //right trigger
@@ -117,38 +124,62 @@ void InputSystem::getGamePadInput() {
 void InputSystem::InputToMovement() {
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->car->gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
-	if (forward && !backward) {
+	std::vector<int> checkvals = {0};
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+	bool f = false;
+	bool b = false;
+	bool l = false;
+	bool r = false;
+	for (int i : checkvals) if (forward[i]) {
+		f = true;
+		forward[i] = false;
+	}
+	for (int i : checkvals) if (backward[i]) {
+		b = true;
+		backward[i] = false;
+	}
+	for (int i : checkvals) if (left[i]) {
+		l = true;
+		left[i] = false;
+	}
+	for (int i : checkvals) if (right[i]) {
+		r = true;
+		right[i] = false;
+	}
+	if (f && !b) {
 		playerCar->car->gVehicle.mCommandState.throttle = 1;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(-1, 0, 0)).getNormalized();
 	}
-	else if (backward && !forward) {
+	else if (b && !f) {
 		playerCar->car->gVehicle.mCommandState.throttle = 1;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(1, 0, 0)).getNormalized();
 	}
 
-	if (left && !right) {
+	if (l && !r) {
 		playerCar->car->gVehicle.mCommandState.throttle = 1;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, 1)).getNormalized();
 	}
-	else if (right && !left) {
+	else if (r && !l) {
 		playerCar->car->gVehicle.mCommandState.throttle = 1;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, -1)).getNormalized();
 	}
 
-	if (!right && !left && !forward && !backward) {
+	if (!r && !l && !f && !b) {
 		playerCar->car->gVehicle.mCommandState.throttle = 0;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 1;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 1;
 	}
-	forward = backward = left = right = false;
+
 	if (intentDir != PxVec3(0, 0, 0)) {
 		float dot = carDir.dot(intentDir);
 		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir)); //triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
@@ -165,19 +196,17 @@ void InputSystem::InputToMovement() {
 		}
 	}
 
-	if (shoot == 1) {
-		playerCar->car->shootProjectile();
-
-		//making a new transform every time projectile is shot
-		playerCar->projectileTransformList.emplace_back(new Transform());
-		shoot = 2;
+	int s = 0;
+	for (int i : checkvals) if (shoot[i] == 1) {
+		s = 1;
+		shoot[i] = 2;
 	}
-	if (gpshoot == 1) {
+
+	if (s == 1) {
 		playerCar->car->shootProjectile();
 
 		//making a new transform every time projectile is shot
 		playerCar->projectileTransformList.emplace_back(new Transform());
-		gpshoot = 2;
 	}
 }
 

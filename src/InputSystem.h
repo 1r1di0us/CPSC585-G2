@@ -17,11 +17,11 @@ public:
 	void InputToMovement();
 private:
 	bool gpArr[16];
-	bool forward = false;
-	bool backward = false;
-	bool left = false;
-	bool right = false;
-	int shoot = 0;
-	int gpshoot = 0;
-	const float sens = 0.5f; //controller joystick sensitivity
+	//make these arrays at some point
+	bool forward[17];
+	bool backward[17];
+	bool left[17];
+	bool right[17];
+	int shoot[17];
+	const float sens = 0.5f; //controller joystick and trigger sensitivity
 };
