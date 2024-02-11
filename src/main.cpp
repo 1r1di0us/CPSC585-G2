@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include "PhysicsSystem.h"
+#include "Shader.h"
+
+#include "PxPhysicsAPI.h"
+#include "RenderingSystem.h"
+
 #include "shader_s.h"
 #include "InputSystem.h"
 #include <chrono>
@@ -106,22 +111,20 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    //for (int i = 0; i < 465; i++) {
+    //    entityList.emplace_back();
+    //    entityList.back().name = "box";
+    //    entityList.back().transform = physicsSys.transformList[i];
+    //    entityList.back().model = NULL;
+    //}
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    // glBindVertexArray(0);
+    RenderingSystem renderingSystem;
 
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
 
     while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
-
+        
         // input
         // -----
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
@@ -132,11 +135,12 @@ int main() {
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+      
+        renderingSystem.updateRenderer();
 
-        // render the triangle
-        ourShader.use();
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //physx::PxVec3 objPos = physicsSys.getPos(50);
+        //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
+        //std::cout << entityList[50].transform->pos.y << std::endl;
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
