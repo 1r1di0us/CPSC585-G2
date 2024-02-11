@@ -32,6 +32,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
+    <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.h" />
     <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\shader_s.h" />

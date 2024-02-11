@@ -73,10 +73,10 @@ void PhysicsSystem::initMaterialFrictionTable() {
 	//If a material is encountered that is not mapped to a friction value, the friction value used is the specified default value.
 	//In this snippet there is only a single material so there can only be a single mapping between material and friction.
 	//In this snippet the same mapping is used by all tires.
-	gPhysXMaterialFrictions[0].friction = 1.0f;
+	gPhysXMaterialFrictions[0].friction = 5.0f;
 	gPhysXMaterialFrictions[0].material = gMaterial;
-	gPhysXDefaultMaterialFriction = 1.0f;
-	gNbPhysXMaterialFrictions = 1;
+	gPhysXDefaultMaterialFriction = 5.0f;
+	gNbPhysXMaterialFrictions = 5;
 }
 
 void PhysicsSystem::initVehicleSimContext() {
@@ -104,25 +104,6 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 
 		EngineDriveVehicle gVehicle = car->gVehicle;
 
-		//TODO: can maybe have this if based on command list length (remove finished command and new ones added)
-		/*if (gNbCommands == gCommandProgress)
-			return;*/
-
-			//MAYBE USE SOMETHING LIKE THIS FOR GOING THROUGH THE COMMANDS AND SIMULATING THEM
-			// NEED A LIST OF VEHICLE MOVEMENT COMPONENTS AND GO THROUGH THEM ALL DOING ONE STEP AT A TIME
-			// playerCar.vehicleMovement->commandVector.erase(playerCar.vehicleMovement->commandVector.begin());
-
-			//constant forward driving (gCommands in the .h)
-		car->gCommandProgress = 1;
-
-		//Apply the brake, throttle and steer to the command state of the vehicle.
-		const Command& command = car->gCommands[car->gCommandProgress];
-		gVehicle.mCommandState.brakes[0] = command.brake;
-		gVehicle.mCommandState.nbBrakes = 1;
-		gVehicle.mCommandState.throttle = command.throttle;
-		gVehicle.mCommandState.steer = command.steer;
-		gVehicle.mTransmissionCommandState.targetGear = command.gear;
-
 		//Forward integrate the vehicle by a single TIMESTEP.
 		//Apply substepping at low forward speed to improve simulation fidelity.
 		const PxVec3 linVel = gVehicle.mPhysXState.physxActor.rigidBody->getLinearVelocity();
@@ -135,15 +116,6 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
 		//updating the car's transform
 		car->setCarTransform();
 
-		//Increment the time spent on the current command.
-		//Move to the next command in the list if enough time has lapsed.
-			//THERE MIGHT BE A BUG HERE WITH WHERE I DEFINE THE COMMAND TIME
-		car->gCommandTime += TIMESTEP;
-		if (car->gCommandTime > car->gCommands[car->gCommandProgress].duration)
-		{
-			car->gCommandProgress++;
-			car->gCommandTime = 0.0f;
-		}
 	}
 
 }

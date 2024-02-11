@@ -15,6 +15,7 @@ using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 //Commands are issued to the vehicle in a pre-choreographed sequence.
+//not used atm
 struct Command
 {
 	PxF32 brake;
@@ -70,20 +71,6 @@ public:
 	//automatic transmission
 	const PxU32 gTargetGearCommand = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
-	//I have a feeling this will be the key to having controls for car
-	//this is the array of commands to execute for this car. need to link this to input system
-	std::vector<Command> gCommands =
-	{
-		{0.5f, 0.0f, 0.0f, gTargetGearCommand, 2.0f},	//brake on and come to rest for 2 seconds
-		{0.0f, 0.65f, 0.0f, gTargetGearCommand, 5.0f},	//throttle for 5 seconds
-		{0.5f, 0.0f, 0.0f, gTargetGearCommand, 5.0f},	//brake for 5 seconds
-		{0.0f, 0.75f, 0.0f, gTargetGearCommand, 5.0f},	//throttle for 5 seconds
-		{0.0f, 0.25f, 0.5f, gTargetGearCommand, 5.0f}	//light throttle and steer for 5 seconds.
-	};
-	const PxU32 gNbCommands = sizeof(gCommands) / sizeof(Command);
-	PxReal gCommandTime = 0.0f;			//Time spent on current command
-	PxU32 gCommandProgress = 0;			//The id of the current command.
-
 	//the transform of the car
 	PxTransform carTransform;
 
@@ -97,9 +84,4 @@ public:
 
 	//updates car transform
 	void setCarTransform();
-
-	//TODO: figure out how moving the car works with commands n shit
-		//this will be the function that deals with converting IO to movement
-		//not sure what params yet
-	void MoveCar();
 };

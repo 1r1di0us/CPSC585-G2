@@ -4,6 +4,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="libraries\snippetcommon\ClassicMain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
@@ -24,6 +25,7 @@
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\shader_s.h" />
+    <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
     <ClInclude Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.h" />
