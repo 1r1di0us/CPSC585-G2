@@ -16,13 +16,7 @@ using std::vector;
 
 int ModelLoaderUpdate(){
 
-    //objl::Loader loader;
-
-    //loader.LoadFile("src/assets/models/bed_double_A.obj");
-
-    //std::cout << loader.LoadedMeshes[0].MeshName << std::endl;
-
-    std::string inputfile = "../assets/Models/plane.obj";
+    std::string inputfile = "C:/Users/guilh/source/repos/CPSC585-G2/assets/Models/tank.obj";
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -30,7 +24,7 @@ int ModelLoaderUpdate(){
     std::string warn;
     std::string err;
 
-    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, inputfile.c_str(), "../assets/Models/plane.mtl");
+    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, inputfile.c_str(), "C:/Users/guilh/source/repos/CPSC585-G2/assets/Models/tank.mtl");
 
     if (!warn.empty()) {
         std::cerr << "Warning: " << warn << std::endl;

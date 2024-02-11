@@ -47,28 +47,70 @@
     <ClInclude Include="src\Transform.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\assets\models\bed_double_A.mtl" />
+    <None Include="assets\models\ball.mtl" />
+    <None Include="assets\models\tank.mtl" />
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="src\assets\arial.ttf" />
-    <Font Include="src\assets\Gaegu-Bold.ttf" />
-    <Font Include="src\assets\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\arial.ttf" />
+    <Font Include="assets\Gaegu-Bold.ttf" />
+    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\fragment_shader_text.txt" />
     <Text Include="src\vertex_shader_text.txt" />
+    <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="src\assets\models\bed_double_A.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    <Object Include="assets\models\ball.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">True</ExcludedFromBuild>
     </Object>
+    <Object Include="assets\models\tank.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">True</ExcludedFromBuild>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
+    <Library Include="physx\debug\LowLevelDynamics_static_64.lib" />
+    <Library Include="physx\debug\LowLevel_static_64.lib" />
+    <Library Include="physx\debug\PhysXCharacterKinematic_static_64.lib" />
+    <Library Include="physx\debug\PhysXCommon_64.lib" />
+    <Library Include="physx\debug\PhysXCooking_64.lib" />
+    <Library Include="physx\debug\PhysXExtensions_static_64.lib" />
+    <Library Include="physx\debug\PhysXFoundation_64.lib" />
+    <Library Include="physx\debug\PhysXPvdSDK_static_64.lib" />
+    <Library Include="physx\debug\PhysXTask_static_64.lib" />
+    <Library Include="physx\debug\PhysXVehicle2_static_64.lib" />
+    <Library Include="physx\debug\PhysXVehicle_static_64.lib" />
+    <Library Include="physx\debug\PhysX_64.lib" />
+    <Library Include="physx\debug\SceneQuery_static_64.lib" />
+    <Library Include="physx\debug\SimulationController_static_64.lib" />
+    <Library Include="physx\debug\SnippetRender_static_64.lib" />
+    <Library Include="physx\debug\SnippetUtils_static_64.lib" />
+    <Library Include="physx\release\LowLevelAABB_static_64.lib" />
+    <Library Include="physx\release\LowLevelDynamics_static_64.lib" />
+    <Library Include="physx\release\LowLevel_static_64.lib" />
+    <Library Include="physx\release\PhysXCharacterKinematic_static_64.lib" />
+    <Library Include="physx\release\PhysXCommon_64.lib" />
+    <Library Include="physx\release\PhysXCooking_64.lib" />
+    <Library Include="physx\release\PhysXExtensions_static_64.lib" />
+    <Library Include="physx\release\PhysXFoundation_64.lib" />
+    <Library Include="physx\release\PhysXPvdSDK_static_64.lib" />
+    <Library Include="physx\release\PhysXTask_static_64.lib" />
+    <Library Include="physx\release\PhysXVehicle2_static_64.lib" />
+    <Library Include="physx\release\PhysXVehicle_static_64.lib" />
+    <Library Include="physx\release\PhysX_64.lib" />
+    <Library Include="physx\release\PVDRuntime_64.lib" />
+    <Library Include="physx\release\SceneQuery_static_64.lib" />
+    <Library Include="physx\release\SimulationController_static_64.lib" />
+    <Library Include="physx\release\SnippetRender_static_64.lib" />
+    <Library Include="physx\release\SnippetUtils_static_64.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
