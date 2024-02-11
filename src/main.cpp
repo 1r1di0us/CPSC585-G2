@@ -119,8 +119,7 @@ int main() {
         //processInput(window);
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        std::cout << std::endl;
-            
+        inputSys.InputToMovement();
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -169,12 +168,12 @@ void processInput(GLFWwindow* window)
 
     //will shoot a projectile
     //FIXME: broken af rn. needs IO to be working to properly test
-    else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        playerCar.car->shootProjectile();
+    //else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    //    playerCar.car->shootProjectile();
 
-        //making a new transform every time projectile is shot
-        playerCar.projectileTransformList.emplace_back(new Transform());
-    }
+    //    //making a new transform every time projectile is shot
+    //    playerCar.projectileTransformList.emplace_back(new Transform());
+    //}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

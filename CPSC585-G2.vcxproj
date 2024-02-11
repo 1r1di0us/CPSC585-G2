@@ -32,13 +32,11 @@
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
-    <ClCompile Include="src\Components\InputComponent.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Components\InputComponent.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />

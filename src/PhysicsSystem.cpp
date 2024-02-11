@@ -95,10 +95,10 @@ void PhysicsSystem::initMaterialFrictionTable() {
 	//If a material is encountered that is not mapped to a friction value, the friction value used is the specified default value.
 	//In this snippet there is only a single material so there can only be a single mapping between material and friction.
 	//In this snippet the same mapping is used by all tires.
-	gPhysXMaterialFrictions[0].friction = 1.0f;
+	gPhysXMaterialFrictions[0].friction = 5.0f;
 	gPhysXMaterialFrictions[0].material = gMaterial;
-	gPhysXDefaultMaterialFriction = 1.0f;
-	gNbPhysXMaterialFrictions = 1;
+	gPhysXDefaultMaterialFriction = 5.0f;
+	gNbPhysXMaterialFrictions = 5;
 }
 
 void PhysicsSystem::initVehicleSimContext() {
