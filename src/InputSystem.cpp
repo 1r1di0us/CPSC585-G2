@@ -1,7 +1,6 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem(Entity* pcar) {
-	playerCar = pcar;
+InputSystem::InputSystem() {
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
 		InputSystem::forward[i] = false;
@@ -121,7 +120,8 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-void InputSystem::InputToMovement() {
+void InputSystem::InputToMovement(Entity* pcar) {
+	playerCar = pcar;
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->car->gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
 	std::vector<int> checkvals = {0};

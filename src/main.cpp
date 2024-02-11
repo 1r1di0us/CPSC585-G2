@@ -7,7 +7,6 @@
 #include "InputSystem.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -17,11 +16,11 @@ const unsigned int SCR_HEIGHT = 600;
 //global vars (ideally temp, idk how that will work tho tbh)
 PhysicsSystem physicsSys;
 Entity playerCar;
-InputSystem inputSys(&playerCar);
+InputSystem inputSys;
 std::vector<Entity> entityList;
 
 int main() {
-
+    
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
@@ -119,7 +118,7 @@ int main() {
         //processInput(window);
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        inputSys.InputToMovement();
+        inputSys.InputToMovement(&playerCar);
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -160,21 +159,6 @@ int main() {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    //will shoot a projectile
-    //FIXME: broken af rn. needs IO to be working to properly test
-    //else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-    //    playerCar.car->shootProjectile();
-
-    //    //making a new transform every time projectile is shot
-    //    playerCar.projectileTransformList.emplace_back(new Transform());
-    //}
-}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
