@@ -5,6 +5,7 @@
 #include "PhysicsSystem.h"
 #include "shader_s.h"
 #include "InputSystem.h"
+#include <chrono>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -19,6 +20,12 @@ Entity playerCar;
 InputSystem inputSys;
 std::vector<Entity> entityList;
 
+//time related variables
+const double TIMELIMIT = 15.0f;
+std::chrono::high_resolution_clock::time_point startTime;
+std::chrono::high_resolution_clock::time_point currentTime;
+std::chrono::duration<double> timePassed;
+
 int main() {
     
     //y axis rotation in radians
@@ -28,10 +35,10 @@ int main() {
     //creating the player car entity
     playerCar.name = "playerCar";
     playerCar.physType = PhysicsType::CAR;
+    playerCar.transform = new Transform();
     playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
-    //adds the car to the carlist and the entity list
-    //TODO: add car to rigid dynamic list
+    //adds the car to the all important lists
     physicsSys.carList.emplace_back(playerCar.car);
     entityList.emplace_back(playerCar);
 
@@ -39,6 +46,7 @@ int main() {
     //Entity car2;
     //car2.name = "car2";
     //car2.physType = PhysicsType::CAR;
+    //car2.transform = new Transform();
     //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
 
     //adding the second car to the entity list
@@ -109,13 +117,14 @@ int main() {
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     // glBindVertexArray(0);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
+    //setting the round timer (will be moved to appropriate place when it is created)
+    startTime = std::chrono::high_resolution_clock::now();
+
+    while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
 
         // input
         // -----
-        //processInput(window);
+        inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         inputSys.InputToMovement(&playerCar);
@@ -142,7 +151,15 @@ int main() {
         //std::cout << "x: " << objPos.x << " y: " << objPos.y << " z: " << objPos.z << std::endl;
         //std::cout << entityList[50].transform->pos.y << std::endl;
         physicsSys.stepPhysics(entityList);
+
+        //updating how much time has passed
+        currentTime = std::chrono::high_resolution_clock::now();
+        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+        printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
     }
+
+    //game loop ends
+    printf("\nGAME LOOP ENDED\n");
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
