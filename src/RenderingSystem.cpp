@@ -176,6 +176,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     renderOBJ(OBJmodel);
 
     model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
     model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
     shader.setMat4("model", model);
     OBJModel plane = LoadModelFromPath("./assets/Models/plane.obj");
@@ -186,6 +187,8 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("model", model);
     OBJModel building = LoadModelFromPath("./assets/Models/building_E.obj");
     renderOBJ(building);
+
+
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
@@ -218,6 +221,9 @@ void renderOBJ(const OBJModel& model) {
 
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     // Unbind VAO
