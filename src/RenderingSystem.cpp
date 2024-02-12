@@ -8,6 +8,7 @@ void renderOBJ(const OBJModel& model);
 std::map<char, Character> Characters_gaegu;
 
 unsigned int texture1, texture2;
+
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
     // Extract the upper-left 3x3 rotation submatrix from the original matrix
@@ -40,19 +41,6 @@ RenderingSystem::RenderingSystem(){
     }
     glfwMakeContextCurrent(window);
 
-    //glfwSetWindowUserPointer(window, this);
-
-    //glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
-    //    if (RenderingSystem* instance = static_cast<RenderingSystem*>(glfwGetWindowUserPointer(window))) {
-    //        instance->mouse_callback(window, x, y);
-    //    }
-    //});
-
-    ////glfwSetCursorPosCallback(window, mouse_callback);
-
-    //// tell GLFW to capture our mouse
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -71,31 +59,12 @@ RenderingSystem::RenderingSystem(){
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
 
-    // init VAO and VBO
-    //initVAO(vertices, sizeof(vertices), &VAO, &VBO);
-
     // depth for 3d rendering
     glEnable(GL_DEPTH_TEST);
 
     // text shader
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // Testing
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    //Transforms world coords to camera coords
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-    shader.setMat4("model", model);
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-    // Testing
 
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
@@ -104,10 +73,18 @@ RenderingSystem::RenderingSystem(){
 
     Characters_gaegu = initFont("./assets/Gaegu-Bold.ttf");
     initTextVAO(&textVAO, &textVBO);
+
+    this->tank = LoadModelFromPath("./assets/Models/tank.obj");
+    this->building = LoadModelFromPath("./assets/Models/building_E.obj");
+    this->ball = LoadModelFromPath("./assets/Models/ball.obj");
+
+    initOBJVAO(tank, &tankVAO, &tankVBO);
+    initOBJVAO(building, &buildingVAO, &buildingVBO);
+    initOBJVAO(ball, &ballVAO, &ballVBO);
 }
 
 
-void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera) {
+void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft, Entity *playerCar) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -120,7 +97,12 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // rendering text
-    RenderText(textShader, textVAO, textVBO, "hello!", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f), Characters_gaegu);
+    // Convert timeLeft to seconds
+    int timeLeftInSeconds = static_cast<int>(timeLeft.count());
+
+    // Convert timeLeftInSeconds to string
+    std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+    RenderText(textShader, textVAO, textVBO, timeLeftStr, 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f), Characters_gaegu);
 
     // activate shader
     shader.use();
@@ -137,7 +119,6 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-
     // getting the car position and rotation
     glm::vec3 playerPos = entityList[0].transform->getPos();
     glm::quat playerRot = entityList[0].transform->getRot();
@@ -150,11 +131,6 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
     //// Camera things
     view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
-
-    //// Convert quaternion to rotation matrix and apply it to the view matrix
-    //glm::mat4 rotationMatrix = glm::mat4_cast(playerRot);
-    // model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //view = view * rotationMatrix;
 
     //bird's eye view
     //Define camera parameters
@@ -183,13 +159,25 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
     //float angle = 45.0f;
     shader.setMat4("model", model);
-    OBJModel OBJmodel2 = LoadModelFromPath("./assets/Models/tank.obj");
-    renderOBJ(OBJmodel2);
+    renderObject(tank, &tankVAO);
 
     model = glm::mat4(1.0f);
     shader.setMat4("model", model);
-    OBJModel building = LoadModelFromPath("./assets/Models/building_E.obj");
-    renderOBJ(building);
+    renderObject(building, &buildingVAO);
+    for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
+    {
+
+        if (!playerCar->car->projectileBodyList.empty()) {
+            glm::vec3 pain;
+            model = glm::mat4(1.0f);
+            pain.x = playerCar->car->projectileBodyList[i]->getGlobalPose().p.x;
+            pain.y = playerCar->car->projectileBodyList[i]->getGlobalPose().p.y;
+            pain.z = playerCar->car->projectileBodyList[i]->getGlobalPose().p.z;
+            model = glm::translate(model, pain);
+            shader.setMat4("model", model);
+            renderObject(ball, &ballVAO);
+        }
+    }
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
@@ -197,45 +185,27 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
 }
 
-void renderOBJ(const OBJModel& model) {
-    // Create and bind VAO
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
+    glGenVertexArrays(1, VAO);
+    glGenBuffers(1, VBO);
 
-    // Create VBOs
-    GLuint vertexBuffer, normalBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glGenBuffers(1, &normalBuffer);
+    glBindVertexArray(*VAO);
 
-    // Bind VBOs and send data
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
     glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ARRAY_BUFFER, model.normals.size() * sizeof(glm::vec3), &model.normals[0], GL_STATIC_DRAW);
-
-    // Set up vertex attribute pointers
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    //Texture vertex attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+}
 
-    // Unbind VAO
-    glBindVertexArray(0);
-
-    // Rendering
-    glBindVertexArray(vao);
+void renderObject(const OBJModel& model, unsigned int* VAO) {
+    glBindVertexArray(*VAO);
     glDrawArrays(GL_TRIANGLES, 0, model.vertices.size());
-    glBindVertexArray(0);
-
-    // Cleanup
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteBuffers(1, &normalBuffer);
 }
 
 
@@ -243,83 +213,9 @@ void renderOBJ(const OBJModel& model) {
 // ---------------------------------------------------------------------------------------------------------
 void RenderingSystem::processInput(GLFWwindow* window)
 {
-    //GLdouble xPos, yPos;
-    //glfwGetCursorPos(window, &xPos, &yPos);
-    //glm::vec3 current_pos;
-    //current_pos.x = (2.f / (float)800) * xPos - 1.f; // 800 = window width
-    //current_pos.y = (2.f / (float)600) * yPos - 1.f; // 600 = window height
-    //current_pos.y *= -1.f;
-
-    //float xoffset = (current_pos.x - lastX) * 1000.f;
-    //float yoffset = (lastY - current_pos.y) * 1000.f; // reversed since y-coordinates go from bottom to top
-    //lastX = current_pos.x;
-    //lastY = current_pos.y;
-    //float sensitivity = 0.05f; // change this value to your liking
-    //xoffset *= sensitivity;
-    //yoffset *= sensitivity;
-
-    //camera.Yaw += xoffset;
-    //camera.Pitch -= yoffset;  // REVERSE UP/DOWN DIRECTION 
-    //if (camera.Pitch > 89.0f)
-    //    camera.Pitch = 89.0f;
-    //if (camera.Pitch < -89.0f)
-    //    camera.Pitch = -89.0f;
-
-    // Camera code (wasd)
-    //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    //    camera.ProcessKeyboard(camera.FORWARD, 0.01);
-    //}
-    //if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    //    camera.ProcessKeyboard(camera.BACKWARD, 0.01);
-    //}
-    //if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    //    camera.ProcessKeyboard(camera.RIGHT, 0.01);
-    //}
-    //if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    //    camera.ProcessKeyboard(camera.LEFT, 0.01);
-    //}
-
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);    
 }
-
-//void RenderingSystem::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-//{
-//    float xpos = static_cast<float>(xposIn);
-//    float ypos = static_cast<float>(yposIn);
-//
-//    if (firstMouse)
-//    {
-//        lastX = xpos;
-//        lastY = ypos;
-//        firstMouse = false;
-//    }
-//
-//    float xoffset = xpos - lastX;
-//    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-//    lastX = xpos;
-//    lastY = ypos;
-//
-//    float sensitivity = 0.1f; // change this value to your liking
-//    xoffset *= sensitivity;
-//    yoffset *= sensitivity;
-//
-//    camera.Yaw += xoffset;
-//    camera.Pitch += yoffset;
-//
-//    // make sure that when pitch is out of bounds, screen doesn't get flipped
-//    if (camera.Pitch > 89.0f)
-//        camera.Pitch = 89.0f;
-//    if (camera.Pitch < -89.0f)
-//        camera.Pitch = -89.0f;
-//
-//    glm::vec3 front;
-//    front.x = cos(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
-//    front.y = sin(glm::radians(camera.Pitch));
-//    front.z = sin(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
-//    camera.Front = glm::normalize(front);
-//}
-
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
