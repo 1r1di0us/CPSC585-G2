@@ -261,27 +261,17 @@
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)src"
 
-copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\shader.vs"
+copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\fragment_shader.txt"
 
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"
-      
-copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"
+copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\vertex_shader.txt"
 
 mkdir "$(TargetDir)assets"
 
-mkdir "$(TargetDir)assets\Models"
+copy "$(SolutionDir)assets\" "$(TargetDir)assets\"
 
-copy "$(SolutionDir)assets\Models\tank.obj" "$(TargetDir)assets\Models\tank.obj"
+mkdir "$(TargetDir)src\Textures"
 
-mkdir "$(TargetDir)assets\vehicledata"
-
-copy "$(SolutionDir)assets\vehicledata\Base.json" "$(TargetDir)assets\vehicledata\Base.json"
-
-copy "$(SolutionDir)assets\vehicledata\DirectDrive.json" "$(TargetDir)assets\vehicledata\DirectDrive.json"
-
-copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\vehicledata\EngineDrive.json"
-
-</Command>
+copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -307,28 +297,29 @@ copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\veh
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)src"
 
-copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\shader.vs"
+copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\fragment_shader.txt"
 
+copy "$(SolutionDir)src\fragment_shader_text.txt" "$(TargetDir)src\fragment_shader_text.txt"
 
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\shader.fs"
+copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\vertex_shader.txt"
 
-copy "$(SolutionDir)src\shader.fs" "$(TargetDir)src\shader.fs"
+copy "$(SolutionDir)src\vertex_shader_text.txt" "$(TargetDir)src\vertex_shader_text.txt"
 
 mkdir "$(TargetDir)assets"
 
+copy "$(SolutionDir)assets" "$(TargetDir)assets"
+
 mkdir "$(TargetDir)assets\Models"
 
-copy "$(SolutionDir)assets\Models\tank.obj" "$(TargetDir)assets\Models\tank.obj"
+copy "$(SolutionDir)assets\Models" "$(TargetDir)assets\Models"
 
 mkdir "$(TargetDir)assets\vehicledata"
 
-copy "$(SolutionDir)assets\vehicledata\Base.json" "$(TargetDir)assets\vehicledata\Base.json"
+copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
 
-copy "$(SolutionDir)assets\vehicledata\DirectDrive.json" "$(TargetDir)assets\vehicledata\DirectDrive.json"
+mkdir "$(TargetDir)src\Textures"
 
-copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\vehicledata\EngineDrive.json"
-
-</Command>
+copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
