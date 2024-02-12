@@ -55,7 +55,7 @@ RenderingSystem::RenderingSystem(){
     texture1 = generateTexture("src/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     texture2 = generateTexture("src/Textures/cat.jpg", true);
-    texture3 = generateTexture("src/Textures/tvblueorange", false);
+    texture3 = generateTexture("src/Textures/tvblueorange.gif", false);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -156,12 +156,11 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("view", view);
 
 
-
     // binding textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture2);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, texture3);
 
     //float angle = 45.0f;
     shader.setMat4("model", model);
@@ -178,14 +177,17 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
     renderObject(plane, &planeVAO);
 
+
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture3);
     shader.setMat4("model", model);
     renderObject(building, &buildingVAO);
+
     for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
     {
-
         if (!playerCar->car->projectileBodyList.empty()) {
             glm::vec3 pain;
             model = glm::mat4(1.0f);
@@ -197,8 +199,6 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             renderObject(ball, &ballVAO);
         }
     }
-
-
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
