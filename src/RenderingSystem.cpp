@@ -26,18 +26,18 @@ RenderingSystem::RenderingSystem(){
     }
     glfwMakeContextCurrent(window);
 
-    glfwSetWindowUserPointer(window, this);
+    //glfwSetWindowUserPointer(window, this);
 
-    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
-        if (RenderingSystem* instance = static_cast<RenderingSystem*>(glfwGetWindowUserPointer(window))) {
-            instance->mouse_callback(window, x, y);
-        }
-    });
+    //glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
+    //    if (RenderingSystem* instance = static_cast<RenderingSystem*>(glfwGetWindowUserPointer(window))) {
+    //        instance->mouse_callback(window, x, y);
+    //    }
+    //});
 
-    //glfwSetCursorPosCallback(window, mouse_callback);
+    ////glfwSetCursorPosCallback(window, mouse_callback);
 
-    // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //// tell GLFW to capture our mouse
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -93,7 +93,7 @@ RenderingSystem::RenderingSystem(){
 }
 
 
-void RenderingSystem::updateRenderer(std::vector<Entity> entityList) {
+void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -124,11 +124,14 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList) {
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
     glm::vec3 playerPos = entityList[0].transform->getPos();
-    std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
+    //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
-    // Camera things
-    view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    // Calculate the point the camera should look at (e.g., slightly above the player)
+    // yay chatgpt
+    //glm::vec3 lookAtPoint = entityList[0].transform->getPos() + glm::vec3(0.0f, 1.0f, 0.0f);
 
+    //// Camera things
+    //view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 
     model = glm::translate(model, playerPos);
     //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.0f));
@@ -243,42 +246,42 @@ void RenderingSystem::processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);    
 }
 
-void RenderingSystem::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.1f; // change this value to your liking
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    camera.Yaw += xoffset;
-    camera.Pitch += yoffset;
-
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (camera.Pitch > 89.0f)
-        camera.Pitch = 89.0f;
-    if (camera.Pitch < -89.0f)
-        camera.Pitch = -89.0f;
-
-    glm::vec3 front;
-    front.x = cos(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
-    front.y = sin(glm::radians(camera.Pitch));
-    front.z = sin(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
-    camera.Front = glm::normalize(front);
-}
+//void RenderingSystem::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+//{
+//    float xpos = static_cast<float>(xposIn);
+//    float ypos = static_cast<float>(yposIn);
+//
+//    if (firstMouse)
+//    {
+//        lastX = xpos;
+//        lastY = ypos;
+//        firstMouse = false;
+//    }
+//
+//    float xoffset = xpos - lastX;
+//    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+//    lastX = xpos;
+//    lastY = ypos;
+//
+//    float sensitivity = 0.1f; // change this value to your liking
+//    xoffset *= sensitivity;
+//    yoffset *= sensitivity;
+//
+//    camera.Yaw += xoffset;
+//    camera.Pitch += yoffset;
+//
+//    // make sure that when pitch is out of bounds, screen doesn't get flipped
+//    if (camera.Pitch > 89.0f)
+//        camera.Pitch = 89.0f;
+//    if (camera.Pitch < -89.0f)
+//        camera.Pitch = -89.0f;
+//
+//    glm::vec3 front;
+//    front.x = cos(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
+//    front.y = sin(glm::radians(camera.Pitch));
+//    front.z = sin(glm::radians(camera.Yaw)) * cos(glm::radians(camera.Pitch));
+//    camera.Front = glm::normalize(front);
+//}
 
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

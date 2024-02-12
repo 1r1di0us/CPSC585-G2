@@ -23,6 +23,7 @@ Entity playerCar;
 InputSystem inputSys;
 std::vector<Entity> entityList;
 RenderingSystem renderingSystem;
+Camera camera;
 
 //time related variables
 const double TIMELIMIT = 180.0f;
@@ -86,7 +87,7 @@ int main() {
         // render
         // ------
       
-        renderingSystem.updateRenderer(entityList);
+        renderingSystem.updateRenderer(entityList, camera);
 
         physicsSys.stepPhysics(entityList);
 

@@ -21,7 +21,6 @@
 class RenderingSystem {
 
 public:
-	Camera camera;
 	// settings
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
@@ -42,7 +41,7 @@ public:
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-	void updateRenderer(std::vector<Entity> entityList);
+	void updateRenderer(std::vector<Entity> entityList, Camera camera);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 
