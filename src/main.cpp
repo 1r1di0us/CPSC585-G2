@@ -76,13 +76,25 @@ int main() {
     GLFWwindow* window;
     window = renderingSystem.getWindow();
 
+    int FPSCOUNTER = 0;
+    int seconds = 1;
+
     while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
-        
+
         //updating how much time has passed
         currentTime = std::chrono::high_resolution_clock::now();
         timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
         timeLeft = std::chrono::duration<double>(TIMELIMIT) - timePassed;
         //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
+        FPSCOUNTER++;
+
+        if (timePassed.count() / seconds >= 1) {
+
+            printf("FPS: %d\n", FPSCOUNTER);
+            FPSCOUNTER = 0;
+            seconds += 1;
+        }
 
         // input
         // -----
@@ -90,7 +102,7 @@ int main() {
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         inputSys.InputToMovement(&playerCar);
-        
+
         // render
         // ------
         renderingSystem.updateRenderer(entityList, camera, timeLeft, &playerCar);
