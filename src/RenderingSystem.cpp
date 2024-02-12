@@ -8,6 +8,20 @@ void renderOBJ(const OBJModel& model);
 std::map<char, Character> Characters_gaegu;
 
 unsigned int texture1, texture2;
+glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
+glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
+    // Extract the upper-left 3x3 rotation submatrix from the original matrix
+    glm::mat3 rotationMatrix = glm::mat3(matrix);
+
+    // Apply quaternion rotation to the rotation submatrix
+    rotationMatrix = glm::mat3_cast(quaternion) * rotationMatrix;
+
+    // Create a new matrix with the rotated rotation submatrix and original translation
+    glm::mat4 rotatedMatrix = glm::mat4(rotationMatrix);
+    rotatedMatrix[3] = matrix[3];  // Preserve the original translation
+
+    return rotatedMatrix;
+}
 
 // constructor
 RenderingSystem::RenderingSystem(){
@@ -130,30 +144,32 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
     // Calculate the point the camera should look at (e.g., slightly above the player)
-    glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 4.0f, 7.0f);
+    /*glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 4.0f, 7.0f);
     camera.Position = playerPos + offsetFromPlayer;
-    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);*/
 
     //// Camera things
-    view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+    view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
 
+    //// Convert quaternion to rotation matrix and apply it to the view matrix
+    //glm::mat4 rotationMatrix = glm::mat4_cast(playerRot);
+    // model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    //view = view * rotationMatrix;
 
-     //bird's eye view
-     //Define camera parameters
-    //glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f); // Position the camera above the scene
-    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Look at the center of the scene
-    //glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); // Define the up vector
+    //bird's eye view
+    //Define camera parameters
+    glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f); // Position the camera above the scene
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Look at the center of the scene
+    glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); // Define the up vector
 
-    //// Calculate the view matrix using glm::lookAt
-    //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+    // Calculate the view matrix using glm::lookAt
+    view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
 
     // car translating
     model = glm::translate(model, playerPos);
     // make it look forward
-    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    // rotating it to reflect rotation
-    //model = glm::mat4_cast(playerRot) * model;
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    model = applyQuaternionToMatrix(model, playerRot);
 
     // sending our matrixes to the shader
     shader.setMat4("projection", projection);
@@ -166,15 +182,11 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     //float angle = 45.0f;
-    //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
-    //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
     shader.setMat4("model", model);
-
-    OBJModel OBJmodel = LoadModelFromPath("./assets/Models/tank.obj");
-    renderOBJ(OBJmodel);
+    OBJModel OBJmodel2 = LoadModelFromPath("./assets/Models/tank.obj");
+    renderOBJ(OBJmodel2);
 
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
     shader.setMat4("model", model);
     OBJModel building = LoadModelFromPath("./assets/Models/building_E.obj");
     renderOBJ(building);
