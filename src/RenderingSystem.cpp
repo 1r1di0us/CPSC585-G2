@@ -144,12 +144,12 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
     // Calculate the point the camera should look at (e.g., slightly above the player)
-    /*glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 4.0f, 7.0f);
+    glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
     camera.Position = playerPos + offsetFromPlayer;
-    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);*/
+    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 
     //// Camera things
-    view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 
     //// Convert quaternion to rotation matrix and apply it to the view matrix
     //glm::mat4 rotationMatrix = glm::mat4_cast(playerRot);
@@ -158,12 +158,12 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
     //bird's eye view
     //Define camera parameters
-    glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f); // Position the camera above the scene
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Look at the center of the scene
-    glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); // Define the up vector
+    //glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f); // Position the camera above the scene
+    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Look at the center of the scene
+    //glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); // Define the up vector
 
-    // Calculate the view matrix using glm::lookAt
-    view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+    //// Calculate the view matrix using glm::lookAt
+    //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
 
     // car translating
     model = glm::translate(model, playerPos);
