@@ -31,11 +31,11 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO;
+	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO, planeVAO, planeVBO;
 	Shader textShader;
 	Shader shader;
 	std::map<char, Character> Characters_gaegu;
-	OBJModel tank, building, ball;
+	OBJModel tank, building, ball, plane;
 
 	RenderingSystem();
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);

@@ -41,7 +41,6 @@
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\OBJ_Loader.h" />
-    <ClInclude Include="src\shader_s.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
@@ -79,6 +78,8 @@
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="assets\Models\furniturebits_texture.png" />
+    <Image Include="src\Textures\Blue.jpg" />
+    <Image Include="src\Textures\tvblueorange.gif" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

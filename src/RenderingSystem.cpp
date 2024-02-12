@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int texture1, texture2;
+unsigned int texture1, texture2, texture3;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -52,12 +52,14 @@ RenderingSystem::RenderingSystem(){
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     
     // create and set textures
-    texture1 = generateTexture("src/Textures/wood.jpg", true);
+    texture1 = generateTexture("src/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     texture2 = generateTexture("src/Textures/cat.jpg", true);
+    texture3 = generateTexture("src/Textures/tvblueorange", false);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
+    shader.setInt("texture3", 2);
 
     // depth for 3d rendering
     glEnable(GL_DEPTH_TEST);
@@ -77,10 +79,12 @@ RenderingSystem::RenderingSystem(){
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->building = LoadModelFromPath("./assets/Models/building_E.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
+    this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(building, &buildingVAO, &buildingVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
+    initOBJVAO(plane, &planeVAO, &planeVBO);
 }
 
 
@@ -155,7 +159,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
     // binding textures
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
@@ -163,13 +167,16 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("model", model);
     renderObject(tank, &tankVAO);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
     model = glm::mat4(1.0f);
   
     model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
     model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
     shader.setMat4("model", model);
-    OBJModel plane = LoadModelFromPath("./assets/Models/plane.obj");
-    renderOBJ(plane);
+
+    renderObject(plane, &planeVAO);
 
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));

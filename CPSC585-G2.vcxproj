@@ -94,7 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Models\furniturebits_texture.png" />
+    <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\cat.jpg" />
+    <Image Include="src\Textures\tvblueorange.gif" />
     <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -279,7 +281,6 @@ copy "$(SolutionDir)assets\vehicledata\DirectDrive.json" "$(TargetDir)assets\veh
 copy "$(SolutionDir)assets\vehicledata\EngineDrive.json" "$(TargetDir)assets\vehicledata\EngineDrive.json"
 
 </Command>
-
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
