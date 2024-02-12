@@ -30,6 +30,7 @@ const double TIMELIMIT = 180.0f;
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> timePassed;
+std::chrono::duration<double> timeLeft;
 
 int main() {
     
@@ -77,6 +78,12 @@ int main() {
 
     while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
         
+        //updating how much time has passed
+        currentTime = std::chrono::high_resolution_clock::now();
+        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+        timeLeft = std::chrono::duration<double>(TIMELIMIT) - timePassed;
+        //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
         // input
         // -----
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
@@ -86,15 +93,11 @@ int main() {
         
         // render
         // ------
-      
-        renderingSystem.updateRenderer(entityList, camera);
+        renderingSystem.updateRenderer(entityList, camera, timeLeft, &playerCar);
 
         physicsSys.stepPhysics(entityList);
 
-        //updating how much time has passed
-        currentTime = std::chrono::high_resolution_clock::now();
-        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
-        printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
     }
 
     //game loop ends
