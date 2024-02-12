@@ -80,6 +80,7 @@
     <Image Include="assets\Models\furniturebits_texture.png" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
+    <Image Include="src\Textures\red.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

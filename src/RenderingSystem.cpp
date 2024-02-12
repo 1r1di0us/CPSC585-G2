@@ -55,7 +55,7 @@ RenderingSystem::RenderingSystem(){
     texture1 = generateTexture("src/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     texture2 = generateTexture("src/Textures/cat.jpg", true);
-    texture3 = generateTexture("src/Textures/tvblueorange.gif", false);
+    texture3 = generateTexture("src/Textures/red.jpg", true);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
