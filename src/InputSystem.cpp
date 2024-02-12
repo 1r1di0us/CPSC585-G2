@@ -149,26 +149,27 @@ void InputSystem::InputToMovement(Entity* playerCar) {
 		right[i] = false;
 	}
 	if (f && !b) {
-		playerCar->car->gVehicle.mCommandState.throttle = 1;
+		
+		playerCar->car->gVehicle.mCommandState.throttle = gasPedal;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(-1, 0, 0)).getNormalized();
 	}
 	else if (b && !f) {
-		playerCar->car->gVehicle.mCommandState.throttle = 1;
+		playerCar->car->gVehicle.mCommandState.throttle = gasPedal;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(1, 0, 0)).getNormalized();
 	}
 
 	if (l && !r) {
-		playerCar->car->gVehicle.mCommandState.throttle = 1;
+		playerCar->car->gVehicle.mCommandState.throttle = gasPedal;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, 1)).getNormalized();
 	}
 	else if (r && !l) {
-		playerCar->car->gVehicle.mCommandState.throttle = 1;
+		playerCar->car->gVehicle.mCommandState.throttle = gasPedal;
 		playerCar->car->gVehicle.mCommandState.nbBrakes = 0;
 		playerCar->car->gVehicle.mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, -1)).getNormalized();
