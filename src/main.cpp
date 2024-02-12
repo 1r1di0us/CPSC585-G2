@@ -22,6 +22,7 @@ PhysicsSystem physicsSys;
 Entity playerCar;
 InputSystem inputSys;
 std::vector<Entity> entityList;
+RenderingSystem renderingSystem;
 
 //time related variables
 const double TIMELIMIT = 180.0f;
@@ -67,9 +68,6 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-
-    RenderingSystem renderingSystem;
-
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
 
@@ -84,11 +82,11 @@ int main() {
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         inputSys.InputToMovement(&playerCar);
+        
         // render
         // ------
       
-        renderingSystem.updateRenderer();
-
+        renderingSystem.updateRenderer(entityList);
 
         physicsSys.stepPhysics(entityList);
 

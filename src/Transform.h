@@ -7,4 +7,8 @@ class Transform {
 public:
 	glm::vec3 pos;
 	glm::quat rot;
+
+	glm::vec3 getPos() {
+		return pos;
+	}
 };

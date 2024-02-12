@@ -5,72 +5,9 @@ void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void renderOBJ(const OBJModel& model);
 
-// vertices for cubes
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f,  0.0f,  0.0f),
-    glm::vec3(2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3(2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3(1.3f, -2.0f, -2.5f),
-    glm::vec3(1.5f,  2.0f, -2.5f),
-    glm::vec3(1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-};
-
-
 std::map<char, Character> Characters_gaegu;
 
 unsigned int texture1, texture2;
-
-// notes for self, declare variable in header before using in cpp
-// shader.use replaces glshader or whatever
-// make sure to construct your variables
 
 // constructor
 RenderingSystem::RenderingSystem(){
@@ -121,7 +58,7 @@ RenderingSystem::RenderingSystem(){
     shader.setInt("texture2", 1);
 
     // init VAO and VBO
-    initVAO(vertices, sizeof(vertices), &VAO, &VBO);
+    //initVAO(vertices, sizeof(vertices), &VAO, &VBO);
 
     // depth for 3d rendering
     glEnable(GL_DEPTH_TEST);
@@ -153,12 +90,10 @@ RenderingSystem::RenderingSystem(){
 
     Characters_gaegu = initFont("./assets/Gaegu-Bold.ttf");
     initTextVAO(&textVAO, &textVBO);
-
-
 }
 
 
-void RenderingSystem::updateRenderer() {
+void RenderingSystem::updateRenderer(std::vector<Entity> entityList) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -177,11 +112,7 @@ void RenderingSystem::updateRenderer() {
     shader.use();
 
     // camera setup stuff/ 3d transformations
-    // this model is for a rotating one
     glm::mat4 model = glm::mat4(1.0f);
-    //// rotating transformation of cube based on time
-    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-    //shader.setMat4("model", model);
 
     // view matrix
     glm::mat4 view = glm::mat4(1.0f);
@@ -192,17 +123,19 @@ void RenderingSystem::updateRenderer() {
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
+    glm::vec3 playerPos = entityList[0].transform->getPos();
+    std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
+
     // Camera things
     view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
-    model = glm::translate(model, glm::vec3(0.01f, 0.f, 0.f));
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+
+    model = glm::translate(model, playerPos);
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.f), glm::vec3(0.5f, 1.0f, 0.0f));
 
     // sending our matrixes to the shader
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
-
-
-    
 
     // binding textures
     glActiveTexture(GL_TEXTURE0);
@@ -210,40 +143,13 @@ void RenderingSystem::updateRenderer() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    //render objects
-    //glBindVertexArray(VAO);
-    //for (unsigned int i = 0; i < 10; i++)
-    //{
-    //    glm::mat4 model = glm::mat4(1.0f);
-    //    model = glm::translate(model, cubePositions[i]);
-    //    float angle = 20.0f * i;
-    //    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-    //    shader.setMat4("model", model);
-
-    //    glDrawArrays(GL_TRIANGLES, 0, 36);
-    //}
-    //glm::mat4 model = glm::mat4(1.0f);
-    float angle = 45.0f;
-    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+    //float angle = 45.0f;
+    //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
     shader.setMat4("model", model);
 
-    OBJModel OBJmodel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
+    OBJModel OBJmodel = LoadModelFromPath("./assets/Models/tank.obj");
     renderOBJ(OBJmodel);
-    //float* modelVerts = ConvertToFloatArray(model);
-    //unsigned int geoVAO, geoVBO;
-  
-    //std::vector<float> modelVector;
-
-    //for (int i = 0; i < model.vertices.size(); i++)
-    //{
-    //    modelVector.push_back(model.vertices[i].x);
-    //    modelVector.push_back(model.vertices[i].y);
-    //    modelVector.push_back(model.vertices[i].z);
-    //    modelVector.push_back(model.textureCoordinates[i].x);
-    //    modelVector.push_back(model.textureCoordinates[i].y);
-    //}
-
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
@@ -293,12 +199,6 @@ void renderOBJ(const OBJModel& model) {
 }
 
 
-//float* ConvertToFloatArray(const OBJModel& objModel) {
-//    
-//
-//    return modelFArray;
-//}
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void RenderingSystem::processInput(GLFWwindow* window)
@@ -326,18 +226,18 @@ void RenderingSystem::processInput(GLFWwindow* window)
     //    camera.Pitch = -89.0f;
 
     // Camera code (wasd)
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.ProcessKeyboard(camera.FORWARD, 0.01);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera.ProcessKeyboard(camera.BACKWARD, 0.01);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.ProcessKeyboard(camera.RIGHT, 0.01);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera.ProcessKeyboard(camera.LEFT, 0.01);
-    }
+    //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    //    camera.ProcessKeyboard(camera.FORWARD, 0.01);
+    //}
+    //if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    //    camera.ProcessKeyboard(camera.BACKWARD, 0.01);
+    //}
+    //if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    //    camera.ProcessKeyboard(camera.RIGHT, 0.01);
+    //}
+    //if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    //    camera.ProcessKeyboard(camera.LEFT, 0.01);
+    //}
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);    
