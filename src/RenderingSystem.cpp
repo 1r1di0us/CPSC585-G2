@@ -151,6 +151,8 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
 
+
+
     // binding textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -162,6 +164,16 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     renderObject(tank, &tankVAO);
 
     model = glm::mat4(1.0f);
+  
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
+    shader.setMat4("model", model);
+    OBJModel plane = LoadModelFromPath("./assets/Models/plane.obj");
+    renderOBJ(plane);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
+
     shader.setMat4("model", model);
     renderObject(building, &buildingVAO);
     for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
@@ -178,6 +190,8 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             renderObject(ball, &ballVAO);
         }
     }
+
+
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
