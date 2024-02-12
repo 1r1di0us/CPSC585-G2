@@ -3,7 +3,10 @@
 
 #include <iostream>
 #include "PhysicsSystem.h"
-#include "shader_s.h"
+#include "Shader.h"
+
+#include "PxPhysicsAPI.h"
+#include "RenderingSystem.h"
 #include "InputSystem.h"
 #include <chrono>
 
@@ -19,12 +22,15 @@ PhysicsSystem physicsSys;
 Entity playerCar;
 InputSystem inputSys;
 std::vector<Entity> entityList;
+RenderingSystem renderingSystem;
+Camera camera;
 
 //time related variables
 const double TIMELIMIT = 180.0f;
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> timePassed;
+std::chrono::duration<double> timeLeft;
 
 int main() {
     
@@ -64,63 +70,31 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-    // build and compile our shader program
-// ------------------------------------
-    Shader ourShader("./src/shader.vs", "./src/shader.fs");
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-// ------------------------------------------------------------------
-    float vertices[] = {
-        // positions         // colors
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    // glBindVertexArray(0);
-
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
 
+    GLFWwindow* window;
+    window = renderingSystem.getWindow();
+
+    int FPSCOUNTER = 0;
+    int seconds = 1;
+
     while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
+
+        //updating how much time has passed
+        currentTime = std::chrono::high_resolution_clock::now();
+        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+        timeLeft = std::chrono::duration<double>(TIMELIMIT) - timePassed;
+        //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
+        FPSCOUNTER++;
+
+        if (timePassed.count() / seconds >= 1) {
+
+            printf("FPS: %d\n", FPSCOUNTER);
+            FPSCOUNTER = 0;
+            seconds += 1;
+        }
 
         // input
         // -----
@@ -128,36 +102,18 @@ int main() {
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         inputSys.InputToMovement(&playerCar);
+
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // render the triangle
-        ourShader.use();
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents(); //these are necessary
+        renderingSystem.updateRenderer(entityList, camera, timeLeft, &playerCar);
 
         physicsSys.stepPhysics(entityList);
 
-        //updating how much time has passed
-        currentTime = std::chrono::high_resolution_clock::now();
-        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
-        printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
     }
 
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
-
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
