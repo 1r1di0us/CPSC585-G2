@@ -66,4 +66,6 @@ public:
 	PxVec3 getGravity();
 
 	PxMaterial* getMaterial();
+
+	double getTIMESTEP();
 };

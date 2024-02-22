@@ -10,6 +10,7 @@
 #include "InputSystem.h"
 #include "CarSystem.h"
 #include <chrono>
+#include <thread>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -28,16 +29,19 @@ Camera camera;
 
 //time related variables
 const double TIMELIMIT = 180.0f;
+const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(physicsSys.getTIMESTEP());
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
-std::chrono::duration<double> timePassed;
-std::chrono::duration<double> timeLeft;
+std::chrono::duration<double> totalTimePassed;
+std::chrono::duration<double> totalTimeLeft;
+std::chrono::high_resolution_clock::time_point previousIterationTime;
+std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED;
 
 int main() {
     
     //y axis rotation in radians
     int angle = PxPiDivFour;
-    PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
+    PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
     //creating the player car entity
     playerCar.name = "playerCar";
@@ -73,6 +77,7 @@ int main() {
 
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
+    previousIterationTime = startTime;
 
     GLFWwindow* window;
     window = renderingSystem.getWindow();
@@ -80,17 +85,24 @@ int main() {
     int FPSCOUNTER = 0;
     int seconds = 1;
 
-    while (!glfwWindowShouldClose(window) && timePassed.count() < TIMELIMIT) {
+    while (!glfwWindowShouldClose(window) && totalTimePassed.count() < TIMELIMIT) {
 
         //updating how much time has passed
         currentTime = std::chrono::high_resolution_clock::now();
-        timePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
-        timeLeft = std::chrono::duration<double>(TIMELIMIT) - timePassed;
+        totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+        totalTimeLeft = std::chrono::duration<double>(TIMELIMIT) - totalTimePassed;
         //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
+
+        //calculating the time passed since the last iteration of the loop
+        physicsSimTime -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
+        previousIterationTime = currentTime;
+        //printf("frame time: %f\n", physicsSimTime);
+
+        totalTimePassed.count();
 
         FPSCOUNTER++;
 
-        if (timePassed.count() / seconds >= 1) {
+        if (totalTimePassed.count() / seconds >= 1) {
 
             printf("FPS: %d\n", FPSCOUNTER);
             FPSCOUNTER = 0;
@@ -106,10 +118,13 @@ int main() {
 
         // render
         // ------
-        renderingSystem.updateRenderer(entityList, camera, timeLeft, &playerCar);
+        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft, &playerCar);
 
-        physicsSys.stepPhysics(entityList);
-
+        //only updating the physics at max 60hz while everything else updates at max speed
+        if (physicsSimTime.count() <= 0.0f) {
+            physicsSys.stepPhysics(entityList);
+            physicsSimTime = PHYSICSUPDATESPEED;
+        }
 
     }
 
