@@ -172,3 +172,8 @@ PxMaterial* PhysicsSystem::getMaterial()
 {
 	return gMaterial;
 }
+
+double PhysicsSystem::getTIMESTEP()
+{
+	return TIMESTEP;
+}
