@@ -6,30 +6,15 @@ void Entity::updateTransform() {
 	case PhysicsType::CAR:
 
 		//position
-		this->transform->pos.x = this->car->carTransform.p.x;
-		this->transform->pos.y = this->car->carTransform.p.y;
-		this->transform->pos.z = this->car->carTransform.p.z;
+		this->transform->pos.x = this->collisionBox->getGlobalPose().p.x;
+		this->transform->pos.y = this->collisionBox->getGlobalPose().p.y;
+		this->transform->pos.z = this->collisionBox->getGlobalPose().p.z;
 
 		//rotation
-		this->transform->rot.x = this->car->carTransform.q.x;
-		this->transform->rot.y = this->car->carTransform.q.y;
-		this->transform->rot.z = this->car->carTransform.q.z;
-		this->transform->rot.w = this->car->carTransform.q.w;
-
-		//updating the list of projectiles car has fired
-		for (int i = 0; i < this->projectileTransformList.size(); i++) {
-
-			//position
-			this->projectileTransformList[i]->pos.x = this->car->projectileBodyList[i]->getGlobalPose().p.x;
-			this->projectileTransformList[i]->pos.y = this->car->projectileBodyList[i]->getGlobalPose().p.y;
-			this->projectileTransformList[i]->pos.z = this->car->projectileBodyList[i]->getGlobalPose().p.z;
-
-			//rotation
-			this->projectileTransformList[i]->rot.x = this->car->projectileBodyList[i]->getGlobalPose().q.x;
-			this->projectileTransformList[i]->rot.y = this->car->projectileBodyList[i]->getGlobalPose().q.y;
-			this->projectileTransformList[i]->rot.z = this->car->projectileBodyList[i]->getGlobalPose().q.z;
-			this->projectileTransformList[i]->rot.w = this->car->projectileBodyList[i]->getGlobalPose().q.w;
-		}
+		this->transform->rot.x = this->collisionBox->getGlobalPose().q.x;
+		this->transform->rot.y = this->collisionBox->getGlobalPose().q.y;
+		this->transform->rot.z = this->collisionBox->getGlobalPose().q.z;
+		this->transform->rot.w = this->collisionBox->getGlobalPose().q.w;		
 
 		break;
 	case PhysicsType::STATIC:
@@ -37,4 +22,18 @@ void Entity::updateTransform() {
 	default:
 		break;
 	}
+}
+
+void Entity::CreateTransformFromPhysX(PxTransform physXTransform) {
+
+	this->transform = new Transform();
+
+	this->transform->pos.x = physXTransform.p.x;
+	this->transform->pos.y = physXTransform.p.y;
+	this->transform->pos.z = physXTransform.p.z;
+
+	this->transform->rot.x = physXTransform.q.x;
+	this->transform->rot.y = physXTransform.q.y;
+	this->transform->rot.z = physXTransform.q.z;
+	this->transform->rot.w = physXTransform.q.w;
 }

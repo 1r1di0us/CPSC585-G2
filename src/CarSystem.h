@@ -13,6 +13,17 @@ using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
+//Commands are issued to the vehicle in a pre-choreographed sequence.
+//not used atm
+struct Command
+{
+	PxF32 brake;
+	PxF32 throttle;
+	PxF32 steer;
+	PxU32 gear;
+	PxF32 duration;
+};
+
 class CarSystem {
 
 public:
@@ -36,15 +47,17 @@ public:
 
 	//need to have list of rigid dynamics corresponding to gvehicles vehicles to move the correct vehicle given rigid dynamic
 	std::vector<PxRigidDynamic*> carRigidDynamicList;
-	std::vector<EngineDriveVehicle*> gVehicleList;
+	std::vector<EngineDriveVehicle> gVehicleList;
 
 	//constructor
 	CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList);
 
 	void SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation);
 
-	//need to figure out how to destroy it without destroying its projectiles
-	void DestroyCar(EngineDriveVehicle* carToDestroy);
+	//need to figure out where to respawn car (WIP)
+	void RespawnCar(EngineDriveVehicle* carToRespawn);
+
+	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
 
 	//shooting
 
@@ -55,6 +68,6 @@ public:
 
 	void DestroyProjectile(PxRigidDynamic* projectileToDestroy);
 
-	std::vector<EngineDriveVehicle*> GetGVehicleList();
+	std::vector<EngineDriveVehicle> GetGVehicleList();
 
 };

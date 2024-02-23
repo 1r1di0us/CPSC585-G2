@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -37,9 +38,6 @@ public:
 	//A ground plane to drive on.
 	PxRigidStatic* gGroundPlane = NULL;
 
-	//car list for efficiency
-	std::vector<Car*> carList;
-
 	//Vehicle simulation needs a simulation context
 	//to store global parameters of the simulation such as 
 	//gravitational acceleration.
@@ -51,9 +49,9 @@ public:
 	void initMaterialFrictionTable();
 	void initVehicleSimContext();
 
-	void stepAllVehicleMovementPhysics(std::vector<Car*> carList);
+	void stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle> carList);
 
-	void stepPhysics(std::vector<Entity> entityList);
+	void stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle> carList);
 
 	PhysicsSystem(); // Constructor
 

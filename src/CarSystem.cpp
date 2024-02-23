@@ -71,14 +71,13 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	gVehicle.mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
 	//adding car to needed lists
-	carRigidDynamicList.emplace_back((PxRigidDynamic*) gVehicle.mPhysXState.physxActor.rigidBody);
+	carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle.mPhysXState.physxActor.rigidBody);
 	gVehicleList.emplace_back(gVehicle);
-
-	projectileRigidDynamicDict.emplace(gVehicle, new std::vector<PxRigidDynamic*>);
+	projectileRigidDynamicDict[&gVehicle] = std::vector<PxRigidDynamic*>();
 
 	//creating the car entity to add to the entity list
 	Entity car;
-	car.name = "car" + gVehicleList.size();
+	car.name = "car" + std::to_string(gVehicleList.size());
 	car.CreateTransformFromPhysX(gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose());
 	car.physType = PhysicsType::CAR;
 	car.collisionBox = carRigidDynamicList.back();
@@ -86,9 +85,23 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	entityList->emplace_back(car);
 }
 
-void CarSystem::DestroyCar(EngineDriveVehicle* carToDestroy) {
+void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {
 
 
+}
+
+EngineDriveVehicle* CarSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic) {
+
+	for (int i = 0; i < carRigidDynamicList.size(); i++) {
+
+		if (carRigidDynamicList[i] == carRigidDynamic) {
+			printf("%f\n", gVehicleList[i]);
+			return &gVehicleList[i];
+		}
+	}
+
+	//unreachable code
+	exit(69);
 }
 
 void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
@@ -99,7 +112,7 @@ void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
 
 }
 
-std::vector<EngineDriveVehicle*> CarSystem::GetGVehicleList()
+std::vector<EngineDriveVehicle> CarSystem::GetGVehicleList()
 {
 	return this->gVehicleList;
 }

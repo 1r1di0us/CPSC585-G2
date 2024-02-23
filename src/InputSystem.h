@@ -13,7 +13,7 @@ public:
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	void InputToMovement(Entity* playerCar);
+	void InputToMovement(EngineDriveVehicle* playerCar);
 private:
 	bool gpArr[16];
 	//make these arrays at some point

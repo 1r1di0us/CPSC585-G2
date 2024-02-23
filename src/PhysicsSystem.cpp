@@ -86,42 +86,42 @@ void PhysicsSystem::initVehicleSimContext() {
 	//b) x as the lateral axis
 	//c) y as the vertical axis.
 	//d) metres  as the lengthscale.
-	gVehicleSimulationContext.setToDefault();
-	gVehicleSimulationContext.frame.lngAxis = PxVehicleAxes::ePosZ;
-	gVehicleSimulationContext.frame.latAxis = PxVehicleAxes::ePosX;
-	gVehicleSimulationContext.frame.vrtAxis = PxVehicleAxes::ePosY;
-	gVehicleSimulationContext.scale.scale = 1.0f;
-	gVehicleSimulationContext.gravity = gGravity;
-	gVehicleSimulationContext.physxScene = gScene;
-	gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
+	this->gVehicleSimulationContext.setToDefault();
+	this->gVehicleSimulationContext.frame.lngAxis = PxVehicleAxes::ePosZ;
+	this->gVehicleSimulationContext.frame.latAxis = PxVehicleAxes::ePosX;
+	this->gVehicleSimulationContext.frame.vrtAxis = PxVehicleAxes::ePosY;
+	this->gVehicleSimulationContext.scale.scale = 1.0f;
+	this->gVehicleSimulationContext.gravity = gGravity;
+	this->gVehicleSimulationContext.physxScene = gScene;
+	this->gVehicleSimulationContext.physxActorUpdateMode = PxVehiclePhysXActorUpdateMode::eAPPLY_ACCELERATION;
 }
 
 //does all the logic for doing one step through every vehicle movement component
-void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<Car*> carList) {
+void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle> carList) {
 
 	//goes through each vehicles movement component and updates them one at a time
-	for (Car* car : carList) {
-
-		EngineDriveVehicle gVehicle = car->gVehicle;
+	for (EngineDriveVehicle gVehicle : carList) {
 
 		//Forward integrate the vehicle by a single TIMESTEP.
 		//Apply substepping at low forward speed to improve simulation fidelity.
-		const PxVec3 linVel = gVehicle.mPhysXState.physxActor.rigidBody->getLinearVelocity();
-		const PxVec3 forwardDir = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
-		const PxReal forwardSpeed = linVel.dot(forwardDir);
-		const PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
-		gVehicle.mComponentSequence.setSubsteps(gVehicle.mComponentSequenceSubstepGroupHandle, nbSubsteps);
-		gVehicle.step(TIMESTEP, gVehicleSimulationContext);
+		PxVec3 linVel = gVehicle.mPhysXState.physxActor.rigidBody->getLinearVelocity();
+		PxVec3 forwardDir = gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+		PxReal forwardSpeed = linVel.dot(forwardDir);
+		if (forwardSpeed != 0) {
+			PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
+			gVehicle.mComponentSequence.setSubsteps(gVehicle.mComponentSequenceSubstepGroupHandle, nbSubsteps);
+			gVehicle.step(TIMESTEP, this->gVehicleSimulationContext);
+		}
 
 		//updating the car's transform
-		car->setCarTransform();
+		//car->setCarTransform();
 
 	}
 
 }
 
 //simulates one step of physics for all objects in scene
-void PhysicsSystem::stepPhysics(std::vector<Entity> entityList) {
+void PhysicsSystem::stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle> carList) {
 
 	//does one step for each car
 	stepAllVehicleMovementPhysics(carList);

@@ -14,17 +14,6 @@ using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
-//Commands are issued to the vehicle in a pre-choreographed sequence.
-//not used atm
-struct Command
-{
-	PxF32 brake;
-	PxF32 throttle;
-	PxF32 steer;
-	PxU32 gear;
-	PxF32 duration;
-};
-
 class Car{
 
 public:

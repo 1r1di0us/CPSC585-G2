@@ -186,7 +186,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("model", model);
     renderObject(building, &buildingVAO);
 
-    for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
+    /*for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
     {
         if (!playerCar->car->projectileBodyList.empty()) {
             glm::vec3 pain;
@@ -198,7 +198,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
         }
-    }
+    }*/
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
