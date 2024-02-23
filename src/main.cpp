@@ -19,11 +19,12 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 
-//global vars (ideally temp, idk how that will work tho tbh)
+//system creation and other important variables
+std::vector<Entity> entityList;
 PhysicsSystem physicsSys;
+CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getMaterial(), &entityList);
 Entity playerCar;
 InputSystem inputSys;
-std::vector<Entity> entityList;
 RenderingSystem renderingSystem;
 Camera camera;
 
@@ -53,16 +54,8 @@ int main() {
     physicsSys.carList.emplace_back(playerCar.car);
     entityList.emplace_back(playerCar);
 
-    ////creating the second car entity
-    //Entity car2;
-    //car2.name = "car2";
-    //car2.physType = PhysicsType::CAR;
-    //car2.transform = new Transform();
-    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
-
-    //adding the second car to the entity list
-    //physicsSys.carList.emplace_back(car2.car);
-    //entityList.emplace_back(car2);
+    //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
+    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 
     // glfw: initialize and configure
     // ------------------------------

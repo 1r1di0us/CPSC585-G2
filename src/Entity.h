@@ -25,5 +25,22 @@ public:
 	std::vector<Transform*> projectileTransformList;
 
 	//helper functions
-	void updateTransform();	
+	void updateTransform();
+
+	//utility function to convert a physx transfom to glm
+		//USELESS HERE, NEEDS TO BE MOVED INTO HELPER CLASS OR SOMETHING
+	//temporary
+	void CreateTransformFromPhysX(PxTransform physXTransform) {
+
+		this->transform = new Transform();
+
+		this->transform->pos.x = physXTransform.p.x;
+		this->transform->pos.y = physXTransform.p.y;
+		this->transform->pos.z = physXTransform.p.z;
+
+		this->transform->rot.x = physXTransform.q.x;
+		this->transform->rot.y = physXTransform.q.y;
+		this->transform->rot.z = physXTransform.q.z;
+		this->transform->rot.w = physXTransform.q.w;
+	}
 };

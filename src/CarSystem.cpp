@@ -1,12 +1,11 @@
 #include "CarSystem.h"
 
-CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial) {
+CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList) {
 
 	this->gPhysics = gPhysics;
 	this->gScene = gScene;
 	this->gMaterial = gMaterial;
-
-
+	this->entityList = entityList;
 
 }
 
@@ -71,19 +70,38 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	//Set the vehicle to use the automatic gearbox.
 	gVehicle.mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
-	rigidDynamicList.emplace_back((PxRigidDynamic*) gVehicle.mPhysXState.physxActor.rigidBody);
+	//adding car to needed lists
+	carRigidDynamicList.emplace_back((PxRigidDynamic*) gVehicle.mPhysXState.physxActor.rigidBody);
 	gVehicleList.emplace_back(gVehicle);
+
+	projectileRigidDynamicDict.emplace(gVehicle, new std::vector<PxRigidDynamic*>);
+
+	//creating the car entity to add to the entity list
+	Entity car;
+	car.name = "car" + gVehicleList.size();
+	car.CreateTransformFromPhysX(gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose());
+	car.physType = PhysicsType::CAR;
+	car.collisionBox = carRigidDynamicList.back();
+
+	entityList->emplace_back(car);
 }
 
-void CarSystem::UpdateAllCars() {
-
-	//TODO: need to pull from the physics system update all cars
-	for (EngineDriveVehicle* gVehicle : gVehicleList) {
-		break;
-	}
-}
-
-void CarSystem::DestroyCar() {
+void CarSystem::DestroyCar(EngineDriveVehicle* carToDestroy) {
 
 
 }
+
+void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
+
+}
+
+void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
+
+}
+
+std::vector<EngineDriveVehicle*> CarSystem::GetGVehicleList()
+{
+	return this->gVehicleList;
+}
+
+
