@@ -2,26 +2,16 @@
 
 void Entity::updateTransform() {
 
-	switch (this->physType) {
-	case PhysicsType::CAR:
+	//position
+	this->transform->pos.x = this->collisionBox->getGlobalPose().p.x;
+	this->transform->pos.y = this->collisionBox->getGlobalPose().p.y;
+	this->transform->pos.z = this->collisionBox->getGlobalPose().p.z;
 
-		//position
-		this->transform->pos.x = this->collisionBox->getGlobalPose().p.x;
-		this->transform->pos.y = this->collisionBox->getGlobalPose().p.y;
-		this->transform->pos.z = this->collisionBox->getGlobalPose().p.z;
-
-		//rotation
-		this->transform->rot.x = this->collisionBox->getGlobalPose().q.x;
-		this->transform->rot.y = this->collisionBox->getGlobalPose().q.y;
-		this->transform->rot.z = this->collisionBox->getGlobalPose().q.z;
-		this->transform->rot.w = this->collisionBox->getGlobalPose().q.w;		
-
-		break;
-	case PhysicsType::STATIC:
-		break;
-	default:
-		break;
-	}
+	//rotation
+	this->transform->rot.x = this->collisionBox->getGlobalPose().q.x;
+	this->transform->rot.y = this->collisionBox->getGlobalPose().q.y;
+	this->transform->rot.z = this->collisionBox->getGlobalPose().q.z;
+	this->transform->rot.w = this->collisionBox->getGlobalPose().q.w;
 }
 
 void Entity::CreateTransformFromPhysX(PxTransform physXTransform) {
