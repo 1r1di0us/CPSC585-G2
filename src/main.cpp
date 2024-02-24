@@ -47,6 +47,8 @@ int main() {
 
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+    soundSys.Init();
+    soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -100,6 +102,7 @@ int main() {
         inputSys.getKeyboardInput(window);
         if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
             carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+            soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 
         //THIS IS BROKEN BELOW
