@@ -3,7 +3,15 @@
 #include <string>
 #include "Transform.h"
 #include "Model.h"
-#include "Car.h"
+#include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
+#include "snippetvehicle2common/serialization/BaseSerialization.h"
+#include "snippetvehicle2common/serialization/EngineDrivetrainSerialization.h"
+#include "snippetvehicle2common/SnippetVehicleHelpers.h"
+#include "snippetcommon/SnippetPVD.h"
+
+using namespace physx;
+using namespace physx::vehicle2;
+using namespace snippetvehicle2;
 
 enum class PhysicsType {
 	CAR,

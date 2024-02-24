@@ -1,5 +1,10 @@
 #pragma once
 #include "PxPhysicsAPI.h"
+#include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
+#include "snippetvehicle2common/serialization/BaseSerialization.h"
+#include "snippetvehicle2common/serialization/EngineDrivetrainSerialization.h"
+#include "snippetvehicle2common/SnippetVehicleHelpers.h"
+#include "snippetcommon/SnippetPVD.h"
 #include "Entity.h"
 #include <vector>
 #include <iostream>
@@ -7,6 +12,7 @@
 
 using namespace physx;
 using namespace physx::vehicle2;
+using namespace snippetvehicle2;
 
 class PhysicsSystem {
 
