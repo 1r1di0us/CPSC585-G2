@@ -1,23 +1,5 @@
 #include "PhysicsSystem.h"
 
-//custom collision callback system
-class ContactReportCallback : public PxSimulationEventCallback {
-	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
-		PX_UNUSED(pairHeader);
-		PX_UNUSED(pairs);
-		PX_UNUSED(nbPairs);
-
-		std::cout << "Callback system: Stop colliding with me!" << std::endl;
-	}
-	void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
-	void onWake(physx::PxActor** actors, physx::PxU32 count) {}
-	void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
-	void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
-	void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
-		const physx::PxTransform* poseBuffer,
-		const physx::PxU32 count) {}
-};
-
 //initializes physx
 void PhysicsSystem::initPhysX() {
 
@@ -35,10 +17,6 @@ void PhysicsSystem::initPhysX() {
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = VehicleFilterShader;
 
-	//assigning the custom callback system to our scene
-	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
-	sceneDesc.simulationEventCallback = gContactReportCallback;
-
 	gScene = gPhysics->createScene(sceneDesc);
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
@@ -50,6 +28,7 @@ void PhysicsSystem::initPhysX() {
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxInitVehicleExtension(*gFoundation);
+	
 }
 
 //creates the ground

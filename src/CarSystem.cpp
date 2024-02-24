@@ -1,11 +1,34 @@
 #include "CarSystem.h"
 
+//custom collision callback system
+class ContactReportCallback : public PxSimulationEventCallback {
+	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
+		PX_UNUSED(pairHeader);
+		PX_UNUSED(pairs);
+		PX_UNUSED(nbPairs);
+
+		printf("Callback system: Stop colliding with me!\n");
+	}
+	void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
+	void onWake(physx::PxActor** actors, physx::PxU32 count) {}
+	void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
+	void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
+	void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
+		const physx::PxTransform* poseBuffer,
+		const physx::PxU32 count) {}
+};
+
 CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList) {
 
 	this->gPhysics = gPhysics;
 	this->gScene = gScene;
 	this->gMaterial = gMaterial;
 	this->entityList = entityList;
+
+
+	//assigning the custom callback system to our scene
+	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
+	gScene->setSimulationEventCallback(gContactReportCallback);
 
 }
 

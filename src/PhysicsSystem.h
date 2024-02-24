@@ -7,7 +7,6 @@
 #include "snippetcommon/SnippetPVD.h"
 #include "Entity.h"
 #include <vector>
-#include <iostream>
 #include <cmath>
 
 using namespace physx;
