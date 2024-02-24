@@ -96,13 +96,15 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+        if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
+            carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+        }
 
         //THIS IS BROKEN BELOW
 
         // render
         // ------
-        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft, &entityList[0]);
+        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft);
 
         //only updating the physics at max 60hz while everything else updates at max speed
         if (physicsSimTime.count() <= 0.0f) {

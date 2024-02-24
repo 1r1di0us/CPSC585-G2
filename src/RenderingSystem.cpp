@@ -88,7 +88,7 @@ RenderingSystem::RenderingSystem(){
 }
 
 
-void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft, Entity *playerCar) {
+void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -186,19 +186,21 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("model", model);
     renderObject(building, &buildingVAO);
 
-    /*for (int i = 0; i < playerCar->car->projectileBodyList.size(); i++)
-    {
-        if (!playerCar->car->projectileBodyList.empty()) {
-            glm::vec3 pain;
+    //rendering all projectiles in the entity list
+    for (int i = 0; i < entityList.size(); i++) {
+
+        if (entityList[i].name.find("projectile") != std::string::npos) {
+
+            glm::vec3 projectilePos;
             model = glm::mat4(1.0f);
-            pain.x = playerCar->car->projectileBodyList[i]->getGlobalPose().p.x;
-            pain.y = playerCar->car->projectileBodyList[i]->getGlobalPose().p.y;
-            pain.z = playerCar->car->projectileBodyList[i]->getGlobalPose().p.z;
-            model = glm::translate(model, pain);
+            projectilePos.x = entityList[i].collisionBox->getGlobalPose().p.x;
+            projectilePos.y = entityList[i].collisionBox->getGlobalPose().p.y;
+            projectilePos.z = entityList[i].collisionBox->getGlobalPose().p.z;
+            model = glm::translate(model, projectilePos);
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
         }
-    }*/
+    }
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);

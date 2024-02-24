@@ -59,7 +59,19 @@ public:
 
 	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
 
-	//shooting
+	//MIGHT SHIFT OUT TO ANOTHER CLASS IF I CAN FIND A GOOD PLACE FOR A HELPER CLASS
+	Entity* GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
+
+	std::vector<EngineDriveVehicle*> GetGVehicleList();
+
+	/*
+	* PROJECTILES
+	*/
+
+	//constants
+	const PxReal projectileMass = 10.0f;
+	const PxReal projectileRadius = 1.0f;
+	const float shootForce = 100;
 
 	//the dictionary for all projectiles for all cars
 	std::map<EngineDriveVehicle*, std::vector<PxRigidDynamic*>> projectileRigidDynamicDict;
@@ -68,6 +80,5 @@ public:
 
 	void DestroyProjectile(PxRigidDynamic* projectileToDestroy);
 
-	std::vector<EngineDriveVehicle*> GetGVehicleList();
-
+	//TODO: might need a getter for finding the projectile for collisions
 };

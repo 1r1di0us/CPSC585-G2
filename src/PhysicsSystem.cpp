@@ -112,9 +112,6 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle
 		gVehicle->mComponentSequence.setSubsteps(gVehicle->mComponentSequenceSubstepGroupHandle, nbSubsteps);
 		gVehicle->step(TIMESTEP, this->gVehicleSimulationContext);
 
-		//updating the car's transform
-		//car->setCarTransform();
-
 	}
 
 }

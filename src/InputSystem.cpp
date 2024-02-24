@@ -120,7 +120,7 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-void InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
+bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
@@ -204,10 +204,11 @@ void InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 	}
 
 	if (s == 1) {
-		//playerCar->car->shootProjectile();
-
-		////making a new transform every time projectile is shot
-		//playerCar->projectileTransformList.emplace_back(new Transform());
+		
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
