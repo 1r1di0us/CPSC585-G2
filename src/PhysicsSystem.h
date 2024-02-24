@@ -49,9 +49,9 @@ public:
 	void initMaterialFrictionTable();
 	void initVehicleSimContext();
 
-	void stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle> carList);
+	void stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle*> carList);
 
-	void stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle> carList);
+	void stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle*> carList);
 
 	PhysicsSystem(); // Constructor
 

@@ -47,7 +47,7 @@ public:
 
 	//need to have list of rigid dynamics corresponding to gvehicles vehicles to move the correct vehicle given rigid dynamic
 	std::vector<PxRigidDynamic*> carRigidDynamicList;
-	std::vector<EngineDriveVehicle> gVehicleList;
+	std::vector<EngineDriveVehicle*> gVehicleList;
 
 	//constructor
 	CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList);
@@ -68,6 +68,6 @@ public:
 
 	void DestroyProjectile(PxRigidDynamic* projectileToDestroy);
 
-	std::vector<EngineDriveVehicle> GetGVehicleList();
+	std::vector<EngineDriveVehicle*> GetGVehicleList();
 
 };

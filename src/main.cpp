@@ -96,8 +96,7 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        auto test = carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox);
-        inputSys.InputToMovement(test);
+        inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
 
         //THIS IS BROKEN BELOW
 

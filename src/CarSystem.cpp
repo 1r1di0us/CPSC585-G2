@@ -15,18 +15,18 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	const char* name = "car";
 
 	//The vehicle with engine drivetrain
-	EngineDriveVehicle gVehicle;
+	EngineDriveVehicle* gVehicle = new EngineDriveVehicle();
 
 	//Load the params from json or set directly.
-	readBaseParamsFromJsonFile(gVehicleDataPath, "Base.json", gVehicle.mBaseParams);
-	setPhysXIntegrationParams(gVehicle.mBaseParams.axleDescription,
+	readBaseParamsFromJsonFile(gVehicleDataPath, "Base.json", gVehicle->mBaseParams);
+	setPhysXIntegrationParams(gVehicle->mBaseParams.axleDescription,
 		gPhysXMaterialFrictions, gNbPhysXMaterialFrictions, gPhysXDefaultMaterialFriction,
-		gVehicle.mPhysXParams);
+		gVehicle->mPhysXParams);
 	readEngineDrivetrainParamsFromJsonFile(gVehicleDataPath, "EngineDrive.json",
-		gVehicle.mEngineDriveParams);
+		gVehicle->mEngineDriveParams);
 
 	//Set the states to default.
-	if (!gVehicle.initialize(*gPhysics, PxCookingParams(PxTolerancesScale()), *gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE))
+	if (!gVehicle->initialize(*gPhysics, PxCookingParams(PxTolerancesScale()), *gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE))
 	{
 		printf("Car initialization failed\n");
 		exit(69);
@@ -34,7 +34,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
 	PxTransform carTransform = PxTransform(spawnPosition, spawnRotation);
-	gVehicle.setUpActor(*gScene, carTransform, name);
+	gVehicle->setUpActor(*gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
 
@@ -44,10 +44,10 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	//TODO: look at shapes and adding to rigid dynamic list
 
 	//making all parts of the vehicle have collisions with the outside world
-	PxU32 shapes = gVehicle.mPhysXState.physxActor.rigidBody->getNbShapes();
+	PxU32 shapes = gVehicle->mPhysXState.physxActor.rigidBody->getNbShapes();
 	for (PxU32 i = 0; i < shapes; i++) {
 		PxShape* shape = NULL;
-		gVehicle.mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
+		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
 
 		//the body of the vehicle is at i = 0
 		//TODO: commented out for now but might need to work around if need these
@@ -64,21 +64,21 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	}
 
 	//Set the vehicle in 1st gear.
-	gVehicle.mEngineDriveState.gearboxState.currentGear = gVehicle.mEngineDriveParams.gearBoxParams.neutralGear + 1;
-	gVehicle.mEngineDriveState.gearboxState.targetGear = gVehicle.mEngineDriveParams.gearBoxParams.neutralGear + 1;
+	gVehicle->mEngineDriveState.gearboxState.currentGear = gVehicle->mEngineDriveParams.gearBoxParams.neutralGear + 1;
+	gVehicle->mEngineDriveState.gearboxState.targetGear = gVehicle->mEngineDriveParams.gearBoxParams.neutralGear + 1;
 
 	//Set the vehicle to use the automatic gearbox.
-	gVehicle.mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
+	gVehicle->mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
 	//adding car to needed lists
-	carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle.mPhysXState.physxActor.rigidBody);
+	carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody);
 	gVehicleList.emplace_back(gVehicle);
-	projectileRigidDynamicDict[&gVehicle] = std::vector<PxRigidDynamic*>();
+	projectileRigidDynamicDict[gVehicle] = std::vector<PxRigidDynamic*>();
 
 	//creating the car entity to add to the entity list
 	Entity car;
 	car.name = "car" + std::to_string(gVehicleList.size());
-	car.CreateTransformFromPhysX(gVehicle.mPhysXState.physxActor.rigidBody->getGlobalPose());
+	car.CreateTransformFromPhysX(gVehicle->mPhysXState.physxActor.rigidBody->getGlobalPose());
 	car.physType = PhysicsType::CAR;
 	car.collisionBox = carRigidDynamicList.back();
 
@@ -95,8 +95,7 @@ EngineDriveVehicle* CarSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRig
 	for (int i = 0; i < carRigidDynamicList.size(); i++) {
 
 		if (carRigidDynamicList[i] == carRigidDynamic) {
-			printf("%f\n", gVehicleList[i]);
-			return &gVehicleList[i];
+			return gVehicleList[i];
 		}
 	}
 
@@ -112,7 +111,7 @@ void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
 
 }
 
-std::vector<EngineDriveVehicle> CarSystem::GetGVehicleList()
+std::vector<EngineDriveVehicle*> CarSystem::GetGVehicleList()
 {
 	return this->gVehicleList;
 }
