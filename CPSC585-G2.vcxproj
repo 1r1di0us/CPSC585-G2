@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Car.cpp" />
     <ClCompile Include="libraries\snippetcommon\ClassicMain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\base\Base.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.cpp" />
@@ -33,6 +32,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CarSystem.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -58,7 +58,7 @@
     <ClInclude Include="libraries\snippetvehicle2common\serialization\EngineDrivetrainSerialization.h" />
     <ClInclude Include="libraries\snippetvehicle2common\serialization\SerializationCommon.h" />
     <ClInclude Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.h" />
-    <ClInclude Include="src\Car.h" />
+    <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="src\Model.h" />

@@ -8,6 +8,7 @@
 #include "PxPhysicsAPI.h"
 #include "RenderingSystem.h"
 #include "InputSystem.h"
+#include "CarSystem.h"
 #include <chrono>
 #include <thread>
 
@@ -18,11 +19,11 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 
-//global vars (ideally temp, idk how that will work tho tbh)
-PhysicsSystem physicsSys;
-Entity playerCar;
-InputSystem inputSys;
+//system creation and other important variables
 std::vector<Entity> entityList;
+PhysicsSystem physicsSys;
+CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getMaterial(), &entityList);
+InputSystem inputSys;
 RenderingSystem renderingSystem;
 Camera camera;
 
@@ -42,26 +43,8 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    //creating the player car entity
-    playerCar.name = "playerCar";
-    playerCar.physType = PhysicsType::CAR;
-    playerCar.transform = new Transform();
-    playerCar.car = new Car(playerCar.name.c_str(), PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat, physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
-
-    //adds the car to the all important lists
-    physicsSys.carList.emplace_back(playerCar.car);
-    entityList.emplace_back(playerCar);
-
-    ////creating the second car entity
-    //Entity car2;
-    //car2.name = "car2";
-    //car2.physType = PhysicsType::CAR;
-    //car2.transform = new Transform();
-    //car2.car = new Car(playerCar.name.c_str(), PxVec3(10.0f, 0.0f, -10.0f), PxQuat(PxIdentity), physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getGravity(), physicsSys.getMaterial());
-
-    //adding the second car to the entity list
-    //physicsSys.carList.emplace_back(car2.car);
-    //entityList.emplace_back(car2);
+    //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
+    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -113,15 +96,19 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        inputSys.InputToMovement(&playerCar);
+        if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
+            carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+        }
+
+        //THIS IS BROKEN BELOW
 
         // render
         // ------
-        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft, &playerCar);
+        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft);
 
         //only updating the physics at max 60hz while everything else updates at max speed
         if (physicsSimTime.count() <= 0.0f) {
-            physicsSys.stepPhysics(entityList);
+            physicsSys.stepPhysics(entityList, carSys.GetGVehicleList());
             physicsSimTime = PHYSICSUPDATESPEED;
         }
 
