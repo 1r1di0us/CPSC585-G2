@@ -3,10 +3,19 @@
 #include <string>
 #include "Transform.h"
 #include "Model.h"
-#include "Car.h"
+#include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
+#include "snippetvehicle2common/serialization/BaseSerialization.h"
+#include "snippetvehicle2common/serialization/EngineDrivetrainSerialization.h"
+#include "snippetvehicle2common/SnippetVehicleHelpers.h"
+#include "snippetcommon/SnippetPVD.h"
+
+using namespace physx;
+using namespace physx::vehicle2;
+using namespace snippetvehicle2;
 
 enum class PhysicsType {
 	CAR,
+	PROJECTILE,
 	STATIC
 };
 	
@@ -14,14 +23,16 @@ class Entity {
 
 public:
 	std::string name;
+
 	Model* model;
 	Transform* transform;
-	PhysicsType physType;
 
-	Car* car;
-	//cant lie i kind of hate this, just tickles me wrong for some reason. it works tho - david
-	std::vector<Transform*> projectileTransformList;
+	PhysicsType physType;
+	PxRigidDynamic* collisionBox;
 
 	//helper functions
-	void updateTransform();	
+	void updateTransform();
+
+	//utility function to create an entities transform component given a physx transform
+	void CreateTransformFromPhysX(PxTransform physXTransform);
 };

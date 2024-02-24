@@ -24,9 +24,9 @@
     <ClCompile Include="libraries\snippetvehicle2common\enginedrivetrain\EngineDrivetrain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\base\Base.cpp" />
-    <ClCompile Include="src\Car.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
+    <ClCompile Include="src\CarSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -55,6 +55,7 @@
     <ClInclude Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
     <ClInclude Include="src\Car.h" />
+    <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
   </ItemGroup>
   <ItemGroup>
