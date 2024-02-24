@@ -121,6 +121,7 @@ int main() {
 
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
+    soundSys.Shutdown();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
