@@ -8,6 +8,7 @@
 #include "PxPhysicsAPI.h"
 #include "RenderingSystem.h"
 #include "InputSystem.h"
+#include "SoundSystem.h"
 #include <chrono>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -21,6 +22,7 @@ const unsigned int SCR_HEIGHT = 600;
 PhysicsSystem physicsSys;
 Entity playerCar;
 InputSystem inputSys;
+SoundSystem soundSys;
 std::vector<Entity> entityList;
 RenderingSystem renderingSystem;
 Camera camera;
