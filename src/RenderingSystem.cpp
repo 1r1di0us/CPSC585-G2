@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int texture1, texture2, texture3;
+unsigned int blueTexture, catTexture, redTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -25,7 +25,7 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
 }
 
 // constructor
-RenderingSystem::RenderingSystem(){
+RenderingSystem::RenderingSystem() {
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -50,12 +50,12 @@ RenderingSystem::RenderingSystem(){
 
     // geom shader
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
-    
+
     // create and set textures
-    texture1 = generateTexture("src/Textures/blue.jpg", true);
+    blueTexture = generateTexture("src/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
-    texture2 = generateTexture("src/Textures/cat.jpg", true);
-    texture3 = generateTexture("src/Textures/red.jpg", true);
+    catTexture = generateTexture("src/Textures/cat.jpg", true);
+    redTexture = generateTexture("src/Textures/red.jpg", true);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -155,50 +155,69 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
 
-
     // binding textures
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture3);
+    glBindTexture(GL_TEXTURE_2D, catTexture);
 
     //float angle = 45.0f;
     shader.setMat4("model", model);
     renderObject(tank, &tankVAO);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
+    glBindTexture(GL_TEXTURE_2D, blueTexture);
 
     model = glm::mat4(1.0f);
-  
+
     model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
     model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
     shader.setMat4("model", model);
 
     renderObject(plane, &planeVAO);
 
-
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture3);
+    glBindTexture(GL_TEXTURE_2D, redTexture);
     shader.setMat4("model", model);
     renderObject(building, &buildingVAO);
 
-    //rendering all projectiles in the entity list
-    for (int i = 0; i < entityList.size(); i++) {
+    //rendering all other entities starting at 1 (skipping player car)
+    for (int i = 1; i < entityList.size(); i++) {
 
-        if (entityList[i].name.find("projectile") != std::string::npos) {
+        switch (entityList[i].physType) {
 
-            glm::vec3 projectilePos;
+        case (PhysicsType::CAR):
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, catTexture);
+
             model = glm::mat4(1.0f);
-            projectilePos.x = entityList[i].collisionBox->getGlobalPose().p.x;
-            projectilePos.y = entityList[i].collisionBox->getGlobalPose().p.y;
-            projectilePos.z = entityList[i].collisionBox->getGlobalPose().p.z;
-            model = glm::translate(model, projectilePos);
+            model = glm::translate(model, entityList[i].transform->getPos());
+            // make it look forward
+            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+            model = applyQuaternionToMatrix(model, entityList[i].transform->getRot());
+            shader.setMat4("model", model);
+            renderObject(tank, &tankVAO);
+
+            break;
+        case (PhysicsType::PROJECTILE):
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, redTexture);
+
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, entityList[i].transform->getPos());
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
+
+            break;
+        case (PhysicsType::STATIC):
+
+            break;
+        default:
+
+            break;
         }
     }
 
@@ -237,7 +256,7 @@ void renderObject(const OBJModel& model, unsigned int* VAO) {
 void RenderingSystem::processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);    
+        glfwSetWindowShouldClose(window, true);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -249,6 +268,6 @@ void RenderingSystem::framebuffer_size_callback(GLFWwindow* window, int width, i
     glViewport(0, 0, width, height);
 }
 
-GLFWwindow* RenderingSystem::getWindow() const{
+GLFWwindow* RenderingSystem::getWindow() const {
     return window;
 }
