@@ -8,6 +8,7 @@
 #include "PxPhysicsAPI.h"
 #include "RenderingSystem.h"
 #include "InputSystem.h"
+#include "SoundSystem.h"
 #include "CarSystem.h"
 #include <chrono>
 #include <thread>
@@ -25,6 +26,7 @@ PhysicsSystem physicsSys;
 CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getMaterial(), &entityList);
 InputSystem inputSys;
 RenderingSystem renderingSystem;
+SoundSystem soundSys;
 Camera camera;
 
 //time related variables
@@ -45,6 +47,8 @@ int main() {
 
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+    soundSys.Init();
+    soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -98,6 +102,7 @@ int main() {
         inputSys.getKeyboardInput(window);
         if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
             carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+            soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 
         //THIS IS BROKEN BELOW
@@ -116,6 +121,7 @@ int main() {
 
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
+    soundSys.Shutdown();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
