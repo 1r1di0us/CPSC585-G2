@@ -26,7 +26,39 @@ struct Command
 
 class CarSystem {
 
+private:
+	//custom collision callback system
+	class ContactReportCallback : public PxSimulationEventCallback {
+
+	public:
+
+		bool contactDetected = false;
+		PxContactPairHeader contactPair;
+
+	private:
+		void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
+			//PX_UNUSED(pairHeader);
+			//PX_UNUSED(pairs);
+			PX_UNUSED(nbPairs);
+
+			//printf("Callback system: Stop colliding with me!\n");
+
+			contactPair = pairHeader;
+			if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
+				contactDetected = true;
+		}
+		void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
+		void onWake(physx::PxActor** actors, physx::PxU32 count) {}
+		void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
+		void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
+		void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
+			const physx::PxTransform* poseBuffer,
+			const physx::PxU32 count) {}
+	};
+
 public:
+
+	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
 
 	PxPhysics* gPhysics;
 	PxScene* gScene;
@@ -74,11 +106,14 @@ public:
 	const float shootForce = 100;
 
 	//the dictionary for all projectiles for all cars
+	//TODO: maybe make this two entities
 	std::map<EngineDriveVehicle*, std::vector<PxRigidDynamic*>> projectileRigidDynamicDict;
 
 	void Shoot(EngineDriveVehicle* shootingCar);
 
 	void DestroyProjectile(PxRigidDynamic* projectileToDestroy);
+
+	void CollideCarProjectile(PxRigidDynamic* car, PxRigidDynamic* projectile);
 
 	//TODO: might need a getter for finding the projectile for collisions
 };

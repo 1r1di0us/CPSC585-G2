@@ -1,23 +1,5 @@
 #include "CarSystem.h"
 
-//custom collision callback system
-class ContactReportCallback : public PxSimulationEventCallback {
-	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
-		PX_UNUSED(pairHeader);
-		PX_UNUSED(pairs);
-		PX_UNUSED(nbPairs);
-
-		printf("Callback system: Stop colliding with me!\n");
-	}
-	void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
-	void onWake(physx::PxActor** actors, physx::PxU32 count) {}
-	void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
-	void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
-	void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
-		const physx::PxTransform* poseBuffer,
-		const physx::PxU32 count) {}
-};
-
 CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList) {
 
 	this->gPhysics = gPhysics;
@@ -25,10 +7,8 @@ CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial
 	this->gMaterial = gMaterial;
 	this->entityList = entityList;
 
-
 	//assigning the custom callback system to our scene
-	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
-	gScene->setSimulationEventCallback(gContactReportCallback);
+	gScene->setSimulationEventCallback(this->gContactReportCallback);
 
 }
 
@@ -138,6 +118,11 @@ Entity* CarSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic) {
 	exit(69);
 }
 
+void CarSystem::CollideCarProjectile(PxRigidDynamic* car, PxRigidDynamic* projectile) {
+
+
+}
+
 std::vector<EngineDriveVehicle*> CarSystem::GetGVehicleList() {
 	return this->gVehicleList;
 }
@@ -160,7 +145,7 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *gMaterial);
 
 	//creating collision flags for each projectile
-	physx::PxFilterData projectileFilter(COLLISION_FLAG_OBSTACLE, COLLISION_FLAG_OBSTACLE_AGAINST, 0, 0);
+	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
 
 	//creates the rigid dynamic body to be a diff instance for each projectile (cant be sharing that)
@@ -172,6 +157,7 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 	//disables gravity for the projectile
 	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 
+	projectileBody->setName("temp");
 	gScene->addActor(*projectileBody);
 
 	projectileBody->setLinearVelocity(shootForce * forwardVector);
@@ -191,6 +177,17 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 }
 
 void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
+
+	if (this->gContactReportCallback->contactDetected) {
+		if (this->gContactReportCallback->contactPair.actors[0]->getName() == "temp") {
+			gScene->removeActor(*gContactReportCallback->contactPair.actors[0]);
+			this->gContactReportCallback->contactPair.actors[0]->release();
+		}
+		else {
+			gScene->removeActor(*gContactReportCallback->contactPair.actors[1]);
+			this->gContactReportCallback->contactPair.actors[1]->release();
+		}
+	}
 
 }
 

@@ -45,6 +45,7 @@ int main() {
 
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 20.0f), carRotateQuat);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -110,6 +111,7 @@ int main() {
         if (physicsSimTime.count() <= 0.0f) {
             physicsSys.stepPhysics(entityList, carSys.GetGVehicleList());
             physicsSimTime = PHYSICSUPDATESPEED;
+            carSys.DestroyProjectile(entityList[0].collisionBox);
         }
 
     }
