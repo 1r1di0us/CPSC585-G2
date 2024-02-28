@@ -157,6 +157,7 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 	//disables gravity for the projectile
 	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 
+	//FIXME
 	projectileBody->setName("temp");
 	gScene->addActor(*projectileBody);
 
@@ -178,6 +179,7 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 
 void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
 
+	//destroys the projectile that collided with the car (based on projectile name
 	if (this->gContactReportCallback->contactDetected) {
 		if (this->gContactReportCallback->contactPair.actors[0]->getName() == "temp") {
 			gScene->removeActor(*gContactReportCallback->contactPair.actors[0]);
