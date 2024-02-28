@@ -60,6 +60,13 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
 		printf("Car chassis hit obstacle.\n");
 	}
+	//if a projectile hits a static object
+	else if ((filterData0.word0 == COLLISION_FLAG_STATIC && filterData1.word0 == COLLISION_FLAG_PROJECTILE) 
+		|| (filterData1.word0 == COLLISION_FLAG_STATIC && filterData0.word0 == COLLISION_FLAG_PROJECTILE)) {
+
+		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
+		printf("Projectile hit static object.\n");
+	}
 
 	return physx::PxFilterFlags();
 }
