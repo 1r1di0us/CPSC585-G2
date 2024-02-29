@@ -82,7 +82,9 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 
 void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {
 
-
+	//need to find where to respawn
+	//have a respawn timer per car (dataSys)
+	//have a car info struct: score, respawn time left, entity/vehicle..., (datasys)
 }
 
 void CarSystem::Shoot(PxRigidDynamic* shootingCar) {

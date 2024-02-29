@@ -7,11 +7,21 @@
 #include "snippetvehicle2common/SnippetVehicleHelpers.h"
 #include "snippetcommon/SnippetPVD.h"
 #include "Entity.h"
-#include <map>
+#include <unordered_map>
 
 using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
+
+//car info struct
+struct CarInfo{
+	Entity* entity;
+	EngineDriveVehicle* gVehicle;
+	PxRigidDynamic* rigidDynamic;
+	int score;
+	float respawnTimeLeft;
+	float parryTimeLeft;
+};
 
 class SharedDataSystem {
 
@@ -59,9 +69,18 @@ public:
 	PxScene* gScene = NULL;
 	PxMaterial* gMaterial = NULL;
 
+	//respawn timer
+	const float RESPAWNLENGTH = 2.5f;
+
 	//need to have list of rigid dynamics corresponding to gvehicles vehicles to move the correct vehicle given rigid dynamic
 	std::vector<PxRigidDynamic*> carRigidDynamicList;
 	std::vector<EngineDriveVehicle*> gVehicleList;
+	
+	//a vector of all car structs for car info
+	std::vector<CarInfo> carInfoList;
+
+	//gets the car info struct using an entity
+	CarInfo* GetCarInfoStructFromEntity(Entity* entity);
 
 	//gets the gVehicle given the rigid dynamic
 	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
@@ -74,7 +93,10 @@ public:
 	*/
 
 	//the dictionary for all projectiles for all cars
-	std::map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;
+	std::unordered_map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;
+
+	//finds the car that shot a given projectile
+	Entity* GetCarThatShotProjectile(PxRigidDynamic* projectile);
 
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);

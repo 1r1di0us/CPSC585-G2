@@ -1,5 +1,21 @@
 #include "SharedDataSystem.h"
 
+CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(Entity* entity) {
+	
+	printf("pp1\n");
+
+	for (CarInfo carInfo : carInfoList) {
+		if (carInfo.entity == entity) {
+			return &carInfo;
+		}
+	}
+
+	printf("pp");
+
+	//unreachable code
+	exit(69);
+}
+
 EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic) {
 	
 	for (int i = 0; i < carRigidDynamicList.size(); i++) {
@@ -21,8 +37,28 @@ Entity* SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic
 			return &entityList.at(i);
 		}
 	}
+
 	//unreachable code
 	exit(69);
+}
+
+Entity* SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
+
+	//not sure if there is a better way to do this
+	//go through every list of shot projectiles and search for the passed one
+	//return the car
+	for (auto iterator = carProjectileRigidDynamicDict.begin(); iterator != carProjectileRigidDynamicDict.end(); ++iterator) {
+		
+		for (PxRigidDynamic* listProjectile : iterator->second) {
+			if (listProjectile == projectile) {
+				return GetEntityFromRigidDynamic(iterator->first);
+			}
+		}
+	}
+
+	//unreachable code
+	exit(69);
+
 }
 
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
@@ -30,8 +66,9 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	Entity* carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	Entity* projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
-	//increase score of car that shot (not figured out yet)
-		//data struct that associates a score with either car entity or gvehicle...
+	//increase score of car that shot
+	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
+	shootingCarInfo->score++;
 
 	/*
 	* remove the projectile from all lists
@@ -55,7 +92,10 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	gScene->removeActor(*projectile);
 	projectile->release();
 
-	//respawn shit (not figured out yet)
+	//respawn shit (either have to call respawn function in main, or merge car and physics) (i think)
+	//UNFINISHED
+	/*CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
+	hitCar->respawnTimeLeft = RESPAWNLENGTH;*/
 
 }
 
