@@ -114,6 +114,8 @@ void PhysicsSystem::stepPhysics() {
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
+	dataSys->ResolveCollisions();
+
 	//update the transform components of each entity
 	for (Entity entity : dataSys->entityList) {
 		entity.updateTransform();

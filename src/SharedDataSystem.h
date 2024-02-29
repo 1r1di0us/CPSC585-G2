@@ -30,8 +30,8 @@ private:
 				//PX_UNUSED(pairs);
 				PX_UNUSED(nbPairs);
 
-				//printf("Callback system: Stop colliding with me!\n");
-
+				//call the resolver here to deal with more than one collision pair per physics sim frame?
+				
 				contactPair = pairHeader;
 				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
 					contactDetected = true;
@@ -48,18 +48,7 @@ private:
 public:
 
 	//graphics system might need to use this too idk
-
-	//need to keep big physics data here
-
-	//all the lists of shit that i need to update (add to and remove from)
-
-	//entity list stuff
-
 	//entity helper functions move from entity cpp?
-
-	//collision detection header shit
-
-	//collision resolution functions to get called in physics system resolve collisions
 
 	std::vector<Entity> entityList;
 

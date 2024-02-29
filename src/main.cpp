@@ -111,7 +111,6 @@ int main() {
         if (physicsSimTime.count() <= 0.0f) {
             physicsSys.stepPhysics();
             physicsSimTime = PHYSICSUPDATESPEED;
-            dataSys.ResolveCollisions();
         }
 
     }
