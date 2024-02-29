@@ -18,6 +18,10 @@ void PhysicsSystem::initPhysX() {
 	sceneDesc.filterShader = VehicleFilterShader;
 
 	gScene = gPhysics->createScene(sceneDesc);
+
+	//assigning the custom callback system to our scene
+	gScene->setSimulationEventCallback(dataSys->gContactReportCallback);
+
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
 	{
@@ -28,6 +32,11 @@ void PhysicsSystem::initPhysX() {
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxInitVehicleExtension(*gFoundation);
+	
+	//setting all the datasys variables
+	dataSys->gPhysics = gPhysics;
+	dataSys->gScene = gScene;
+	dataSys->gMaterial = gMaterial;
 	
 }
 
@@ -76,10 +85,10 @@ void PhysicsSystem::initVehicleSimContext() {
 }
 
 //does all the logic for doing one step through every vehicle movement component
-void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle*> carList) {
+void PhysicsSystem::stepAllVehicleMovementPhysics() {
 
 	//goes through each vehicles movement component and updates them one at a time
-	for (EngineDriveVehicle* gVehicle : carList) {
+	for (EngineDriveVehicle* gVehicle : dataSys->gVehicleList) {
 
 		//Forward integrate the vehicle by a single TIMESTEP.
 		//Apply substepping at low forward speed to improve simulation fidelity.
@@ -96,29 +105,33 @@ void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle
 }
 
 //simulates one step of physics for all objects in scene
-void PhysicsSystem::stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle*> carList) {
+void PhysicsSystem::stepPhysics() {
 
 	//does one step for each car
-	stepAllVehicleMovementPhysics(carList);
+	stepAllVehicleMovementPhysics();
 
 	//Forward integrate the phsyx scene by a single TIMESTEP.
 	gScene->simulate(TIMESTEP);
 	gScene->fetchResults(true);
 
 	//update the transform components of each entity
-	for (Entity entity : entityList) {
+	for (Entity entity : dataSys->entityList) {
 		entity.updateTransform();
 	}
 	
 }
 
-PhysicsSystem::PhysicsSystem() { // Constructor
+PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
+
+	this->dataSys = dataSys;
 
 	//physx setup
 	initPhysX();
 	initGroundPlane();
 	initMaterialFrictionTable();
 	initVehicleSimContext();
+
+
 
 }
 

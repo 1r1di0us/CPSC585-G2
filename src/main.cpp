@@ -9,6 +9,7 @@
 #include "RenderingSystem.h"
 #include "InputSystem.h"
 #include "CarSystem.h"
+#include "SharedDataSystem.h"
 #include <chrono>
 #include <thread>
 
@@ -18,12 +19,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-
 //system creation and other important variables
-std::vector<Entity> entityList;
-PhysicsSystem physicsSys;
-CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getMaterial(), &entityList);
-InputSystem inputSys;
+SharedDataSystem dataSys;
+PhysicsSystem physicsSys(&dataSys);
+CarSystem carSys(&dataSys);
+InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem;
 Camera camera;
 
@@ -97,21 +97,21 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
-            carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+        if (inputSys.InputToMovement()) {
+            carSys.Shoot(dataSys.entityList[0].collisionBox);
         }
 
         //THIS IS BROKEN BELOW
 
         // render
         // ------
-        renderingSystem.updateRenderer(entityList, camera, totalTimeLeft);
+        renderingSystem.updateRenderer(dataSys.entityList, camera, totalTimeLeft);
 
         //only updating the physics at max 60hz while everything else updates at max speed
         if (physicsSimTime.count() <= 0.0f) {
-            physicsSys.stepPhysics(entityList, carSys.GetGVehicleList());
+            physicsSys.stepPhysics();
             physicsSimTime = PHYSICSUPDATESPEED;
-            carSys.DestroyProjectile(entityList[0].collisionBox);
+            dataSys.ResolveCollisions();
         }
 
     }

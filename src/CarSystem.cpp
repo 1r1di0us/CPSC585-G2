@@ -1,15 +1,8 @@
 #include "CarSystem.h"
 
-CarSystem::CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList) {
+CarSystem::CarSystem(SharedDataSystem* dataSys) {
 
-	this->gPhysics = gPhysics;
-	this->gScene = gScene;
-	this->gMaterial = gMaterial;
-	this->entityList = entityList;
-
-	//assigning the custom callback system to our scene
-	gScene->setSimulationEventCallback(this->gContactReportCallback);
-
+	this->dataSys = dataSys;
 }
 
 void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
@@ -29,15 +22,14 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 		gVehicle->mEngineDriveParams);
 
 	//Set the states to default.
-	if (!gVehicle->initialize(*gPhysics, PxCookingParams(PxTolerancesScale()), *gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE))
-	{
+	if (!gVehicle->initialize(*dataSys->gPhysics, PxCookingParams(PxTolerancesScale()), *dataSys->gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE)) {
 		printf("Car initialization failed\n");
 		exit(69);
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
 	PxTransform carTransform = PxTransform(spawnPosition, spawnRotation);
-	gVehicle->setUpActor(*gScene, carTransform, name);
+	gVehicle->setUpActor(*dataSys->gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
 
@@ -74,18 +66,18 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	gVehicle->mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
 	//adding car to needed lists
-	carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody);
-	gVehicleList.emplace_back(gVehicle);
-	projectileRigidDynamicDict[gVehicle] = std::vector<PxRigidDynamic*>();
+	dataSys->carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody);
+	dataSys->gVehicleList.emplace_back(gVehicle);
+	dataSys->carProjectileRigidDynamicDict[(PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody] = std::vector<PxRigidDynamic*>();
 
 	//creating the car entity to add to the entity list
 	Entity car;
-	car.name = "car" + std::to_string(gVehicleList.size());
+	car.name = "car" + std::to_string(dataSys->gVehicleList.size());
 	car.CreateTransformFromPhysX(gVehicle->mPhysXState.physxActor.rigidBody->getGlobalPose());
 	car.physType = PhysicsType::CAR;
-	car.collisionBox = carRigidDynamicList.back();
+	car.collisionBox = dataSys->carRigidDynamicList.back();
 
-	entityList->emplace_back(car);
+	dataSys->entityList.emplace_back(car);
 }
 
 void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {
@@ -93,63 +85,29 @@ void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {
 
 }
 
-EngineDriveVehicle* CarSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic) {
-
-	for (int i = 0; i < carRigidDynamicList.size(); i++) {
-
-		if (carRigidDynamicList[i] == carRigidDynamic) {
-			return gVehicleList[i];
-		}
-	}
-
-	//unreachable code
-	exit(69);
-}
-
-Entity* CarSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic) {
-
-	for (int i = 0; i < entityList->size(); i++) {
-
-		if (entityList->at(i).collisionBox == rigidDynamic) {
-			return &entityList->at(i);
-		}
-	}
-	//unreachable code
-	exit(69);
-}
-
-void CarSystem::CollideCarProjectile(PxRigidDynamic* car, PxRigidDynamic* projectile) {
-
-
-}
-
-std::vector<EngineDriveVehicle*> CarSystem::GetGVehicleList() {
-	return this->gVehicleList;
-}
-
-void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
+void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//gets the forward vector of the car
-	PxVec3 forwardVector = shootingCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+	PxVec3 forwardVector = shootingCar->getGlobalPose().q.getBasisVector2();
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.x + forwardVector.x * 5,
-			shootingCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.y + projectileRadius + 0.1f,
-			shootingCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.z + forwardVector.z * 5),
-		shootingCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q);
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * 5,
+			shootingCar->getGlobalPose().p.y + projectileRadius + 0.1f,
+			shootingCar->getGlobalPose().p.z + forwardVector.z * 5),
+		shootingCar->getGlobalPose().q);
 
 	//define a projectile
-	physx::PxShape* shape = gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *gMaterial);
+	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *dataSys->gMaterial);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
 
 	//creates the rigid dynamic body to be a diff instance for each projectile (cant be sharing that)
-	PxRigidDynamic* projectileBody = gPhysics->createRigidDynamic(spawnTransform);
+	PxRigidDynamic* projectileBody = dataSys->gPhysics->createRigidDynamic(spawnTransform);
 
 	projectileBody->attachShape(*shape);
 	physx::PxRigidBodyExt::updateMassAndInertia(*projectileBody, projectileMass);
@@ -159,38 +117,20 @@ void CarSystem::Shoot(EngineDriveVehicle* shootingCar) {
 
 	//FIXME
 	projectileBody->setName("temp");
-	gScene->addActor(*projectileBody);
+	dataSys->gScene->addActor(*projectileBody);
 
 	projectileBody->setLinearVelocity(shootForce * forwardVector);
 
 	//adding the projectile to the dict for the correct car
-	projectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
+	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 
 	//creating the projectile entity with name based on 
 	Entity projectile;
-	projectile.name = GetEntityFromRigidDynamic((PxRigidDynamic*)shootingCar->mPhysXState.physxActor.rigidBody)->name + "projectile" + std::to_string(projectileRigidDynamicDict[shootingCar].size());
+	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->carProjectileRigidDynamicDict[shootingCar].size());
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
 
-	entityList->emplace_back(projectile);
+	dataSys->entityList.emplace_back(projectile);
 
 }
-
-void CarSystem::DestroyProjectile(PxRigidDynamic* projectileToDestroy) {
-
-	//destroys the projectile that collided with the car (based on projectile name
-	if (this->gContactReportCallback->contactDetected) {
-		if (this->gContactReportCallback->contactPair.actors[0]->getName() == "temp") {
-			gScene->removeActor(*gContactReportCallback->contactPair.actors[0]);
-			this->gContactReportCallback->contactPair.actors[0]->release();
-		}
-		else {
-			gScene->removeActor(*gContactReportCallback->contactPair.actors[1]);
-			this->gContactReportCallback->contactPair.actors[1]->release();
-		}
-	}
-
-}
-
-

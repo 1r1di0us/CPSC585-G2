@@ -1,6 +1,9 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem() {
+InputSystem::InputSystem(SharedDataSystem* dataSys) {
+
+	this->dataSys = dataSys;
+
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
 		InputSystem::forward[i] = false;
@@ -120,7 +123,9 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
+bool InputSystem::InputToMovement() {
+
+	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();

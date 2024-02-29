@@ -8,12 +8,16 @@
 #include "Entity.h"
 #include <vector>
 #include <cmath>
+#include "SharedDataSystem.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 class PhysicsSystem {
+
+private:
+	SharedDataSystem* dataSys;
 
 public:
 
@@ -54,11 +58,11 @@ public:
 	void initMaterialFrictionTable();
 	void initVehicleSimContext();
 
-	void stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle*> carList);
+	void stepAllVehicleMovementPhysics();
 
-	void stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle*> carList);
+	void stepPhysics();
 
-	PhysicsSystem(); // Constructor
+	PhysicsSystem(SharedDataSystem* dataSys); // Constructor
 
 	void cleanPhysicsSystem();
 
