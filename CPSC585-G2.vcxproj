@@ -62,9 +62,9 @@
     <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\InputSystem.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ModelLoader.h" />
-    <ClInclude Include="src\OBJ_Loader.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />

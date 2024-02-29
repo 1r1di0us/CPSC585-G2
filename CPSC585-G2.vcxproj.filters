@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
-    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\Shader.h" />
@@ -41,7 +40,6 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
-    <ClInclude Include="src\OBJ_Loader.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
@@ -54,9 +52,10 @@
     <ClInclude Include="libraries\snippetvehicle2common\enginedrivetrain\EngineDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
-    <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
