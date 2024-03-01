@@ -81,6 +81,10 @@
     <None Include="assets\Models\bed_double_A.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
     <None Include="src\assets\models\bed_double_A.mtl" />
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
@@ -105,6 +109,10 @@
     <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio_vc.lib" />
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
     <Library Include="physx\debug\LowLevelDynamics_static_64.lib" />
     <Library Include="physx\debug\LowLevel_static_64.lib" />
