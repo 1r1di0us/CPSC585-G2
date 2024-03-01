@@ -5,15 +5,19 @@
 #include <iostream> //for now
 #include <math.h>
 #include "PhysicsSystem.h"
+#include "SharedDataSystem.h"
 
 
 class InputSystem {
 public:
-	InputSystem();
+
+	SharedDataSystem* dataSys;
+
+	InputSystem(SharedDataSystem* dataSys);
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	bool InputToMovement(EngineDriveVehicle* playerCar);
+	bool InputToMovement();
 private:
 	bool gpArr[16];
 	//make these arrays at some point
