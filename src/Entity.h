@@ -16,12 +16,15 @@ using namespace snippetvehicle2;
 enum class PhysicsType {
 	CAR,
 	PROJECTILE,
-	STATIC
+	STATIC,
+	POWERUP
 };
 	
 class Entity {
 
 public:
+
+	//NAMES MUST BE UNIQUE
 	std::string name;
 
 	Model* model;

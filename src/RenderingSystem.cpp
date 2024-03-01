@@ -88,7 +88,7 @@ RenderingSystem::RenderingSystem() {
 }
 
 
-void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
+void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -124,8 +124,8 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
     // getting the car position and rotation
-    glm::vec3 playerPos = entityList[0].transform->getPos();
-    glm::quat playerRot = entityList[0].transform->getRot();
+    glm::vec3 playerPos = entityList->at(0).transform->getPos();
+    glm::quat playerRot = entityList->at(0).transform->getRot();
     //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
     // Calculate the point the camera should look at (e.g., slightly above the player)
@@ -183,9 +183,9 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     renderObject(building, &buildingVAO);
 
     //rendering all other entities starting at 1 (skipping player car)
-    for (int i = 1; i < entityList.size(); i++) {
+    for (int i = 1; i < entityList->size(); i++) {
 
-        switch (entityList[i].physType) {
+        switch (entityList->at(i).physType) {
 
         case (PhysicsType::CAR):
 
@@ -193,10 +193,10 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             glBindTexture(GL_TEXTURE_2D, catTexture);
 
             model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList[i].transform->getPos());
+            model = glm::translate(model, entityList->at(i).transform->getPos());
             // make it look forward
             model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-            model = applyQuaternionToMatrix(model, entityList[i].transform->getRot());
+            model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
             shader.setMat4("model", model);
             renderObject(tank, &tankVAO);
 
@@ -207,7 +207,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             glBindTexture(GL_TEXTURE_2D, redTexture);
 
             model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList[i].transform->getPos());
+            model = glm::translate(model, entityList->at(i).transform->getPos());
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
 
