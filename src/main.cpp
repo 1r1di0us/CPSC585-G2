@@ -98,14 +98,12 @@ int main() {
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         if (inputSys.InputToMovement()) {
-            carSys.Shoot(dataSys.entityList[0].collisionBox);
+            carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
         }
-
-        //THIS IS BROKEN BELOW
 
         // render
         // ------
-        renderingSystem.updateRenderer(dataSys.entityList, camera, totalTimeLeft);
+        renderingSystem.updateRenderer(std::make_shared<std::vector<Entity>>(dataSys.entityList), camera, totalTimeLeft);
 
         //only updating the physics at max 60hz while everything else updates at max speed
         if (physicsSimTime.count() <= 0.0f) {

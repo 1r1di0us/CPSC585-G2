@@ -18,8 +18,7 @@ using namespace snippetvehicle2;
 //ERROR HERE WHERE THE ENTITY IS NOT PROPERLY LINKED?
 struct CarInfo{
 	//waow smart pointer! I HARDLY KNOW ER
-	//std::shared_ptr<Entity> entity;
-	Entity* entity;
+	std::shared_ptr<Entity> entity;
 	int score = 0;
 	float respawnTimeLeft = 0;
 	float parryTimeLeft = 0;
@@ -59,9 +58,17 @@ private:
 
 public:
 
+	/*
+	* CONSTANTS:
+	*/
+
+	//respawn timer
+	const float RESPAWNLENGTH = 2.5f;
+
 	//graphics system might need to use this too idk
 	//entity helper functions move from entity cpp?
 
+	//the GOAT list of entities
 	std::vector<Entity> entityList;
 
 	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
@@ -71,9 +78,6 @@ public:
 	PxScene* gScene = NULL;
 	PxMaterial* gMaterial = NULL;
 
-	//respawn timer
-	const float RESPAWNLENGTH = 2.5f;
-
 	//need to have list of rigid dynamics corresponding to gvehicles vehicles to move the correct vehicle given rigid dynamic
 	std::vector<PxRigidDynamic*> carRigidDynamicList;
 	std::vector<EngineDriveVehicle*> gVehicleList;
@@ -82,13 +86,13 @@ public:
 	std::vector<CarInfo> carInfoList;
 
 	//gets the car info struct using an entity
-	CarInfo* GetCarInfoStructFromEntity(Entity* entity);
+	std::shared_ptr<CarInfo> GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
 
 	//gets the gVehicle given the rigid dynamic
 	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
 
 	//returns an entity given its rigid dynamic component
-	Entity* GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
+	std::shared_ptr<Entity> GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
 
 	/*
 	* PROJECTILES
@@ -98,7 +102,7 @@ public:
 	std::unordered_map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;
 
 	//finds the car that shot a given projectile
-	Entity* GetCarThatShotProjectile(PxRigidDynamic* projectile);
+	std::shared_ptr<Entity> GetCarThatShotProjectile(PxRigidDynamic* projectile);
 
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);

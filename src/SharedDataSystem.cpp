@@ -1,10 +1,10 @@
 #include "SharedDataSystem.h"
 
-CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(Entity* entity) {
+std::shared_ptr<CarInfo> SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
 	
-	for (CarInfo carInfo : carInfoList) {
-		if (carInfo.entity->name == entity->name) {
-			return &carInfo;
+	for (int i = 0; i < carInfoList.size(); i++) {
+		if (carInfoList[i].entity->name == entity->name) {
+			return std::make_shared<CarInfo>(carInfoList[i]);
 		}
 	}
 
@@ -25,12 +25,12 @@ EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic*
 	exit(69);
 }
 
-Entity* SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic) {
+std::shared_ptr<Entity> SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic) {
 
 	for (int i = 0; i < entityList.size(); i++) {
 
 		if (entityList.at(i).collisionBox == rigidDynamic) {
-			return &entityList.at(i);
+			return std::make_shared<Entity>(entityList[i]);
 		}
 	}
 
@@ -38,7 +38,7 @@ Entity* SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic
 	exit(69);
 }
 
-Entity* SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
+std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
 
 	//not sure if there is a better way to do this
 	//go through every list of shot projectiles and search for the passed one
@@ -59,11 +59,11 @@ Entity* SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
 
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
-	Entity* carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
-	Entity* projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
+	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
 	//increase score of car that shot
-	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
+	std::shared_ptr<CarInfo> shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
 	printf("score of %s: %d\n", shootingCarInfo->entity->name, shootingCarInfo->score);
@@ -103,7 +103,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
-	Entity* projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
 	//entity list
 	for (int i = 0; i < entityList.size(); i++) {
@@ -136,8 +136,8 @@ void SharedDataSystem::ResolveCollisions() {
 		PxActor* actor2 = gContactReportCallback->contactPair.actors[1];
 
 		//get the two entities that collided
-		Entity* entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
-		Entity* entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
+		std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
+		std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
 
 		//determines the logic to use
 		switch (entity1->physType) {

@@ -81,7 +81,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 
 	//creating the car info struct
 	CarInfo carInfo;
-	carInfo.entity = &dataSys->entityList.back();
+	carInfo.entity = std::make_shared<Entity>(dataSys->entityList.back());
 	dataSys->carInfoList.emplace_back(carInfo);
 	
 }
@@ -132,7 +132,7 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 
-	//creating the projectile entity with name based on 
+	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
 	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->carProjectileRigidDynamicDict[shootingCar].size());
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
