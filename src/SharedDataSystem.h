@@ -8,19 +8,21 @@
 #include "snippetcommon/SnippetPVD.h"
 #include "Entity.h"
 #include <unordered_map>
+#include <memory>
 
 using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 //car info struct
+//ERROR HERE WHERE THE ENTITY IS NOT PROPERLY LINKED?
 struct CarInfo{
+	//waow smart pointer! I HARDLY KNOW ER
+	//std::shared_ptr<Entity> entity;
 	Entity* entity;
-	EngineDriveVehicle* gVehicle;
-	PxRigidDynamic* rigidDynamic;
-	int score;
-	float respawnTimeLeft;
-	float parryTimeLeft;
+	int score = 0;
+	float respawnTimeLeft = 0;
+	float parryTimeLeft = 0;
 };
 
 class SharedDataSystem {

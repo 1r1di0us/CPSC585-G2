@@ -78,6 +78,12 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	car.collisionBox = dataSys->carRigidDynamicList.back();
 
 	dataSys->entityList.emplace_back(car);
+
+	//creating the car info struct
+	CarInfo carInfo;
+	carInfo.entity = &dataSys->entityList.back();
+	dataSys->carInfoList.emplace_back(carInfo);
+	
 }
 
 void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {

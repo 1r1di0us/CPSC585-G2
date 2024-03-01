@@ -2,15 +2,11 @@
 
 CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(Entity* entity) {
 	
-	printf("pp1\n");
-
 	for (CarInfo carInfo : carInfoList) {
-		if (carInfo.entity == entity) {
+		if (carInfo.entity->name == entity->name) {
 			return &carInfo;
 		}
 	}
-
-	printf("pp");
 
 	//unreachable code
 	exit(69);
@@ -70,6 +66,8 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
+	printf("score of %s: %d\n", shootingCarInfo->entity->name, shootingCarInfo->score);
+
 	/*
 	* remove the projectile from all lists
 	*/
@@ -93,9 +91,9 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	projectile->release();
 
 	//respawn shit (either have to call respawn function in main, or merge car and physics) (i think)
-	//UNFINISHED
-	/*CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	hitCar->respawnTimeLeft = RESPAWNLENGTH;*/
+		//UNFINISHED
+	//CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
+	//hitCar->respawnTimeLeft = RESPAWNLENGTH;
 
 }
 
@@ -104,7 +102,28 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
-	printf("projectile hit static\n");
+
+	Entity* projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+
+	//entity list
+	for (int i = 0; i < entityList.size(); i++) {
+		if (entityList[i].name == projectileEntity->name) {
+			entityList.erase(entityList.begin() + i);
+		}
+	}
+
+	//car projectile dict
+	for (auto& entry : carProjectileRigidDynamicDict) {
+		for (int i = 0; i < entry.second.size(); i++) {
+			if (carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first][i] == (PxRigidDynamic*)projectile) {
+				carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].erase(carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].begin() + i);
+			}
+		}
+	}
+
+	//delete the projectile
+	gScene->removeActor(*projectile);
+	projectile->release();
 }
 
 void SharedDataSystem::ResolveCollisions() {
