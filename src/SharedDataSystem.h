@@ -15,11 +15,12 @@ using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 //car info struct
-//ERROR HERE WHERE THE ENTITY IS NOT PROPERLY LINKED?
 struct CarInfo{
 	//waow smart pointer! I HARDLY KNOW ER
 	std::shared_ptr<Entity> entity;
 	int score = 0;
+	//THANKS MURTAZA!
+	bool isAlive = true;
 	float respawnTimeLeft = 0;
 	float parryTimeLeft = 0;
 };
@@ -32,6 +33,7 @@ private:
 
 		public:
 
+			//THANKS MATT!
 			bool contactDetected = false;
 			PxContactPairHeader contactPair;
 
@@ -65,7 +67,12 @@ public:
 	//respawn timer
 	const float RESPAWNLENGTH = 2.5f;
 
-	//graphics system might need to use this too idk
+	//timestep value, easily modifiable
+	const PxReal TIMESTEP = 1.0f / 60.0f;
+
+	//the min distance cars can spawn from other cars
+	const PxReal CARSPAWNDISTANCE = 5.0f;
+
 	//entity helper functions move from entity cpp?
 
 	//the GOAT list of entities
@@ -91,8 +98,17 @@ public:
 	//gets the gVehicle given the rigid dynamic
 	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
 
+	//gets the rigid dynamic from the vehicle
+	PxRigidDynamic* GetRigidDynamicFromVehicle(EngineDriveVehicle* gVehicle);
+
 	//returns an entity given its rigid dynamic component
 	std::shared_ptr<Entity> GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
+
+	//gets the list of dead cars to do shit to
+	std::vector<std::shared_ptr<CarInfo>> GetListOfDeadCars();
+
+	//returns a location where an entity can be respawned
+	PxVec3 DetermineSpawnLocation(PhysicsType physType);
 
 	/*
 	* PROJECTILES
