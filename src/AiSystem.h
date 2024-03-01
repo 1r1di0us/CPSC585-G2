@@ -3,9 +3,10 @@
 #include "PhysicsSystem.h"
 #include <math.h>
 
-enum State { SIT, SPIN, MOVETO }; //no idea how to do what I want
+enum State;
 
 class AiSystem {
+public:
 	State state;
 
 	AiSystem();

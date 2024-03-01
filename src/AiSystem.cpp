@@ -1,5 +1,7 @@
 #include "AiSystem.h"
 
+enum State { SIT, SPIN, MOVETO };  //no idea how to do what I want
+
 AiSystem::AiSystem() {
 	state = MOVETO;
 }
@@ -23,6 +25,9 @@ void AiSystem::update(EngineDriveVehicle* aiCar) {
 }
 
 void AiSystem::sit_behaviour(EngineDriveVehicle* aiCar) {
+	aiCar->mCommandState.throttle = 0.f;
+	aiCar->mCommandState.brakes[0] = 1.f;
+	aiCar->mCommandState.nbBrakes = 1.f;
 	//would love to make it a turret that shoots periodically but i can't turn the turret
 }
 

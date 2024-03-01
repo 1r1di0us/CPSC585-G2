@@ -10,6 +10,7 @@
 #include "InputSystem.h"
 #include "SoundSystem.h"
 #include "CarSystem.h"
+#include "AiSystem.h"
 #include <chrono>
 #include <thread>
 
@@ -27,6 +28,7 @@ CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getM
 InputSystem inputSys;
 RenderingSystem renderingSystem;
 SoundSystem soundSys;
+AiSystem aiSys;
 Camera camera;
 
 //time related variables
@@ -104,6 +106,8 @@ int main() {
             carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
+
+        //aiSys.update(carSys.GetVehicleFromRigidDynamic(entityList[1].collisionBox));
 
         //THIS IS BROKEN BELOW
 
