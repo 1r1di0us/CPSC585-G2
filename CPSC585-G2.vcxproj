@@ -30,6 +30,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\serialization\SerializationCommon.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CarSystem.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
