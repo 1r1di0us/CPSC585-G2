@@ -1,10 +1,10 @@
 #include "SharedDataSystem.h"
 
-std::shared_ptr<CarInfo> SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
+CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
 	
 	for (int i = 0; i < carInfoList.size(); i++) {
 		if (carInfoList[i].entity->name == entity->name) {
-			return std::make_shared<CarInfo>(carInfoList[i]);
+			return &carInfoList[i];
 		}
 	}
 
@@ -63,10 +63,10 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
 	//increase score of car that shot
-	std::shared_ptr<CarInfo> shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
+	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
-	printf("score of %s: %d\n", shootingCarInfo->entity->name, shootingCarInfo->score);
+	printf("score of %s: %d\n", shootingCarInfo->entity->name.c_str(), shootingCarInfo->score);
 
 	/*
 	* remove the projectile from all lists

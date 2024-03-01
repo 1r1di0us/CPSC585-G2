@@ -86,7 +86,7 @@ public:
 	std::vector<CarInfo> carInfoList;
 
 	//gets the car info struct using an entity
-	std::shared_ptr<CarInfo> GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
+	CarInfo* GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
 
 	//gets the gVehicle given the rigid dynamic
 	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
