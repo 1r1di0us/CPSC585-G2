@@ -27,6 +27,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\CarSystem.cpp" />
+    <ClCompile Include="src\SharedDataSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -56,6 +57,7 @@
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
     <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\CarSystem.h" />
+    <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
   </ItemGroup>
   <ItemGroup>

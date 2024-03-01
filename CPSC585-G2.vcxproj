@@ -41,6 +41,7 @@
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\SharedDataSystem.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Text.cpp" />
@@ -68,6 +69,7 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Text.h" />
