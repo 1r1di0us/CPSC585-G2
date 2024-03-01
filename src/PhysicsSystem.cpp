@@ -27,6 +27,17 @@ void PhysicsSystem::initPhysX() {
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
+	meshDesc.points.count = ;
+	meshDesc.points.data = ;
+	meshDesc.points.stride;
+	
+	meshDesc.triangles.count;
+	meshDesc.triangles.data;
+	meshDesc.triangles.stride;
+
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = gGravity;
 
