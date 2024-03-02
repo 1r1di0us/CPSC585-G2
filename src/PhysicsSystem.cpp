@@ -1,4 +1,5 @@
 #include "PhysicsSystem.h"
+#include "RenderingSystem.h"
 
 //initializes physx
 void PhysicsSystem::initPhysX() {
@@ -8,17 +9,6 @@ void PhysicsSystem::initPhysX() {
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
-
-	PxTriangleMeshDesc meshDesc;
-	meshDesc.setToDefault();
-
-	meshDesc.points.count = ;
-	meshDesc.points.data = ;
-	meshDesc.points.stride;
-	
-	meshDesc.triangles.count;
-	meshDesc.triangles.data;
-	meshDesc.triangles.stride;
 
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = gGravity;
@@ -52,8 +42,46 @@ void PhysicsSystem::initPhysX() {
 }
 
 //creates the ground
-void PhysicsSystem::initGroundPlane() {
+void PhysicsSystem::initGroundPlane()
+{
+	/////////////////////////////////////////////////////////////////////////
+	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeWithObstacles.obj");
 
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
+	meshDesc.points.count = (PxU32)groundObstacles.vertices.size();
+	meshDesc.points.data = groundObstacles.vertices.data();
+	meshDesc.points.stride = sizeof(PxVec3);
+
+	meshDesc.triangles.count = (PxU32)(groundObstacles.indices.size() / 3);
+	meshDesc.triangles.data = groundObstacles.indices.data();
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxCookingParams cookParams = gPhysics->getTolerancesScale();
+	bool status = PxCookTriangleMesh(cookParams, meshDesc, writeBuffer);
+	if (!status) std::cout << "Cooking failed! Get out of the kitchen!" << std::endl;
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+	PxTriangleMesh* trimesh = gPhysics->createTriangleMesh(readBuffer);
+
+	PxTriangleMeshGeometry meshGeom = PxTriangleMeshGeometry(trimesh, PxMeshScale(1));
+	PxShape* meshShape = gPhysics->createShape(meshGeom, *gMaterial, true);
+
+	// VVV This is just the collision code logic for Matt's entity system. Need to adapt to ours  
+	//if(gameState->entityList.at(i).name != "map_border")
+	//{
+	//	PxFilterData meshFilter(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
+	//	meshShape->setSimulationFilterData(meshFilter);
+	//}
+
+	PxTransform meshTrans(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
+
+	meshStatic->attachShape(*meshShape);
+	gScene->addActor(*meshStatic);
+	/////////////////////////////////////////////////////////////////////////
 	gGroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	for (PxU32 i = 0; i < gGroundPlane->getNbShapes(); i++)
 	{
