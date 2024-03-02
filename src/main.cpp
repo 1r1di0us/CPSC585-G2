@@ -28,7 +28,7 @@ CarSystem carSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem;
 SoundSystem soundSys;
-AiSystem aiSys;
+AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
@@ -109,7 +109,7 @@ int main() {
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 
-        //aiSys.update(carSys.GetVehicleFromRigidDynamic(entityList[1].collisionBox));
+        aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox));
 
         // render
         // ------
