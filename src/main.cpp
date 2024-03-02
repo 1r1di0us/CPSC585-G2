@@ -25,13 +25,13 @@ SharedDataSystem dataSys;
 PhysicsSystem physicsSys(&dataSys);
 CarSystem carSys(&dataSys);
 InputSystem inputSys(&dataSys);
-RenderingSystem renderingSystem;
+RenderingSystem renderingSystem(&dataSys);
 SoundSystem soundSys;
 Camera camera;
 
 //time related variables
 const double TIMELIMIT = 180.0f;
-const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(physicsSys.getTIMESTEP());
+const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> totalTimePassed;
@@ -115,6 +115,7 @@ int main() {
         if (physicsSimTime.count() <= 0.0f) {
             physicsSys.stepPhysics();
             physicsSimTime = PHYSICSUPDATESPEED;
+            carSys.RespawnAllCars();
         }
 
     }

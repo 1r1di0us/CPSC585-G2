@@ -51,13 +51,13 @@ std::shared_ptr<Entity> SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynam
 	exit(69);
 }
 
-std::vector<std::shared_ptr<CarInfo>> SharedDataSystem::GetListOfDeadCars() {
+std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 
-	std::vector<std::shared_ptr<CarInfo>> deadCarVec;
+	std::vector<CarInfo*> deadCarVec;
 
-	for (CarInfo carInfo : carInfoList) {
-		if (carInfo.isAlive == false) {
-			deadCarVec.emplace_back(std::make_shared<CarInfo>(carInfo));
+	for (int i = 0; i < carInfoList.size(); i++) {
+		if (carInfoList[i].isAlive == false) {
+			deadCarVec.emplace_back(&carInfoList[i]);
 		}
 	}
 
@@ -66,11 +66,11 @@ std::vector<std::shared_ptr<CarInfo>> SharedDataSystem::GetListOfDeadCars() {
 
 PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 
+	PxVec2 spawnPoint(10, 0);
+
 	//the spacing from other entities of the same physics type is important
 	switch (physType) {
 	case PhysicsType::CAR:
-
-		PxVec3 spawnPoint;
 
 		//need to get the locations of all cars on map
 		//need to find any point where the cars are min distance away from each other
@@ -78,7 +78,6 @@ PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 		//only care about x and z
 
 
-		return spawnPoint;
 		break;
 	case PhysicsType::POWERUP:
 
@@ -88,7 +87,7 @@ PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 		break;
 	}
 
-	return PxVec3(0, 1, 20);
+	return PxVec3(spawnPoint.x, 1, spawnPoint.y);
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {

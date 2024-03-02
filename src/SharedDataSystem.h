@@ -105,7 +105,7 @@ public:
 	std::shared_ptr<Entity> GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
 
 	//gets the list of dead cars to do shit to
-	std::vector<std::shared_ptr<CarInfo>> GetListOfDeadCars();
+	std::vector<CarInfo*> GetListOfDeadCars();
 
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineSpawnLocation(PhysicsType physType);
