@@ -10,6 +10,7 @@
 #include "InputSystem.h"
 #include "SoundSystem.h"
 #include "CarSystem.h"
+#include "AiSystem.h"
 #include "SharedDataSystem.h"
 #include <chrono>
 #include <thread>
@@ -27,6 +28,7 @@ CarSystem carSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem;
 SoundSystem soundSys;
+AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
@@ -37,7 +39,7 @@ std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> totalTimePassed;
 std::chrono::duration<double> totalTimeLeft;
 std::chrono::high_resolution_clock::time_point previousIterationTime;
-std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED;
+std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED; //change in time
 
 int main() {
     
@@ -85,6 +87,7 @@ int main() {
         previousIterationTime = currentTime;
         //printf("frame time: %f\n", physicsSimTime);
 
+
         totalTimePassed.count();
 
         FPSCOUNTER++;
@@ -104,6 +107,11 @@ int main() {
         
         if (inputSys.InputToMovement()) {
             carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
+            soundSys.PlaySound("assets/PianoClusterThud.wav");
+        }
+
+        if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), physicsSimTime)) {
+            carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 

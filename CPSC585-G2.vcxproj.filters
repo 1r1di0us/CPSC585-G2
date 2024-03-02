@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -27,6 +27,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\CarSystem.cpp" />
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\SharedDataSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,7 @@
     <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
+    <ClInclude Include="src\AiSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
