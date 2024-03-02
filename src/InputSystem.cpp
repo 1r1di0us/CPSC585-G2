@@ -1,12 +1,15 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem() {
+InputSystem::InputSystem(GameState* gameState) {
+	this->gameState = gameState;
+
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
 		InputSystem::forward[i] = false;
 		InputSystem::backward[i] = false;
 		InputSystem::left[i] = false;
 		InputSystem::right[i] = false;
+		InputSystem::confirm[i] = false;
 		InputSystem::shoot[i] = 0;
 	}
 }
@@ -42,6 +45,10 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 			shoot[0] = 0;
 		}
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+		confirm[0] = true;
+	}
 }
 
 void InputSystem::checkIfGamepadsPresent() {
@@ -55,6 +62,7 @@ void InputSystem::checkIfGamepadsPresent() {
 	}
 }
 
+// Need to add confirm button on controller
 void InputSystem::getGamePadInput() {
 	GLFWgamepadstate state;
 	for (int j = 0; j < 16; j++) {
@@ -209,6 +217,59 @@ bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 	}
 	else {
 		return false;
+	}
+}
+
+void InputSystem::InputToMenu() {
+	std::vector<int> checkvals = { 0 };
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+
+	bool l = false;
+	bool r = false;
+	bool conf = false;
+
+	for (int i : checkvals) if (left[i]) {
+		l = true;
+		left[i] = false;
+	}
+	for (int i : checkvals) if (right[i]) {
+		r = true;
+		right[i] = false;
+	}
+	for (int i : checkvals) if (confirm[i]) {
+		conf = true;
+		confirm[i] = false;
+	}
+
+	// Check if left key is pressed and was not pressed before
+	if (l && !menuLeftPressed) {
+		gameState->menuOptionIndex = (gameState->menuOptionIndex - 1) % gameState->nbMenuOptions;
+		menuLeftPressed = true;
+	}
+	else if (!l) {
+		menuLeftPressed = false;
+	}
+
+	// Check if right key is pressed and was not pressed before
+	if (r && !menuRightPressed) {
+		gameState->menuOptionIndex = (gameState->menuOptionIndex + 1) % gameState->nbMenuOptions;
+		menuRightPressed = true;
+	}
+	else if (!r) {
+		menuRightPressed = false;
+	}
+
+	if (conf && gameState->menuOptionIndex == 0) {
+		gameState->inMenu = false;
+	}
+	else if (conf && gameState->menuOptionIndex == 1) {
+		gameState->quit = true;
+	}
+
+	if (gameState->menuOptionIndex < 0) {
+		gameState->menuOptionIndex = gameState->nbMenuOptions - 1;
 	}
 }
 

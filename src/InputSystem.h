@@ -5,15 +5,19 @@
 #include <iostream> //for now
 #include <math.h>
 #include "PhysicsSystem.h"
+#include "GameState.h"
 
 
 class InputSystem {
 public:
-	InputSystem();
+	InputSystem(GameState* gameState);
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
 	bool InputToMovement(EngineDriveVehicle* playerCar);
+	void InputToMenu();
+	// GameState Pointer
+	GameState* gameState;
 private:
 	bool gpArr[16];
 	//make these arrays at some point
@@ -21,8 +25,10 @@ private:
 	bool backward[17];
 	bool left[17];
 	bool right[17];
+	bool confirm[17];
 	int shoot[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
-
+	bool menuLeftPressed = false;
+	bool menuRightPressed = false;
 };

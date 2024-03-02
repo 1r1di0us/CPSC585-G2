@@ -10,6 +10,7 @@
 #include "InputSystem.h"
 #include "SoundSystem.h"
 #include "CarSystem.h"
+#include "GameState.h"
 #include <chrono>
 #include <thread>
 
@@ -22,10 +23,11 @@ const unsigned int SCR_HEIGHT = 600;
 
 //system creation and other important variables
 std::vector<Entity> entityList;
+GameState gameState;
 PhysicsSystem physicsSys;
 CarSystem carSys(physicsSys.getPhysics(), physicsSys.getScene(), physicsSys.getMaterial(), &entityList);
-InputSystem inputSys;
-RenderingSystem renderingSystem;
+InputSystem inputSys(&gameState);
+RenderingSystem renderingSystem(&gameState);
 SoundSystem soundSys;
 Camera camera;
 
@@ -100,11 +102,16 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
-            carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
-            soundSys.PlaySound("assets/PianoClusterThud.wav");
+        if (gameState.inMenu) {
+            inputSys.InputToMenu();
         }
-
+        else {
+            if (inputSys.InputToMovement(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox))) {
+                carSys.Shoot(carSys.GetVehicleFromRigidDynamic(entityList[0].collisionBox));
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
+        }
+        
         //THIS IS BROKEN BELOW
 
         // render
@@ -115,6 +122,10 @@ int main() {
         if (physicsSimTime.count() <= 0.0f) {
             physicsSys.stepPhysics(entityList, carSys.GetGVehicleList());
             physicsSimTime = PHYSICSUPDATESPEED;
+        }
+
+        if (gameState.quit) {
+            break;
         }
 
     }

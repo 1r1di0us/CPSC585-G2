@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int blueTexture, catTexture, redTexture;
+unsigned int blueTexture, catTexture, redTexture, menuPlay, menuQuit;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -25,7 +25,8 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
 }
 
 // constructor
-RenderingSystem::RenderingSystem() {
+RenderingSystem::RenderingSystem(GameState* gameState) {
+    this->gameState = gameState;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -56,6 +57,8 @@ RenderingSystem::RenderingSystem() {
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     catTexture = generateTexture("src/Textures/cat.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
+    menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
+    menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -86,7 +89,6 @@ RenderingSystem::RenderingSystem() {
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
 }
-
 
 void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -219,6 +221,24 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
 
             break;
         }
+    }
+
+    // Setup UI if necessary
+    if (gameState->inMenu) {
+        GLuint fboId = 0;
+        glGenFramebuffers(1, &fboId);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
+        if (gameState->menuOptionIndex == 0) {
+            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D, menuPlay, 0);
+        }
+        else if (gameState->menuOptionIndex == 1) {
+            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D, menuQuit, 0);
+        }
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // if not already bound
+        glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     // swap buffers and poll IO events
