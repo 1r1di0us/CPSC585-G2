@@ -4,7 +4,9 @@ enum State { SIT, SPIN, MOVETO };  //no idea how to do what I want
 
 AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
+	timer = 0.0;
 	state = MOVETO;
+
 }
 
 //TODO: add randomness and timing.
@@ -13,34 +15,53 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 //TODO: ask matt why anyone would want to use quaternions to find the direction the guy is facing.
 //TODO: actually think of an ai
 
-void AiSystem::update(EngineDriveVehicle* aiCar) {
+bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
+	bool fire = false;
+	if (timer < deltaTime.count()) {
+		timer = 0.0;
+	} else {
+		timer -= deltaTime.count();
+	}
+
 	if (state == SIT) {
-		sit_behaviour(aiCar);
+		fire = sit_behaviour(aiCar, fire);
 	}
 	else if (state == SPIN) {
-		spin_behaviour(aiCar);
+		fire = spin_behaviour(aiCar, fire);
 	}
 	else if (state == MOVETO) {
-		moveto_behaviour(aiCar, PxVec3(0, 0, 0));
+		fire = moveto_behaviour(aiCar, PxVec3(0, 0, 0), fire);
 	}
+	return fire;
 }
 
-void AiSystem::sit_behaviour(EngineDriveVehicle* aiCar) {
+bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.steer = 0.f;
 	aiCar->mCommandState.throttle = 0.f;
 	aiCar->mCommandState.brakes[0] = 1.f;
 	aiCar->mCommandState.nbBrakes = 1.f;
-	//would love to make it a turret that shoots periodically but i can't turn the turret
+	if (timer == 0.0) {
+		fire = true;
+		state = SPIN;
+		distribution = std::normal_distribution<double>(5.0, 2.0);
+		timer = distribution(rand); //generate a random number with normal distribution with mean of 5 and standard deviation of 2
+	}
+	return fire;
 }
 
-void AiSystem::spin_behaviour(EngineDriveVehicle* aiCar) {
+bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.steer = 2.5;
 	aiCar->mCommandState.throttle = 1; //speeeeeeeeeeeeeeeeeen
 	aiCar->mCommandState.brakes[0] = 0.f;
 	aiCar->mCommandState.nbBrakes = 0.f;
+	if (timer == 0.0) {
+		state = SIT;
+		timer = 1.0;
+	}
+	return fire;
 }
 
-void AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal) {
+bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fire) {
 
 	PxVec3 carPos = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p;
 	float dist = (goal - carPos).magnitude();
@@ -58,7 +79,8 @@ void AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal) {
 
 	if (dist < 2) {
 		state = SPIN;
-		return;
+		distribution = std::normal_distribution<double>(5.0, 2.0);
+		timer = distribution(rand); //generate a random number with normal distribution with mean of 5 and standard deviation of 2
 	}
 	else if (dist < 3) {
 		aiCar->mCommandState.nbBrakes = 1.0f;
@@ -79,4 +101,5 @@ void AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal) {
 		aiCar->mCommandState.brakes[0] = 0.0f;
 		aiCar->mCommandState.throttle = 1;
 	}
+	return fire;
 }
