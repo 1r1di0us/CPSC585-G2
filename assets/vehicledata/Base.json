@@ -326,25 +326,25 @@
             "WheelId": 0,
             "Damping": 8528.1201171875,
             "Stiffness": 32833.30078125,
-            "SprungMass": 1053.7739868164063
+            "SprungMass": 5053.7739868164063
         },
         {
             "WheelId": 1,
             "Damping": 8742.1904296875,
             "Stiffness": 33657.3984375,
-            "SprungMass": 1067.6749877929688
+            "SprungMass": 5067.6749877929688
         },
         {
             "WheelId": 2,
             "Damping": 6765.97021484375,
             "Stiffness": 26049.0,
-            "SprungMass": 1039.3489990234375
+            "SprungMass": 5039.3489990234375
         },
         {
             "WheelId": 3,
             "Damping": 6985.47998046875,
             "Stiffness": 26894.099609375,
-            "SprungMass": 1053.6029968261719
+            "SprungMass": 5053.6029968261719
         }
     ],
     "SuspensionForceLegacyParams": [
@@ -380,7 +380,7 @@
     "TireForceParams": [
         {
             "WheelId": 0,
-            "LongitudinalStiffness": 24525.0,
+            "LongitudinalStiffness": 54525.0,
             "LateralStiffnessX": 0.009999999776482582,
             "LateralStiffnessY": 118699.637252138,
             "CamberStiffness": 0.0,
@@ -412,7 +412,7 @@
         },
         {
             "WheelId": 1,
-            "LongitudinalStiffness": 24525.0,
+            "LongitudinalStiffness": 54525.0,
             "LateralStiffnessX": 0.009999999776482582,
             "LateralStiffnessY": 118699.637252138,
             "CamberStiffness": 0.0,
@@ -444,7 +444,7 @@
         },
         {
             "WheelId": 2,
-            "LongitudinalStiffness": 24525.0,
+            "LongitudinalStiffness": 54525.0,
             "LateralStiffnessX": 0.009999999776482582,
             "LateralStiffnessY": 143930.84033118,
             "CamberStiffness": 0.0,
@@ -476,7 +476,7 @@
         },
         {
             "WheelId": 3,
-            "LongitudinalStiffness": 24525.0,
+            "LongitudinalStiffness": 54525.0,
             "LateralStiffnessX": 0.009999999776482582,
             "LateralStiffnessY": 143930.84033118,
             "CamberStiffness": 0.0,

@@ -189,11 +189,11 @@ bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
 			playerCar->mCommandState.steer = -angle;
 		}
-		else if (angle > -M_PI/8) {
-			playerCar->mCommandState.steer = -1;
-		}
-		else if (angle < M_PI/8) {
+		else if (angle < -M_PI/8) {
 			playerCar->mCommandState.steer = 1;
+		}
+		else if (angle > M_PI/8) {
+			playerCar->mCommandState.steer = -1;
 		}
 	}
 
