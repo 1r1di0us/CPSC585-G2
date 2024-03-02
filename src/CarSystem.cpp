@@ -86,11 +86,31 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	
 }
 
-void CarSystem::RespawnCar(EngineDriveVehicle* carToRespawn) {
+void CarSystem::RespawnAllCars() {
 
-	//need to find where to respawn
-	//have a respawn timer per car (dataSys)
-	//have a car info struct: score, respawn time left, entity/vehicle..., (datasys)
+	//go through all dead cars
+	for (CarInfo* carInfo : dataSys->GetListOfDeadCars()) {
+
+		//if the car is ready to be respawned
+		if (carInfo->respawnTimeLeft <= 0) {
+
+			//get the spawn location
+			PxVec3 spawnVec = dataSys->DetermineSpawnLocation(carInfo->entity->physType);
+
+			//"spawn" the car
+			carInfo->isAlive = true;
+			carInfo->respawnTimeLeft = 0;
+			carInfo->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, false);
+			carInfo->entity->collisionBox->setGlobalPose(PxTransform(spawnVec));
+		}
+		else {
+
+			//subtract the physics system update rate from the respawn timer
+				//real time instead maybe?
+			carInfo->respawnTimeLeft -= dataSys->TIMESTEP;
+		}
+	}
+
 }
 
 void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
