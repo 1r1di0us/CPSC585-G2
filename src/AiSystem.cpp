@@ -23,6 +23,10 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 		timer -= deltaTime.count();
 	}
 
+	if (aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.magnitude() > 30.f) {
+		state = MOVETO;
+	}
+
 	if (state == SIT) {
 		fire = sit_behaviour(aiCar, fire);
 	}
