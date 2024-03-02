@@ -1,23 +1,5 @@
 #include "PhysicsSystem.h"
 
-//custom collision callback system
-class ContactReportCallback : public PxSimulationEventCallback {
-	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
-		PX_UNUSED(pairHeader);
-		PX_UNUSED(pairs);
-		PX_UNUSED(nbPairs);
-
-		std::cout << "Callback system: Stop colliding with me!" << std::endl;
-	}
-	void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
-	void onWake(physx::PxActor** actors, physx::PxU32 count) {}
-	void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
-	void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
-	void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
-		const physx::PxTransform* poseBuffer,
-		const physx::PxU32 count) {}
-};
-
 //initializes physx
 void PhysicsSystem::initPhysX() {
 
@@ -35,11 +17,11 @@ void PhysicsSystem::initPhysX() {
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = VehicleFilterShader;
 
-	//assigning the custom callback system to our scene
-	ContactReportCallback* gContactReportCallback = new ContactReportCallback();
-	sceneDesc.simulationEventCallback = gContactReportCallback;
-
 	gScene = gPhysics->createScene(sceneDesc);
+
+	//assigning the custom callback system to our scene
+	gScene->setSimulationEventCallback(dataSys->gContactReportCallback);
+
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
 	{
@@ -50,6 +32,12 @@ void PhysicsSystem::initPhysX() {
 	gMaterial = gPhysics->createMaterial(1.0f, 1.0f, 0.0f);
 
 	PxInitVehicleExtension(*gFoundation);
+	
+	//setting all the datasys variables
+	dataSys->gPhysics = gPhysics;
+	dataSys->gScene = gScene;
+	dataSys->gMaterial = gMaterial;
+	
 }
 
 //creates the ground
@@ -97,43 +85,50 @@ void PhysicsSystem::initVehicleSimContext() {
 }
 
 //does all the logic for doing one step through every vehicle movement component
-void PhysicsSystem::stepAllVehicleMovementPhysics(std::vector<EngineDriveVehicle*> carList) {
+void PhysicsSystem::stepAllVehicleMovementPhysics() {
 
 	//goes through each vehicles movement component and updates them one at a time
-	for (EngineDriveVehicle* gVehicle : carList) {
+	for (int i = 0; i < dataSys->gVehicleList.size(); i++) {
 
-		//Forward integrate the vehicle by a single TIMESTEP.
-		//Apply substepping at low forward speed to improve simulation fidelity.
-		const PxVec3 linVel = gVehicle->mPhysXState.physxActor.rigidBody->getLinearVelocity();
-		const PxVec3 forwardDir = gVehicle->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
-		const PxReal forwardSpeed = linVel.dot(forwardDir);
-		const PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
+		//simulate only if the vehicle is alive
+		if (dataSys->carInfoList[i].isAlive) {
 
-		gVehicle->mComponentSequence.setSubsteps(gVehicle->mComponentSequenceSubstepGroupHandle, nbSubsteps);
-		gVehicle->step(TIMESTEP, this->gVehicleSimulationContext);
+			//Forward integrate the vehicle by a single TIMESTEP.
+			//Apply substepping at low forward speed to improve simulation fidelity.
+			const PxVec3 linVel = dataSys->carRigidDynamicList[i]->getLinearVelocity();
+			const PxVec3 forwardDir = dataSys->carRigidDynamicList[i]->getGlobalPose().q.getBasisVector2();
+			const PxReal forwardSpeed = linVel.dot(forwardDir);
+			const PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
 
+			dataSys->gVehicleList[i]->mComponentSequence.setSubsteps(dataSys->gVehicleList[i]->mComponentSequenceSubstepGroupHandle, nbSubsteps);
+			dataSys->gVehicleList[i]->step(dataSys->TIMESTEP, this->gVehicleSimulationContext);
+		}
 	}
 
 }
 
 //simulates one step of physics for all objects in scene
-void PhysicsSystem::stepPhysics(std::vector<Entity> entityList, std::vector<EngineDriveVehicle*> carList) {
+void PhysicsSystem::stepPhysics() {
 
 	//does one step for each car
-	stepAllVehicleMovementPhysics(carList);
+	stepAllVehicleMovementPhysics();
 
 	//Forward integrate the phsyx scene by a single TIMESTEP.
-	gScene->simulate(TIMESTEP);
+	gScene->simulate(dataSys->TIMESTEP);
 	gScene->fetchResults(true);
 
+	dataSys->ResolveCollisions();
+
 	//update the transform components of each entity
-	for (Entity entity : entityList) {
+	for (Entity entity : dataSys->entityList) {
 		entity.updateTransform();
 	}
 	
 }
 
-PhysicsSystem::PhysicsSystem() { // Constructor
+PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
+
+	this->dataSys = dataSys;
 
 	//physx setup
 	initPhysX();
@@ -143,33 +138,8 @@ PhysicsSystem::PhysicsSystem() { // Constructor
 
 }
 
-//TODO: ask matt if needed
+//TODO: make this good
 void PhysicsSystem::cleanPhysicsSystem() {
 
 	gPhysics->release();
-}
-
-PxPhysics* PhysicsSystem::getPhysics()
-{
-	return gPhysics;
-}
-
-PxScene* PhysicsSystem::getScene()
-{
-	return gScene;
-}
-
-PxVec3 PhysicsSystem::getGravity()
-{
-	return gGravity;
-}
-
-PxMaterial* PhysicsSystem::getMaterial()
-{
-	return gMaterial;
-}
-
-double PhysicsSystem::getTIMESTEP()
-{
-	return TIMESTEP;
 }
