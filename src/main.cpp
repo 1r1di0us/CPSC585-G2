@@ -105,7 +105,7 @@ int main() {
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
         
-        if (inputSys.InputToMovement()) {
+        if (inputSys.InputToMovement(physicsSimTime)) {
             carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }

@@ -6,6 +6,7 @@
 #include <math.h>
 #include "PhysicsSystem.h"
 #include "SharedDataSystem.h"
+#include <chrono>
 
 
 class InputSystem {
@@ -17,7 +18,7 @@ public:
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	bool InputToMovement();
+	bool InputToMovement(std::chrono::duration<double> deltaTime);
 private:
 	bool gpArr[16];
 	//make these arrays at some point
@@ -28,5 +29,6 @@ private:
 	int shoot[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
-
+	bool turning;
+	double timer;
 };

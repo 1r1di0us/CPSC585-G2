@@ -12,6 +12,7 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 		InputSystem::right[i] = false;
 		InputSystem::shoot[i] = 0;
 	}
+	turning = false;
 }
 
 void InputSystem::getKeyboardInput(GLFWwindow* window) {
@@ -123,7 +124,14 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement() {
+bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
+
+	if (timer < deltaTime.count()) {
+		timer = 0.0;
+	}
+	else {
+		timer -= deltaTime.count();
+	}
 
 	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
@@ -154,27 +162,22 @@ bool InputSystem::InputToMovement() {
 		right[i] = false;
 	}
 	if (f && !b) {
-		
-		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(-1, 0, 0)).getNormalized();
 	}
 	else if (b && !f) {
-		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(1, 0, 0)).getNormalized();
 	}
 
 	if (l && !r) {
-		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, 1)).getNormalized();
 	}
 	else if (r && !l) {
-		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
 		intentDir = (intentDir + PxVec3(0, 0, -1)).getNormalized();
@@ -191,14 +194,29 @@ bool InputSystem::InputToMovement() {
 		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir)); //triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 		float angle = atan2(dot, det);
 
+		if ((angle < -M_PI / 8 || angle > M_PI / 8) && turning == false && playerCar->mCommandState.throttle > 0.5) {
+			timer = 0.7;
+		}
+		if (timer > 0.1) {
+			playerCar->mCommandState.nbBrakes = 0.7;
+			playerCar->mCommandState.brakes[0] = 0.7; //brake for a quick bit before turning
+		}
+		std::cout << timer << ", " << angle << std::endl;
+
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
-			playerCar->mCommandState.steer = -4*angle;
+			playerCar->mCommandState.steer = -angle;
+			playerCar->mCommandState.throttle = gasPedal;
+			turning = false;
 		}
-		else if (angle > -M_PI/8) {
-			playerCar->mCommandState.steer = -2.5;
-		}
-		else if (angle < M_PI/8) {
+		else if (angle < -M_PI/8) {
 			playerCar->mCommandState.steer = 2.5;
+			playerCar->mCommandState.throttle = gasPedal;
+			turning = true;
+		}
+		else if (angle > M_PI/8) {
+			playerCar->mCommandState.steer = -2.5;
+			playerCar->mCommandState.throttle = gasPedal;
+			turning = true;
 		}
 	}
 
