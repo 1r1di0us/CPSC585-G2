@@ -8,6 +8,7 @@
 #include "snippetcommon/SnippetPVD.h"
 #include "Entity.h"
 #include <map>
+#include "SharedDataSystem.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -26,13 +27,12 @@ struct Command
 
 class CarSystem {
 
+private:
+
+	//a reference to the instance of the shared data system in carsystem
+	SharedDataSystem* dataSys;
+
 public:
-
-	PxPhysics* gPhysics;
-	PxScene* gScene;
-	PxMaterial* gMaterial;
-
-	std::vector<Entity>* entityList;
 
 	//The path to the vehicle json files to be loaded.
 	const char* gVehicleDataPath = "assets/vehicledata";
@@ -45,24 +45,13 @@ public:
 	//automatic transmission
 	const PxU32 gTargetGearCommand = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
 
-	//need to have list of rigid dynamics corresponding to gvehicles vehicles to move the correct vehicle given rigid dynamic
-	std::vector<PxRigidDynamic*> carRigidDynamicList;
-	std::vector<EngineDriveVehicle*> gVehicleList;
-
 	//constructor
-	CarSystem(PxPhysics* gPhysics, PxScene* gScene, PxMaterial* gMaterial, std::vector<Entity>* entityList);
+	CarSystem(SharedDataSystem* dataSys);
 
 	void SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation);
 
-	//need to figure out where to respawn car (WIP)
-	void RespawnCar(EngineDriveVehicle* carToRespawn);
-
-	EngineDriveVehicle* GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic);
-
-	//MIGHT SHIFT OUT TO ANOTHER CLASS IF I CAN FIND A GOOD PLACE FOR A HELPER CLASS
-	Entity* GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic);
-
-	std::vector<EngineDriveVehicle*> GetGVehicleList();
+	//respawn all dead cars
+	void RespawnAllCars();
 
 	/*
 	* PROJECTILES
@@ -73,12 +62,6 @@ public:
 	const PxReal projectileRadius = 1.0f;
 	const float shootForce = 100;
 
-	//the dictionary for all projectiles for all cars
-	std::map<EngineDriveVehicle*, std::vector<PxRigidDynamic*>> projectileRigidDynamicDict;
+	void Shoot(PxRigidDynamic* shootingCar);
 
-	void Shoot(EngineDriveVehicle* shootingCar);
-
-	void DestroyProjectile(PxRigidDynamic* projectileToDestroy);
-
-	//TODO: might need a getter for finding the projectile for collisions
 };

@@ -1,7 +1,8 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem(GameState* gameState) {
-	this->gameState = gameState;
+InputSystem::InputSystem(SharedDataSystem* dataSys) {
+
+	this->dataSys = dataSys;
 
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
@@ -128,7 +129,9 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
+bool InputSystem::InputToMovement() {
+
+	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
@@ -197,11 +200,11 @@ bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
 			playerCar->mCommandState.steer = -4*angle;
 		}
-		else if (angle > -M_PI/8) {
-			playerCar->mCommandState.steer = -2.5;
+		else if (angle < -M_PI/8) {
+			playerCar->mCommandState.steer = 1;
 		}
-		else if (angle < M_PI/8) {
-			playerCar->mCommandState.steer = 2.5;
+		else if (angle > M_PI/8) {
+			playerCar->mCommandState.steer = -1;
 		}
 	}
 
@@ -245,7 +248,7 @@ void InputSystem::InputToMenu() {
 
 	// Check if left key is pressed and was not pressed before
 	if (l && !menuLeftPressed) {
-		gameState->menuOptionIndex = (gameState->menuOptionIndex - 1) % gameState->nbMenuOptions;
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex - 1) % dataSys->nbMenuOptions;
 		menuLeftPressed = true;
 	}
 	else if (!l) {
@@ -254,22 +257,22 @@ void InputSystem::InputToMenu() {
 
 	// Check if right key is pressed and was not pressed before
 	if (r && !menuRightPressed) {
-		gameState->menuOptionIndex = (gameState->menuOptionIndex + 1) % gameState->nbMenuOptions;
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex + 1) % dataSys->nbMenuOptions;
 		menuRightPressed = true;
 	}
 	else if (!r) {
 		menuRightPressed = false;
 	}
 
-	if (conf && gameState->menuOptionIndex == 0) {
-		gameState->inMenu = false;
+	if (conf && dataSys->menuOptionIndex == 0) {
+		dataSys->inMenu = false;
 	}
-	else if (conf && gameState->menuOptionIndex == 1) {
-		gameState->quit = true;
+	else if (conf && dataSys->menuOptionIndex == 1) {
+		dataSys->quit = true;
 	}
 
-	if (gameState->menuOptionIndex < 0) {
-		gameState->menuOptionIndex = gameState->nbMenuOptions - 1;
+	if (dataSys->menuOptionIndex < 0) {
+		dataSys->menuOptionIndex = dataSys->nbMenuOptions - 1;
 	}
 }
 

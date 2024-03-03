@@ -53,12 +53,19 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 
 	pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
-	//if a obstacle collides with the car body or the car body collides with an obstacle
-	if ((filterData0.word0 == COLLISION_FLAG_CHASSIS && filterData1.word0 == COLLISION_FLAG_OBSTACLE)
-		|| (filterData1.word0 == COLLISION_FLAG_CHASSIS && filterData0.word0 == COLLISION_FLAG_OBSTACLE)) {
+	//if a projectile collides with the car body or the car body collides with an projectile
+	if ((filterData0.word0 == COLLISION_FLAG_CHASSIS && filterData1.word0 == COLLISION_FLAG_PROJECTILE)
+		|| (filterData1.word0 == COLLISION_FLAG_CHASSIS && filterData0.word0 == COLLISION_FLAG_PROJECTILE)) {
 		
 		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
 		printf("Car chassis hit obstacle.\n");
+	}
+	//if a projectile hits a static object
+	else if ((filterData0.word0 == COLLISION_FLAG_STATIC && filterData1.word0 == COLLISION_FLAG_PROJECTILE) 
+		|| (filterData1.word0 == COLLISION_FLAG_STATIC && filterData0.word0 == COLLISION_FLAG_PROJECTILE)) {
+
+		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
+		printf("Projectile hit static object.\n");
 	}
 
 	return physx::PxFilterFlags();

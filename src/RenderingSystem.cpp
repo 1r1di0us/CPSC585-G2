@@ -25,8 +25,9 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
 }
 
 // constructor
-RenderingSystem::RenderingSystem(GameState* gameState) {
-    this->gameState = gameState;
+RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
+
+    this->dataSys = dataSys;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -90,7 +91,8 @@ RenderingSystem::RenderingSystem(GameState* gameState) {
     initOBJVAO(plane, &planeVAO, &planeVBO);
 }
 
-void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
+
+void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -126,8 +128,8 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
     // getting the car position and rotation
-    glm::vec3 playerPos = entityList[0].transform->getPos();
-    glm::quat playerRot = entityList[0].transform->getRot();
+    glm::vec3 playerPos = entityList->at(0).transform->getPos();
+    glm::quat playerRot = entityList->at(0).transform->getRot();
     //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
     // Calculate the point the camera should look at (e.g., slightly above the player)
@@ -185,22 +187,26 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     renderObject(building, &buildingVAO);
 
     //rendering all other entities starting at 1 (skipping player car)
-    for (int i = 1; i < entityList.size(); i++) {
+    for (int i = 1; i < entityList->size(); i++) {
 
-        switch (entityList[i].physType) {
+        switch (entityList->at(i).physType) {
 
         case (PhysicsType::CAR):
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, catTexture);
+            //is the car alive? -> render it
+            if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(entityList->at(i)))->isAlive) {
 
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList[i].transform->getPos());
-            // make it look forward
-            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-            model = applyQuaternionToMatrix(model, entityList[i].transform->getRot());
-            shader.setMat4("model", model);
-            renderObject(tank, &tankVAO);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, catTexture);
+
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, entityList->at(i).transform->getPos());
+                // make it look forward
+                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+                model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
+                shader.setMat4("model", model);
+                renderObject(tank, &tankVAO);
+            }
 
             break;
         case (PhysicsType::PROJECTILE):
@@ -209,7 +215,7 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
             glBindTexture(GL_TEXTURE_2D, redTexture);
 
             model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList[i].transform->getPos());
+            model = glm::translate(model, entityList->at(i).transform->getPos());
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
 
@@ -224,15 +230,15 @@ void RenderingSystem::updateRenderer(std::vector<Entity> entityList, Camera came
     }
 
     // Setup UI if necessary
-    if (gameState->inMenu) {
+    if (dataSys->inMenu) {
         GLuint fboId = 0;
         glGenFramebuffers(1, &fboId);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
-        if (gameState->menuOptionIndex == 0) {
+        if (dataSys->menuOptionIndex == 0) {
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D, menuPlay, 0);
         }
-        else if (gameState->menuOptionIndex == 1) {
+        else if (dataSys->menuOptionIndex == 1) {
             glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_2D, menuQuit, 0);
         }
