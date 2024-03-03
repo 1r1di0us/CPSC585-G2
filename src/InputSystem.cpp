@@ -126,7 +126,7 @@ void InputSystem::getGamePadInput() {
 
 bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 
-	//decrement timer
+	//update timer
 	if (brakeTimer < deltaTime.count()) {
 		brakeTimer = 0.0;
 	}
@@ -206,7 +206,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		}
 		else if (angle < -M_PI/8) {
 			playerCar->mCommandState.steer = 1;
-			if (angle < -M_PI / 5 && brakeTimer == 0.0) {
+			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
 				if (carSpeed > 20.0) {
 					brakeTimer = 0.35;
 				}
@@ -217,7 +217,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		}
 		else if (angle > M_PI/8) {
 			playerCar->mCommandState.steer = -1;
-			if (angle > M_PI / 5 && brakeTimer == 0.0) {
+			if (angle > M_PI / 4 && brakeTimer == 0.0) {
 				if (carSpeed > 20.0) {
 					brakeTimer = 0.35;
 				}
