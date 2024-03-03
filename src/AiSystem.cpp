@@ -95,11 +95,11 @@ bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fir
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
 			aiCar->mCommandState.steer = -4 * angle;
 		}
-		else if (angle > -M_PI / 8) {
-			aiCar->mCommandState.steer = -2.5;
+		else if (angle < -M_PI / 8) {
+			aiCar->mCommandState.steer = 1;
 		}
-		else if (angle < M_PI / 8) {
-			aiCar->mCommandState.steer = 2.5;
+		else if (angle > M_PI / 8) {
+			aiCar->mCommandState.steer = -1;
 		}
 		aiCar->mCommandState.nbBrakes = 0.0f;
 		aiCar->mCommandState.brakes[0] = 0.0f;
