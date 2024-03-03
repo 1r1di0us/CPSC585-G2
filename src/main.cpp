@@ -49,7 +49,11 @@ int main() {
 
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 20.0f), carRotateQuat);
+
+    carSys.SpawnNewCar(PxVec3(20.0f, 0.0f, 20.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(-20.0f, 0.0f, -20.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(-20.0, 0.0f, 20.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(20.0, 0.0f, -20.0f), carRotateQuat);
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
@@ -110,10 +114,10 @@ int main() {
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 
-        if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), physicsSimTime)) {
+        /*if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), physicsSimTime)) {
             carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
             soundSys.PlaySound("assets/PianoClusterThud.wav");
-        }
+        }*/
 
         // render
         // ------

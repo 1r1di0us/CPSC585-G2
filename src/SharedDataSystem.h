@@ -28,7 +28,7 @@ struct CarInfo{
 //respawn square struct
 struct MapSquare {
 	int id;
-	int numPoints;
+	int numPoints = 0;
 	std::vector<PxVec2> pointsInIt;
 	PxVec2 bottomLeft;
 	PxVec2 topRight;
@@ -80,15 +80,15 @@ public:
 	const PxReal TIMESTEP = 1.0f / 60.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOMLEFTMAPCOORD = PxVec2(-10.0f, -10.0f);
-	const PxVec2 TOPRIGHTMAPCOORD = PxVec2(10.0f, 10.0f);
+	const PxVec2 BOTTOMLEFTMAPCOORD = PxVec2(-20.0f, -20.0f);
+	const PxVec2 TOPRIGHTMAPCOORD = PxVec2(20.0f, 20.0f);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOPRIGHTMAPCOORD.x - BOTTOMLEFTMAPCOORD.x;
 	const PxReal MAPLENGTHZ = TOPRIGHTMAPCOORD.y - BOTTOMLEFTMAPCOORD.y;
 
 	//the min distance cars can spawn from other cars
-	const PxReal CARMINSPAWNDISTANCE = 3.0f;
+	const PxReal CARMINSPAWNDISTANCE = 5.0f;
 
 	//the min spawn distance between powerups
 	const PxReal POWERUPSPAWNMINDISTANCE = 2.0f;
@@ -118,9 +118,6 @@ public:
 	//a vector of all car structs for car info
 	std::vector<CarInfo> carInfoList;
 
-	//for respawning, the list of map squares
-	std::vector<MapSquare> mapSquareList;
-
 	//gets the car info struct using an entity
 	CarInfo* GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
 
@@ -148,7 +145,7 @@ public:
 	//finds the center of four points
 	PxVec2 FindCenterOfFourPoints(std::vector<PxVec2> pointsList);
 
-	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType);
+	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList);
 
 	//generates a point a min distance away from all points in given vec and within the map range
 	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);

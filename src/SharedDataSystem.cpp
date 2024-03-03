@@ -123,7 +123,7 @@ PxVec2 SharedDataSystem::FindCenterOfFourPoints(std::vector<PxVec2> pointsList) 
 	return PxVec2(centerX, centerY);
 }
 
-void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType) {
+void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
 	//go through the map square list and populate each one fully before moving on to the next one
 	for (int i = 0; i < mapSquareList.size(); i++) {
@@ -141,6 +141,7 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
 
 	PxVec2 spawnPoint;
+	std::vector<MapSquare> mapSquareList;
 
 	int xMapSquares = MAPLENGTHX / minDistance;
 	int zMapSquares = MAPLENGTHZ / minDistance;
@@ -155,7 +156,7 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 	}
 
 	//place the points in their respecitve squares
-	PopulateMapSquareList(pointsOfSameType);
+	PopulateMapSquareList(pointsOfSameType, mapSquareList);
 
 	//find the square with the least amount of points in it
 	//if the square has no points in it, find the center and return that
