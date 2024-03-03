@@ -100,22 +100,16 @@ bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fir
 		else if (angle < -M_PI / 8) {
 			aiCar->mCommandState.steer = 1;
 			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 20.0) {
+				if (carSpeed > 19.0) {
 					brakeTimer = 0.35;
-				}
-				else if (carSpeed > 18.0) {
-					brakeTimer = 0.1;
 				}
 			}
 		}
 		else if (angle > M_PI / 8) {
 			aiCar->mCommandState.steer = -1;
 			if (angle > M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 20.0) {
+				if (carSpeed > 19.0) {
 					brakeTimer = 0.35;
-				}
-				else if (carSpeed > 18.0) {
-					brakeTimer = 0.1;
 				}
 			}
 		}
