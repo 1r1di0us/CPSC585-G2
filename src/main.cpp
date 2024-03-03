@@ -39,7 +39,7 @@ std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> totalTimePassed;
 std::chrono::duration<double> totalTimeLeft;
 std::chrono::high_resolution_clock::time_point previousIterationTime;
-std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED;
+std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 
 int main() {
@@ -50,7 +50,13 @@ int main() {
 
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 20.0f), carRotateQuat);
+
+    //spawning more cars (need min 4 cars for respawning to work)
+    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
+    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
@@ -81,19 +87,16 @@ int main() {
         currentTime = std::chrono::high_resolution_clock::now();
         totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
         totalTimeLeft = std::chrono::duration<double>(TIMELIMIT) - totalTimePassed;
-        //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
 
-        //calculating the time passed since the last iteration of the loop
+        //calculating the total time passed since the last physics update
         deltaTime = currentTime - previousIterationTime;
-        physicsSimTime -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
+        timeUntilPhysicsUpdate -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
         previousIterationTime = currentTime;
-        //printf("frame time: %f\n", physicsSimTime);
 
-
-        totalTimePassed.count();
-
+        //increases the frame counter
         FPSCOUNTER++;
 
+        //if another second has passed, print the fps
         if (totalTimePassed.count() / seconds >= 1) {
 
             printf("FPS: %d\n", FPSCOUNTER);
@@ -122,9 +125,9 @@ int main() {
         renderingSystem.updateRenderer(std::make_shared<std::vector<Entity>>(dataSys.entityList), camera, totalTimeLeft);
 
         //only updating the physics at max 60hz while everything else updates at max speed
-        if (physicsSimTime.count() <= 0.0f) {
+        if (timeUntilPhysicsUpdate.count() <= 0.0f) {
             physicsSys.stepPhysics();
-            physicsSimTime = PHYSICSUPDATESPEED;
+            timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
             carSys.RespawnAllCars();
         }
 
