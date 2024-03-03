@@ -11,9 +11,9 @@
 	},
 	"EngineParams":
 	{
-		"TorqueCurve": [[0.0, 10.0], [0.33, 10.0], [1.0, 10.0]],
+		"TorqueCurve": [[0.0, 1.0], [0.33, 1.0], [1.0, 1.0]],
 		"MOI": 1.0,
-		"PeakTorque": 4000.0,
+		"PeakTorque": 500.0,
 		"IdleOmega": 0.0,
 		"MaxOmega": 600.0,
 		"DampingRateFullThrottle": 0.15,
