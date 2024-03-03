@@ -47,7 +47,7 @@ bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	if (timer == 0.0) {
 		fire = true;
 		state = SPIN;
-		distribution = std::normal_distribution<double>(5.0, 2.0);
+		distribution = std::normal_distribution<double>(3.0, 1.5);
 		timer = distribution(rand); //generate a random number with normal distribution with mean of 5 and standard deviation of 2
 	}
 	return fire;
@@ -60,7 +60,7 @@ bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.nbBrakes = 0.f;
 	if (timer == 0.0) {
 		state = SIT;
-		timer = 1.0;
+		timer = 0.6;
 	}
 	return fire;
 }
@@ -82,9 +82,8 @@ bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fir
 	float angle = atan2(dot, det);
 
 	if (dist < 2) {
-		state = SPIN;
-		distribution = std::normal_distribution<double>(5.0, 2.0);
-		timer = distribution(rand); //generate a random number with normal distribution with mean of 5 and standard deviation of 2
+		state = SIT;
+		timer = 0.2;
 	}
 	else if (dist < 3) {
 		aiCar->mCommandState.nbBrakes = 1.0f;
