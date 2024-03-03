@@ -3,6 +3,7 @@
 InputSystem::InputSystem(SharedDataSystem* dataSys) {
 
 	this->dataSys = dataSys;
+	brakeTimer = 0.0;
 
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
@@ -123,12 +124,21 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement() {
+bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
+
+	//decrement timer
+	if (brakeTimer < deltaTime.count()) {
+		brakeTimer = 0.0;
+	}
+	else {
+		brakeTimer -= deltaTime.count();
+	}
 
 	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+	float carSpeed = playerCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().magnitude();
 	std::vector<int> checkvals = {0};
 	for (int i = 0; i < 16; i++) {
 		if (gpArr[i]) checkvals.push_back(i + 1);
@@ -196,9 +206,36 @@ bool InputSystem::InputToMovement() {
 		}
 		else if (angle < -M_PI/8) {
 			playerCar->mCommandState.steer = 1;
+			if (angle < -M_PI / 5 && brakeTimer == 0.0) {
+				if (carSpeed > 20.0) {
+					brakeTimer = 0.35;
+				}
+				else if (carSpeed > 18.0) {
+					brakeTimer = 0.1;
+				}
+			}
 		}
 		else if (angle > M_PI/8) {
 			playerCar->mCommandState.steer = -1;
+			if (angle > M_PI / 5 && brakeTimer == 0.0) {
+				if (carSpeed > 20.0) {
+					brakeTimer = 0.35;
+				}
+				else if (carSpeed > 18.0) {
+					brakeTimer = 0.1;
+				}
+			}
+		}
+		
+		if (brakeTimer > 0.0) {
+			if (carSpeed < 1.0) {
+				brakeTimer = 0.0;
+			}
+			else {
+				playerCar->mCommandState.throttle = 0;
+				playerCar->mCommandState.nbBrakes = 1;
+				playerCar->mCommandState.brakes[0] = 1;
+			}
 		}
 	}
 
