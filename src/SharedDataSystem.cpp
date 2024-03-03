@@ -1,4 +1,5 @@
 #include "SharedDataSystem.h"
+#include <queue>
 
 CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
 	
@@ -64,19 +65,155 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 	return deadCarVec;
 }
 
+PxVec2 SharedDataSystem::ConvertVec3ToVec2(PxVec3 vectorToConvert) {
+	return PxVec2(vectorToConvert.x, vectorToConvert.z);
+}
+
+bool SharedDataSystem::IsPointInSquare(PxVec2 point, MapSquare& square) {
+
+	//check if the point is between the two other points. on the line counts
+	if (point.x < square.bottomLeft.x || point.x > square.topRight.x ||
+		point.y < square.bottomLeft.y || point.y > square.topRight.y) {
+		return false;
+	}
+
+	return true;
+}
+
+// Function to calculate the distance between two PhysX vectors
+float distanceBetween(const PxVec2& point1, const PxVec2& point2) {
+	return (point1 - point2).magnitude();
+}
+
+// Comparator for priority queue based on distance
+struct CompareDistance {
+	bool operator()(const std::pair<float, PxVec2>& p1, const std::pair<float, PxVec2>& p2) {
+		return p1.first < p2.first;
+	}
+};
+
+std::vector<PxVec2> SharedDataSystem::GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType) {
+	
+	std::priority_queue<std::pair<float, PxVec2>, std::vector<std::pair<float, PxVec2>>, CompareDistance> minHeap;
+
+	for (const auto& point : pointsOfSameType) {
+		float distance = 0.0f;
+		for (const auto& p : pointList) {
+			distance += distanceBetween(point, p);
+		}
+		minHeap.push({ distance, point });
+		if (minHeap.size() > numPointsToGet) {
+			minHeap.pop();
+		}
+	}
+
+	std::vector<PxVec2> result;
+	while (!minHeap.empty()) {
+		result.push_back(minHeap.top().second);
+		minHeap.pop();
+	}
+
+	return result;
+}
+
+PxVec2 SharedDataSystem::FindCenterOfFourPoints(std::vector<PxVec2> pointsList) {
+	float centerX = (pointsList[0].x + pointsList[1].x + pointsList[2].x + pointsList[3].x) / 4.0f;
+	float centerY = (pointsList[0].y + pointsList[1].y + pointsList[2].y + pointsList[3].y) / 4.0f;
+
+	return PxVec2(centerX, centerY);
+}
+
+void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType) {
+
+	//go through all the points and as they are added to the correct square, they are removed from the list
+	while (pointsOfSameType.size() > 0) {
+		int i = 0;
+		for (int j = 0; j < mapSquareList.size(); j++) {
+			if (IsPointInSquare(pointsOfSameType[i], mapSquareList[j])) {
+				mapSquareList[j].numPoints++;
+				mapSquareList[j].pointsInIt.emplace_back(pointsOfSameType[i]);
+				pointsOfSameType.erase(pointsOfSameType.begin() + i);
+				break;
+			}
+		}
+		i++;
+	}
+}
+
+PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
+
+	PxVec2 spawnPoint;
+
+	int xMapSquares = MAPLENGTHX / minDistance;
+	int zMapSquares = MAPLENGTHZ / minDistance;
+
+	//divide the map into squares using the minDistance
+	for (int i = 0; i < xMapSquares * zMapSquares; i++) {
+		MapSquare square;
+		square.id = i;
+		square.bottomLeft = PxVec2(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + i * minDistance);
+		square.topRight = PxVec2(TOPRIGHTMAPCOORD.x + i * minDistance, TOPRIGHTMAPCOORD.y + i * minDistance);
+	}
+
+	//place the points in their respecitve squares
+	PopulateMapSquareList(pointsOfSameType);
+
+	//find the square with the least amount of points in it
+	//if the square has no points in it, find the center and return that
+	MapSquare* bestSquare = &mapSquareList[0];
+
+	for (int i = 0; i < mapSquareList.size(); i++) {
+		if (mapSquareList[i].numPoints < bestSquare->numPoints) {
+			bestSquare = &mapSquareList[i];
+			if (bestSquare->numPoints == 0) {
+				spawnPoint.x = (bestSquare->topRight.x - bestSquare->bottomLeft.x) / 2;
+				spawnPoint.y = (bestSquare->topRight.y - bestSquare->bottomLeft.y) / 2;
+				return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
+			}
+		}
+	}
+
+	switch (bestSquare->numPoints) {
+	case 1:
+		//need to find 3 nearest points
+		spawnPoint = FindCenterOfFourPoints(GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType));
+		
+		break;
+	case 2:
+		//need to find 2 nearest points
+		spawnPoint = FindCenterOfFourPoints(GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType));
+		break;
+	case 3:
+		//need to find nearest point
+		spawnPoint = FindCenterOfFourPoints(GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType));
+		break;
+	case 4:
+		//make square, return middle
+		spawnPoint = FindCenterOfFourPoints(bestSquare->pointsInIt);
+		break;
+	default:
+		//make a random point in the square and return that
+		spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * minDistance;
+		spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * minDistance;
+		break;
+	}
+
+	return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
+}
+
 PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 
-	PxVec2 spawnPoint(10, 0);
+	std::vector<PxVec2> locations;
 
 	//the spacing from other entities of the same physics type is important
 	switch (physType) {
 	case PhysicsType::CAR:
 
-		//need to get the locations of all cars on map
-		//need to find any point where the cars are min distance away from each other
-			//if thats not possible, maximize the distance
-		//only care about x and z
+		for (int i = 0; i < carRigidDynamicList.size(); i++) {
+			locations.emplace_back(PxVec2(carRigidDynamicList[i]->getGlobalPose().p.x, carRigidDynamicList[i]->getGlobalPose().p.z));
+		}
 
+		return GenerateSpawnPoint(locations, CARMINSPAWNDISTANCE, CARSPAWNHEIGHT);
 
 		break;
 	case PhysicsType::POWERUP:
@@ -84,10 +221,12 @@ PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 		return PxVec3(0, 0, 0);
 		break;
 	default:
+		printf("this is a physics type that cannot be spawned");
 		break;
 	}
 
-	return PxVec3(spawnPoint.x, 1, spawnPoint.y);
+	//unreachable code
+	exit(69);
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
