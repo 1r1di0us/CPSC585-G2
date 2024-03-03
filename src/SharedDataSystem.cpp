@@ -87,7 +87,7 @@ PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 		break;
 	}
 
-	return PxVec3(spawnPoint.x, 1, spawnPoint.y);
+	return PxVec3(spawnPoint.x, 0.2, spawnPoint.y);
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
