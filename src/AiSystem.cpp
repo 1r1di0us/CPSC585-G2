@@ -62,7 +62,7 @@ bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 
 bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.steer = 2.5;
-	aiCar->mCommandState.throttle = 1; //speeeeeeeeeeeeeeeeeen
+	aiCar->mCommandState.throttle = 0.8; //speeeeeeeeeeeeeeeeeen
 	aiCar->mCommandState.brakes[0] = 0.f;
 	aiCar->mCommandState.nbBrakes = 0.f;
 	if (timer <= 0.0) {
