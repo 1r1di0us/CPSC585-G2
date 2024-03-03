@@ -423,3 +423,10 @@ void SharedDataSystem::ResolveCollisions() {
 	//resolved the collision
 	gContactReportCallback->contactDetected = false;
 }
+
+void SharedDataSystem::menuEventHandler() {
+	// Only handle events when in menu
+	if (inMenu) {
+		menuOptionIndex = 0;
+	}
+}
