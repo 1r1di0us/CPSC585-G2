@@ -125,18 +125,16 @@ PxVec2 SharedDataSystem::FindCenterOfFourPoints(std::vector<PxVec2> pointsList) 
 
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType) {
 
-	//go through all the points and as they are added to the correct square, they are removed from the list
-	while (pointsOfSameType.size() > 0) {
-		int i = 0;
-		for (int j = 0; j < mapSquareList.size(); j++) {
-			if (IsPointInSquare(pointsOfSameType[i], mapSquareList[j])) {
-				mapSquareList[j].numPoints++;
-				mapSquareList[j].pointsInIt.emplace_back(pointsOfSameType[i]);
-				pointsOfSameType.erase(pointsOfSameType.begin() + i);
+	//go through the map square list and populate each one fully before moving on to the next one
+	for (int i = 0; i < mapSquareList.size(); i++) {
+		while (pointsOfSameType.size() > 0) {
+			if (IsPointInSquare(pointsOfSameType.at(0), mapSquareList[i])) {
+				mapSquareList[i].numPoints++;
+				mapSquareList[i].pointsInIt.emplace_back(pointsOfSameType.at(0));
+				pointsOfSameType.erase(pointsOfSameType.begin());
 				break;
 			}
 		}
-		i++;
 	}
 }
 
@@ -153,6 +151,7 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 		square.id = i;
 		square.bottomLeft = PxVec2(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + i * minDistance);
 		square.topRight = PxVec2(TOPRIGHTMAPCOORD.x + i * minDistance, TOPRIGHTMAPCOORD.y + i * minDistance);
+		mapSquareList.emplace_back(square);
 	}
 
 	//place the points in their respecitve squares
