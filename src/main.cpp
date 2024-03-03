@@ -39,7 +39,8 @@ std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::duration<double> totalTimePassed;
 std::chrono::duration<double> totalTimeLeft;
 std::chrono::high_resolution_clock::time_point previousIterationTime;
-std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED; //change in time
+std::chrono::duration<double> physicsSimTime = PHYSICSUPDATESPEED;
+std::chrono::duration<double> deltaTime;
 
 int main() {
     
@@ -83,6 +84,7 @@ int main() {
         //printf("Time remaining: %f\n", TIMELIMIT - timePassed.count());
 
         //calculating the time passed since the last iteration of the loop
+        deltaTime = currentTime - previousIterationTime;
         physicsSimTime -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
         previousIterationTime = currentTime;
         //printf("frame time: %f\n", physicsSimTime);
@@ -110,7 +112,7 @@ int main() {
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
 
-        if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), physicsSimTime)) {
+        if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
             carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
             soundSys.PlaySound("assets/PianoClusterThud.wav");
         }
