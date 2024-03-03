@@ -40,7 +40,7 @@ bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.throttle = 0.f;
 	aiCar->mCommandState.brakes[0] = 1.f;
 	aiCar->mCommandState.nbBrakes = 1.f;
-	if (timer == 0.0) {
+	if (timer <= 0.0) {
 		fire = true;
 		state = SPIN;
 		distribution = std::normal_distribution<double>(5.0, 2.0);
@@ -54,9 +54,9 @@ bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.throttle = 1; //speeeeeeeeeeeeeeeeeen
 	aiCar->mCommandState.brakes[0] = 0.f;
 	aiCar->mCommandState.nbBrakes = 0.f;
-	if (timer == 0.0) {
+	if (timer <= 0.0) {
 		state = SIT;
-		timer = 1.0;
+		timer = 0.6;
 	}
 	return fire;
 }
@@ -82,20 +82,15 @@ bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fir
 		distribution = std::normal_distribution<double>(5.0, 2.0);
 		timer = distribution(rand); //generate a random number with normal distribution with mean of 5 and standard deviation of 2
 	}
-	else if (dist < 3) {
-		aiCar->mCommandState.nbBrakes = 1.0f;
-		aiCar->mCommandState.brakes[0] = 1.0f;
-		aiCar->mCommandState.throttle = 0.f;
-	}
 	else {
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
-			aiCar->mCommandState.steer = -4 * angle;
+			aiCar->mCommandState.steer = -angle;
 		}
-		else if (angle > -M_PI / 8) {
-			aiCar->mCommandState.steer = -2.5;
+		else if (angle < -M_PI / 8) {
+			aiCar->mCommandState.steer = 1;
 		}
-		else if (angle < M_PI / 8) {
-			aiCar->mCommandState.steer = 2.5;
+		else if (angle > M_PI / 8) {
+			aiCar->mCommandState.steer = -1;
 		}
 		aiCar->mCommandState.nbBrakes = 0.0f;
 		aiCar->mCommandState.brakes[0] = 0.0f;
