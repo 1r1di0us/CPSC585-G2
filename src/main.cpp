@@ -109,15 +109,19 @@ int main() {
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
-        
-        if (inputSys.InputToMovement()) {
-            carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
-            soundSys.PlaySound("assets/PianoClusterThud.wav");
+        if (dataSys.inMenu) {
+            inputSys.InputToMenu();
         }
+        else {
+            if (inputSys.InputToMovement()) {
+                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
 
-        if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
-            carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
-            soundSys.PlaySound("assets/PianoClusterThud.wav");
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
+                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
         }
 
         // render
@@ -129,6 +133,10 @@ int main() {
             physicsSys.stepPhysics();
             timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
             carSys.RespawnAllCars();
+        }
+
+        if (dataSys.quit) {
+            break;
         }
 
     }
