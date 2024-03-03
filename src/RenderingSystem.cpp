@@ -25,7 +25,9 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
 }
 
 // constructor
-RenderingSystem::RenderingSystem() {
+RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
+
+    this->dataSys = dataSys;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -189,16 +191,20 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
         case (PhysicsType::CAR):
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, catTexture);
+            //is the car alive? -> render it
+            if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(entityList->at(i)))->isAlive) {
 
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList->at(i).transform->getPos());
-            // make it look forward
-            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-            model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
-            shader.setMat4("model", model);
-            renderObject(tank, &tankVAO);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, catTexture);
+
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, entityList->at(i).transform->getPos());
+                // make it look forward
+                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+                model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
+                shader.setMat4("model", model);
+                renderObject(tank, &tankVAO);
+            }
 
             break;
         case (PhysicsType::PROJECTILE):

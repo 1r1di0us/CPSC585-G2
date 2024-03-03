@@ -21,9 +21,6 @@ private:
 
 public:
 
-	//timestep value, easily modifiable
-	const PxReal TIMESTEP = 1.0f / 60.0f;
-
 	//VEHICLE STUFF
 
 	//PhysX management class instances.
@@ -65,14 +62,4 @@ public:
 	PhysicsSystem(SharedDataSystem* dataSys); // Constructor
 
 	void cleanPhysicsSystem();
-
-	PxPhysics* getPhysics();
-
-	PxScene* getScene();
-
-	PxVec3 getGravity();
-
-	PxMaterial* getMaterial();
-
-	double getTIMESTEP();
 };

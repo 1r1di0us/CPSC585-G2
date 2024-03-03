@@ -68,6 +68,10 @@
     <None Include="assets\Models\bed_double_A.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />
@@ -124,6 +128,10 @@
     <Library Include="physx\release\SimulationController_static_64.lib" />
     <Library Include="physx\release\SnippetRender_static_64.lib" />
     <Library Include="physx\release\SnippetUtils_static_64.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL_vc.lib" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="assets\Models\bed_double_A.obj" />

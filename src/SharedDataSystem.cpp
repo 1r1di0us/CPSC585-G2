@@ -25,6 +25,19 @@ EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic*
 	exit(69);
 }
 
+PxRigidDynamic* SharedDataSystem::GetRigidDynamicFromVehicle(EngineDriveVehicle* gVehicle) {
+
+	for (int i = 0; i < gVehicleList.size(); i++) {
+
+		if (gVehicleList[i] == gVehicle) {
+			return carRigidDynamicList[i];
+		}
+	}
+
+	//unreachable code
+	exit(69);
+}
+
 std::shared_ptr<Entity> SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynamic* rigidDynamic) {
 
 	for (int i = 0; i < entityList.size(); i++) {
@@ -36,6 +49,45 @@ std::shared_ptr<Entity> SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynam
 
 	//unreachable code
 	exit(69);
+}
+
+std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
+
+	std::vector<CarInfo*> deadCarVec;
+
+	for (int i = 0; i < carInfoList.size(); i++) {
+		if (carInfoList[i].isAlive == false) {
+			deadCarVec.emplace_back(&carInfoList[i]);
+		}
+	}
+
+	return deadCarVec;
+}
+
+PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
+
+	PxVec2 spawnPoint(10, 0);
+
+	//the spacing from other entities of the same physics type is important
+	switch (physType) {
+	case PhysicsType::CAR:
+
+		//need to get the locations of all cars on map
+		//need to find any point where the cars are min distance away from each other
+			//if thats not possible, maximize the distance
+		//only care about x and z
+
+
+		break;
+	case PhysicsType::POWERUP:
+
+		return PxVec3(0, 0, 0);
+		break;
+	default:
+		break;
+	}
+
+	return PxVec3(spawnPoint.x, 1, spawnPoint.y);
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
@@ -90,10 +142,15 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	gScene->removeActor(*projectile);
 	projectile->release();
 
-	//respawn shit (either have to call respawn function in main, or merge car and physics) (i think)
-		//UNFINISHED
-	//CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	//hitCar->respawnTimeLeft = RESPAWNLENGTH;
+	//setting the data of the car that got hit to let it respawn
+	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
+	hitCar->respawnTimeLeft = RESPAWNLENGTH;
+	hitCar->isAlive = false;
+	//moving into the sky and disabling gravity to "delete it"
+	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 100;
+	PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
+	hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
 
 }
 
