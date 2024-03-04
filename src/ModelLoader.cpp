@@ -26,8 +26,6 @@ Mesh LoadModelFromPathMesh(std::string modelFilePath) {
         std::cerr << "Failed to load/parse .obj file: " << modelFilePath << std::endl;
     }
     
-    //Mesh modelMesh;
-
     std::vector<Vertex> vertices;
     std::vector<Texture> textures;
     std::vector<unsigned int> indices;
@@ -42,16 +40,19 @@ Mesh LoadModelFromPathMesh(std::string modelFilePath) {
             glm::vec2 texCoord;
             glm::vec3 position, normal;
 
+            // storing the verticies
             position.x = attributes.vertices[3 * index.vertex_index + 0];
             position.y = attributes.vertices[3 * index.vertex_index + 1];
             position.z = attributes.vertices[3 * index.vertex_index + 2];
 
+            // storing the normals
             if (!attributes.normals.empty()) {
                 normal.x = attributes.normals[3 * index.normal_index + 0];
                 normal.y = attributes.normals[3 * index.normal_index + 1];
                 normal.z = attributes.normals[3 * index.normal_index + 2];
             }
-
+            
+            // storing the texcoords
             if (!attributes.texcoords.empty()) {
                 texCoord.x = attributes.texcoords[2 * index.texcoord_index + 0];
                 texCoord.y = attributes.texcoords[2 * index.texcoord_index + 1];
@@ -60,16 +61,30 @@ Mesh LoadModelFromPathMesh(std::string modelFilePath) {
             Vertex vertex(position, normal, texCoord);
             vertices.push_back(vertex);
 
-            // need to store textures and indices
+            // get texture information
+            for (int i = 0; i < materials.size(); i++)
+            {
+                //unsigned int id = materials[i].
+            }
+
+
+            // get indices information
+            for (size_t s = 0; s < shapes.size(); s++)
+            {
+                for (size_t f = 0; f < shapes[s].mesh.indices.size(); f++) {
+                    indices.push_back(shapes[s].mesh.indices[f].vertex_index);
+                    // Do something with vertex_index
+                    std::cout << "Vertex index: " << shapes[s].mesh.indices[f].vertex_index << std::endl;
+                }
+            }
 
             
         }
     }
 
+    Mesh modelMesh(vertices, indices, textures);
+
     return modelMesh;
-
-
-
 }
 
 OBJModel LoadModelFromPath(std::string modelFilePath){

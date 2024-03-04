@@ -40,7 +40,7 @@ public:
         this->textures = textures;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
-        setupMesh();
+        //setupMesh();
     }
 
     Mesh() {
