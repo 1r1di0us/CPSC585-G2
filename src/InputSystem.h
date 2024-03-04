@@ -7,6 +7,7 @@
 #include <chrono>
 #include "PhysicsSystem.h"
 #include "SharedDataSystem.h"
+#include <chrono>
 
 class InputSystem {
 public:
@@ -17,11 +18,12 @@ public:
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	bool InputToMovement();
+	bool InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
 	void InputToResults();
 
 private:
+	double brakeTimer;
 	bool gpArr[16];
 	//make these arrays at some point
 	bool forward[17];

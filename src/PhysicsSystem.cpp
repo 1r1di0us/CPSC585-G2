@@ -29,7 +29,7 @@ void PhysicsSystem::initPhysX() {
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
-	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	gMaterial = gPhysics->createMaterial(1.0f, 1.0f, 0.0f);
 
 	PxInitVehicleExtension(*gFoundation);
 	

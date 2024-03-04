@@ -17,10 +17,17 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 
 bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
 	bool fire = false;
+	//update timers
 	if (timer < deltaTime.count()) {
 		timer = 0.0;
 	} else {
 		timer -= deltaTime.count();
+	}
+	if (brakeTimer < deltaTime.count()) {
+		brakeTimer = 0.0;
+	}
+	else {
+		brakeTimer -= deltaTime.count();
 	}
 
 	if (aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.magnitude() > 30.f) {
@@ -44,7 +51,7 @@ bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	aiCar->mCommandState.throttle = 0.f;
 	aiCar->mCommandState.brakes[0] = 1.f;
 	aiCar->mCommandState.nbBrakes = 1.f;
-	if (timer == 0.0) {
+	if (timer <= 0.0) {
 		fire = true;
 		state = SPIN;
 		distribution = std::normal_distribution<double>(3.0, 1.5);
@@ -54,11 +61,11 @@ bool AiSystem::sit_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 }
 
 bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
-	aiCar->mCommandState.steer = 2.5;
-	aiCar->mCommandState.throttle = 1; //speeeeeeeeeeeeeeeeeen
+	aiCar->mCommandState.steer = 1;
+	aiCar->mCommandState.throttle = 0.8; //speeeeeeeeeeeeeeeeeen
 	aiCar->mCommandState.brakes[0] = 0.f;
 	aiCar->mCommandState.nbBrakes = 0.f;
-	if (timer == 0.0) {
+	if (timer <= 0.0) {
 		state = SIT;
 		timer = 0.6;
 	}
@@ -68,6 +75,7 @@ bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fire) {
 
 	PxVec3 carPos = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p;
+	float carSpeed = aiCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().magnitude();
 	float dist = (goal - carPos).magnitude();
 	PxVec3 intentDir = (goal - carPos).getNormalized();
 	float x = intentDir.x;
@@ -85,24 +93,42 @@ bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fir
 		state = SIT;
 		timer = 0.2;
 	}
-	else if (dist < 3) {
-		aiCar->mCommandState.nbBrakes = 1.0f;
-		aiCar->mCommandState.brakes[0] = 1.0f;
-		aiCar->mCommandState.throttle = 0.f;
-	}
 	else {
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
-			aiCar->mCommandState.steer = -4 * angle;
+			aiCar->mCommandState.steer = -angle;
 		}
 		else if (angle < -M_PI / 8) {
 			aiCar->mCommandState.steer = 1;
+			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
+				if (carSpeed > 19.0) {
+					brakeTimer = 0.35;
+				}
+			}
 		}
 		else if (angle > M_PI / 8) {
 			aiCar->mCommandState.steer = -1;
+			if (angle > M_PI / 4 && brakeTimer == 0.0) {
+				if (carSpeed > 19.0) {
+					brakeTimer = 0.35;
+				}
+			}
 		}
-		aiCar->mCommandState.nbBrakes = 0.0f;
-		aiCar->mCommandState.brakes[0] = 0.0f;
-		aiCar->mCommandState.throttle = 1;
+
+		if (brakeTimer > 0.0) {
+			if (carSpeed < 1.0) {
+				brakeTimer = 0.0;
+			}
+			else {
+				aiCar->mCommandState.throttle = 0;
+				aiCar->mCommandState.nbBrakes = 1;
+				aiCar->mCommandState.brakes[0] = 1;
+			}
+		}
+		else {
+			aiCar->mCommandState.nbBrakes = 0.0f;
+			aiCar->mCommandState.brakes[0] = 0.0f;
+			aiCar->mCommandState.throttle = 1;
+		}
 	}
 	return fire;
 }

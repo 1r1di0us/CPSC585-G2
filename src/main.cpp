@@ -44,7 +44,7 @@ std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 
 int main() {
-    
+
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
@@ -114,7 +114,7 @@ int main() {
             deltaTime = currentTime - previousIterationTime;
             timeUntilPhysicsUpdate -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
             previousIterationTime = currentTime;
- 
+
             if (totalTimeLeft <= durationZero) {
                 for (int i = 0; i < dataSys.carInfoList.size(); i++) {
                     if (dataSys.carInfoList[i].score > dataSys.winningPlayer) {
