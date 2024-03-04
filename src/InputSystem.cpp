@@ -41,15 +41,12 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		if (shoot[0] == 0) {
 			shoot[0] = 1;
 		}
+		confirm[0] = true;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
 		if (shoot[0] == 2) {
 			shoot[0] = 0;
 		}
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		confirm[0] = true;
 	}
 }
 
@@ -112,6 +109,7 @@ void InputSystem::getGamePadInput() {
 					if (shoot[j+1] == 0) {
 						shoot[j+1] = 1;
 					}
+					confirm[j+1] = true;
 				}
 				else if (x < -sens) {
 					if (shoot[j+1] == 2) {
@@ -207,26 +205,59 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir)); //triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 		float angle = atan2(dot, det);
 
-		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
-			playerCar->mCommandState.steer = -angle;
-		}
-		else if (angle < -M_PI/8) {
-			playerCar->mCommandState.steer = 1;
-			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 19.0) {
+		if (playerCar->mTransmissionCommandState.targetGear == 2) {
+			if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
+				playerCar->mCommandState.steer = -angle;
+			}
+			else if (angle < -M_PI / 8 && angle >= - 2 *M_PI / 3) {
+				playerCar->mCommandState.steer = 1;
+				if (angle < -M_PI / 3 && brakeTimer == 0.0 && carSpeed > 19.0) {
+					brakeTimer = 0.15;
+				}
+			}
+			else if (angle < -2 * M_PI / 3) {
+				reverseCar(playerCar);
+				if (carSpeed > 19.0 && brakeTimer == 0.0) {
+					brakeTimer = 0.35;
+				}
+			}
+			else if (angle > M_PI / 8 && angle <= 2 * M_PI / 3) {
+				playerCar->mCommandState.steer = -1;
+				if (angle > M_PI / 3 && brakeTimer == 0.0 && carSpeed > 19.0) {
+					brakeTimer = 0.15;
+				}
+			}
+			else if (angle > 2 * M_PI / 3) {
+				reverseCar(playerCar);
+				if (carSpeed > 19.0 && brakeTimer == 0.0) {
 					brakeTimer = 0.35;
 				}
 			}
 		}
-		else if (angle > M_PI/8) {
-			playerCar->mCommandState.steer = -1;
-			if (angle > M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 19.0) {
+		else if (playerCar->mTransmissionCommandState.targetGear == 0) {
+			if (angle >= 7 * M_PI / 8 || angle <= -7 * M_PI / 8) {
+				playerCar->mCommandState.steer = angle;
+			}
+			else if (angle > -7 * M_PI / 8 && angle <= -M_PI / 2) {
+				playerCar->mCommandState.steer = 1;
+				if (angle < -M_PI / 2 && brakeTimer == 0.0 && carSpeed > 19.0) {
+					brakeTimer = 0.15;
+				}
+			}
+			else if (angle < 7 * M_PI / 8 && angle >= M_PI / 2) {
+				playerCar->mCommandState.steer = -1;
+				if (angle > M_PI / 4 && brakeTimer == 0.0 && carSpeed > 19.0) {
+					brakeTimer = 0.15;
+				}
+			}
+			else if (angle < M_PI / 2 && angle > -M_PI / 2) {
+				reverseCar(playerCar);
+				if (carSpeed > 19.0 && brakeTimer == 0.0) {
 					brakeTimer = 0.35;
 				}
 			}
 		}
-		
+
 		if (brakeTimer > 0.0) {
 			if (carSpeed < 1.0) {
 				brakeTimer = 0.0;
@@ -307,6 +338,11 @@ void InputSystem::InputToMenu() {
 	}
 }
 
-	/*if (glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		; //gamepad buttons
-	}*/
+void InputSystem::reverseCar(EngineDriveVehicle* playerCar) {
+	if (playerCar->mTransmissionCommandState.targetGear == 2) {
+		playerCar->mTransmissionCommandState.targetGear = 0;
+	}
+	else if (playerCar->mTransmissionCommandState.targetGear == 0) {
+		playerCar->mTransmissionCommandState.targetGear = 2;
+	}
+}
