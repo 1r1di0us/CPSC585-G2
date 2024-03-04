@@ -81,12 +81,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     initTextVAO(&textVAO, &textVBO);
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
-    this->building = LoadModelFromPath("./assets/Models/building_E.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
-    initOBJVAO(building, &buildingVAO, &buildingVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
 }
@@ -177,14 +175,6 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     shader.setMat4("model", model);
 
     renderObject(plane, &planeVAO);
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, redTexture);
-    shader.setMat4("model", model);
-    renderObject(building, &buildingVAO);
 
     //rendering all other entities starting at 1 (skipping player car)
     for (int i = 1; i < entityList->size(); i++) {
