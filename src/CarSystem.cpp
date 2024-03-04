@@ -53,7 +53,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 
 		shape->setSimulationFilterData(vehicleFilter);
 
-		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
 		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
@@ -63,7 +63,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	gVehicle->mEngineDriveState.gearboxState.targetGear = gVehicle->mEngineDriveParams.gearBoxParams.neutralGear + 1;
 
 	//Set the vehicle to use the automatic gearbox.
-	gVehicle->mTransmissionCommandState.targetGear = PxVehicleEngineDriveTransmissionCommandState::eAUTOMATIC_GEAR;
+	gVehicle->mTransmissionCommandState.targetGear = 2;
 
 	//adding car to needed lists
 	dataSys->carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody);

@@ -103,7 +103,6 @@ int main() {
 
         //if another second has passed, print the fps
         if (totalTimePassed.count() / seconds >= 1) {
-
             printf("FPS: %d\n", FPSCOUNTER);
             FPSCOUNTER = 0;
             seconds += 1;
@@ -118,7 +117,7 @@ int main() {
             inputSys.InputToMenu();
         }
         else {
-            if (inputSys.InputToMovement()) {
+            if (inputSys.InputToMovement(deltaTime)) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
