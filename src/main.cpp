@@ -81,6 +81,8 @@ int main() {
     int FPSCOUNTER = 0;
     int seconds = 1;
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     while (!glfwWindowShouldClose(window) && totalTimePassed.count() < TIMELIMIT) {
 
         //updating how much time has passed
@@ -143,7 +145,6 @@ int main() {
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
     soundSys.Shutdown();
-
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();

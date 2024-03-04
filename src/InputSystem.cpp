@@ -44,10 +44,12 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		camLeft[0] = true;
+		mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		camRight[0] = true;
+		mouseControl = false;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -70,6 +72,15 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
 		confirm[0] = true;
 	}
+
+	prevx = xpos;
+	prevy = ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
+		mouseControl = true;
+	}
+	//glfwSetCursorPos(window, 512, 512); //set it to the middle of the display so you don't move out of bounds
+
 }
 
 void InputSystem::checkIfGamepadsPresent() {
@@ -109,9 +120,11 @@ void InputSystem::getGamePadInput() {
 				//y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 				if (x < -sens) {
 					camLeft[j + 1] = true;
+					mouseControl = false;
 				}
 				else if (x > sens) {
 					camRight[j + 1] = true;
+					mouseControl = false;
 				}
 				//else {
 				//	std::cout << "mid ";
@@ -292,13 +305,21 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		playerCar->mTransmissionCommandState.targetGear = 2;
 	}
 
+	//camera shenanigans	
 	if (cl && !cr) {
 		dataSys->cameraAngle += 1.5 * deltaTime.count();
 	}
 	else if (cr && !cl) {
 		dataSys->cameraAngle -= 1.5 * deltaTime.count();
 	}
-	dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
+
+
+	if (mouseControl) {
+		dataSys->cameraAngle = fmod(M_PI * (1 - (xpos / 1600)), 2 * M_PI);
+	}
+	else {
+		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
+	}
 
 	int s = 0;
 	for (int i : checkvals) if (shoot[i] == 1) {

@@ -37,4 +37,9 @@ private:
 	const float gasPedal = 1;
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
+
+	//mouse related things
+	double xpos, ypos, prevx, prevy;
+	int screenWidth;
+	bool mouseControl;
 };
