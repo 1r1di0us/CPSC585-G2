@@ -17,7 +17,7 @@ public:
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	bool InputToMovement();
+	bool InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
 
 private:
