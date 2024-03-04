@@ -50,7 +50,7 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
+    //spawning player car
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 
     //spawning more cars (need min 4 cars for respawning to work)
@@ -59,7 +59,8 @@ int main() {
     carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
     carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
 
-    powerupSys.SpawnPowerup(PxVec3(0.0f, 3.0f, 0.0f), PowerupType::AMMO);
+    //spawning powerups
+    powerupSys.SpawnPowerup(PxVec3(0.0f, 0.0f, 5.0f), PowerupType::AMMO);
 
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
