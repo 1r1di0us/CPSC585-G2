@@ -38,13 +38,18 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	//will shoot a projectile
 	//FIXME: broken af rn. needs IO to be working to properly test
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (shoot[0] == 0) {
-			shoot[0] = 1;
+		if (dataSys->inMenu) {
+			confirm[0] = true;
+			shoot[0] = 3;
 		}
-		confirm[0] = true;
+		else {
+			if (shoot[0] == 0) {
+				shoot[0] = 1;
+			}
+		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (shoot[0] == 2) {
+		if (shoot[0] >= 2) {
 			shoot[0] = 0;
 		}
 	}
@@ -106,13 +111,18 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (shoot[j+1] == 0) {
-						shoot[j+1] = 1;
+					if (dataSys->inMenu) {
+						confirm[0] = true;
+						shoot[0] = 3;
 					}
-					confirm[j+1] = true;
+					else {
+						if (shoot[0] == 0) {
+							shoot[0] = 1;
+						}
+					}
 				}
 				else if (x < -sens) {
-					if (shoot[j+1] == 2) {
+					if (shoot[j+1] >= 2) {
 						shoot[j+1] = 0;
 					}
 				}
@@ -209,25 +219,25 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 			if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
 				playerCar->mCommandState.steer = -angle;
 			}
-			else if (angle < -M_PI / 8 && angle >= - 2 *M_PI / 3) {
+			else if (angle < -M_PI / 8 && angle >= -3 *M_PI / 4) {
 				playerCar->mCommandState.steer = 1;
 				if (angle < -M_PI / 3 && brakeTimer == 0.0 && carSpeed > 19.0) {
-					brakeTimer = 0.15;
+					brakeTimer = 0.30;
 				}
 			}
-			else if (angle < -2 * M_PI / 3) {
+			else if (angle < -3 * M_PI / 4) {
 				reverseCar(playerCar);
 				if (carSpeed > 19.0 && brakeTimer == 0.0) {
 					brakeTimer = 0.35;
 				}
 			}
-			else if (angle > M_PI / 8 && angle <= 2 * M_PI / 3) {
+			else if (angle > M_PI / 8 && angle <= 3 * M_PI / 4) {
 				playerCar->mCommandState.steer = -1;
 				if (angle > M_PI / 3 && brakeTimer == 0.0 && carSpeed > 19.0) {
-					brakeTimer = 0.15;
+					brakeTimer = 0.30;
 				}
 			}
-			else if (angle > 2 * M_PI / 3) {
+			else if (angle > 3 * M_PI / 4) {
 				reverseCar(playerCar);
 				if (carSpeed > 19.0 && brakeTimer == 0.0) {
 					brakeTimer = 0.35;
@@ -260,7 +270,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		}
 
 		if (brakeTimer > 0.0) {
-			if (carSpeed < 1.0) {
+			if (carSpeed < 5.0) {
 				brakeTimer = 0.0;
 			}
 			else {
