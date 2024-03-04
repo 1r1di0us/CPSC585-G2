@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int blueTexture, catTexture, redTexture;
+unsigned int blueTexture, catTexture, redTexture, menuPlay, menuQuit;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -58,6 +58,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     catTexture = generateTexture("src/Textures/cat.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
+    menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
+    menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -225,6 +227,24 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
             break;
         }
+    }
+
+    // Setup UI if necessary
+    if (dataSys->inMenu) {
+        GLuint fboId = 0;
+        glGenFramebuffers(1, &fboId);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
+        if (dataSys->menuOptionIndex == 0) {
+            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D, menuPlay, 0);
+        }
+        else if (dataSys->menuOptionIndex == 1) {
+            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D, menuQuit, 0);
+        }
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // if not already bound
+        glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     // swap buffers and poll IO events

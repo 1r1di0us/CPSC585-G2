@@ -115,6 +115,11 @@ void CarSystem::RespawnAllCars() {
 
 void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
+	//if the car is dead, it cant shoot
+	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
+		return;
+	}
+
 	//gets the forward vector of the car
 	PxVec3 forwardVector = shootingCar->getGlobalPose().q.getBasisVector2();
 

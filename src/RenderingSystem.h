@@ -36,6 +36,7 @@ public:
 	// variables
 	GLFWwindow* window;
 	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO, planeVAO, planeVBO;
+	unsigned int quadVAO, quadVBO;
 	Shader textShader;
 	Shader shader;
 	std::map<char, Character> Characters_gaegu;
@@ -48,7 +49,6 @@ public:
 	void updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
-
 };
 
 //void drawFromModel(std::string modelFilePath);

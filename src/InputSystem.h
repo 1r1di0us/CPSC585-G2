@@ -8,7 +8,6 @@
 #include "SharedDataSystem.h"
 #include <chrono>
 
-
 class InputSystem {
 public:
 
@@ -18,7 +17,9 @@ public:
 	void checkIfGamepadsPresent();
 	void getGamePadInput();
 	void getKeyboardInput(GLFWwindow* window);
-	bool InputToMovement(std::chrono::duration<double> deltaTime);
+	bool InputToMovement();
+	void InputToMenu();
+
 private:
 	double brakeTimer;
 	bool gpArr[16];
@@ -27,8 +28,10 @@ private:
 	bool backward[17];
 	bool left[17];
 	bool right[17];
+	bool confirm[17];
 	int shoot[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
-
+	bool menuLeftPressed = false;
+	bool menuRightPressed = false;
 };

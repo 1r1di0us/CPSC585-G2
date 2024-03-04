@@ -11,6 +11,7 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 		InputSystem::backward[i] = false;
 		InputSystem::left[i] = false;
 		InputSystem::right[i] = false;
+		InputSystem::confirm[i] = false;
 		InputSystem::shoot[i] = 0;
 	}
 }
@@ -46,6 +47,10 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 			shoot[0] = 0;
 		}
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+		confirm[0] = true;
+	}
 }
 
 void InputSystem::checkIfGamepadsPresent() {
@@ -59,6 +64,7 @@ void InputSystem::checkIfGamepadsPresent() {
 	}
 }
 
+// Need to add confirm button on controller
 void InputSystem::getGamePadInput() {
 	GLFWgamepadstate state;
 	for (int j = 0; j < 16; j++) {
@@ -245,6 +251,59 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 	else {
 		return false;
+	}
+}
+
+void InputSystem::InputToMenu() {
+	std::vector<int> checkvals = { 0 };
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+
+	bool l = false;
+	bool r = false;
+	bool conf = false;
+
+	for (int i : checkvals) if (left[i]) {
+		l = true;
+		left[i] = false;
+	}
+	for (int i : checkvals) if (right[i]) {
+		r = true;
+		right[i] = false;
+	}
+	for (int i : checkvals) if (confirm[i]) {
+		conf = true;
+		confirm[i] = false;
+	}
+
+	// Check if left key is pressed and was not pressed before
+	if (l && !menuLeftPressed) {
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex - 1) % dataSys->nbMenuOptions;
+		menuLeftPressed = true;
+	}
+	else if (!l) {
+		menuLeftPressed = false;
+	}
+
+	// Check if right key is pressed and was not pressed before
+	if (r && !menuRightPressed) {
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex + 1) % dataSys->nbMenuOptions;
+		menuRightPressed = true;
+	}
+	else if (!r) {
+		menuRightPressed = false;
+	}
+
+	if (conf && dataSys->menuOptionIndex == 0) {
+		dataSys->inMenu = false;
+	}
+	else if (conf && dataSys->menuOptionIndex == 1) {
+		dataSys->quit = true;
+	}
+
+	if (dataSys->menuOptionIndex < 0) {
+		dataSys->menuOptionIndex = dataSys->nbMenuOptions - 1;
 	}
 }
 
