@@ -48,7 +48,13 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		confirm[0] = true;
+		auto currentTime = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
+
+		if (elapsed >= pressBuffer) {
+			confirm[0] = true;
+			lastConfirmPressTime = currentTime;
+		}
 	}
 }
 
@@ -123,6 +129,16 @@ void InputSystem::getGamePadInput() {
 				else if (y < -sens) {
 					//idk
 				}
+
+				// Check the state of the A button with a buffer
+				auto currentTime = std::chrono::steady_clock::now();
+				auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
+
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && elapsed >= pressBuffer) {
+					confirm[j] = true;
+					lastConfirmPressTime = currentTime;
+				}
+
 			}
 		}
 	}
@@ -130,6 +146,11 @@ void InputSystem::getGamePadInput() {
 }
 
 bool InputSystem::InputToMovement() {
+	std::cout << "Movement confirm array: ";
+	for (int i = 0; i < 17; i++) {
+		std::cout << confirm[i] << " ";
+	}
+	std::cout << std::endl;
 
 	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
@@ -159,6 +180,7 @@ bool InputSystem::InputToMovement() {
 		r = true;
 		right[i] = false;
 	}
+
 	if (f && !b) {
 		
 		playerCar->mCommandState.throttle = gasPedal;
@@ -273,6 +295,36 @@ void InputSystem::InputToMenu() {
 
 	if (dataSys->menuOptionIndex < 0) {
 		dataSys->menuOptionIndex = dataSys->nbMenuOptions - 1;
+	}
+}
+
+void InputSystem::InputToResults() {
+	std::cout << "Results confirm array: ";
+	for (int i = 0; i < 17; i++) {
+		std::cout << confirm[i] << " ";
+	}
+	std::cout << std::endl;
+
+	std::vector<int> checkvals = { 0 };
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+
+	bool conf = false;
+
+	for (int i : checkvals) if (confirm[i]) {
+		conf = true;
+		confirm[i] = false;
+	}
+
+	if (conf) {
+		printf("here 2");
+		dataSys->inMenu = true;
+		dataSys->inResults = false;
+
+		dataSys->winningPlayer = 0;
+		dataSys->tieGame = false;
+		//dataSys->resetSharedDataSystem();
 	}
 }
 

@@ -41,6 +41,7 @@ std::chrono::duration<double> totalTimeLeft;
 std::chrono::high_resolution_clock::time_point previousIterationTime;
 std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
+std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 
 int main() {
     
@@ -81,29 +82,7 @@ int main() {
     int FPSCOUNTER = 0;
     int seconds = 1;
 
-    while (!glfwWindowShouldClose(window) && totalTimePassed.count() < TIMELIMIT) {
-
-        //updating how much time has passed
-        currentTime = std::chrono::high_resolution_clock::now();
-        totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
-        totalTimeLeft = std::chrono::duration<double>(TIMELIMIT) - totalTimePassed;
-
-        //calculating the total time passed since the last physics update
-        deltaTime = currentTime - previousIterationTime;
-        timeUntilPhysicsUpdate -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
-        previousIterationTime = currentTime;
-
-        //increases the frame counter
-        FPSCOUNTER++;
-
-        //if another second has passed, print the fps
-        if (totalTimePassed.count() / seconds >= 1) {
-
-            printf("FPS: %d\n", FPSCOUNTER);
-            FPSCOUNTER = 0;
-            seconds += 1;
-        }
-
+    while (!glfwWindowShouldClose(window)) {
         // input
         // -----
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
@@ -111,8 +90,50 @@ int main() {
         inputSys.getKeyboardInput(window);
         if (dataSys.inMenu) {
             inputSys.InputToMenu();
+            startTime = std::chrono::high_resolution_clock::now();
+            previousIterationTime = startTime;
+        }
+        else if (dataSys.inResults) {
+            inputSys.InputToResults();
         }
         else {
+            //updating how much time has passed
+            currentTime = std::chrono::high_resolution_clock::now();
+            totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+            totalTimeLeft = std::chrono::duration<double>(TIMELIMIT) - totalTimePassed;
+
+            //calculating the total time passed since the last physics update
+            deltaTime = currentTime - previousIterationTime;
+            timeUntilPhysicsUpdate -= std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - previousIterationTime);
+            previousIterationTime = currentTime;
+ 
+            if (totalTimeLeft <= durationZero) {
+                for (int i = 0; i < dataSys.carInfoList.size(); i++) {
+                    if (dataSys.carInfoList[i].score > dataSys.winningPlayer) {
+                        dataSys.winningPlayer = i;
+                    }
+                }
+                for (int i = 0; i < dataSys.carInfoList.size(); i++) {
+                    if (dataSys.carInfoList[i].score == dataSys.carInfoList[dataSys.winningPlayer].score) {
+                        if (dataSys.carInfoList[i].entity->name != dataSys.carInfoList[dataSys.winningPlayer].entity->name) {
+                            dataSys.tieGame = true;
+                        }
+                    }
+                }
+                dataSys.inResults = true;
+            }
+
+            //if another second has passed, print the fps
+            if (totalTimePassed.count() / seconds >= 1) {
+
+                printf("FPS: %d\n", FPSCOUNTER);
+                FPSCOUNTER = 0;
+                seconds += 1;
+            }
+
+            //increases the frame counter
+            FPSCOUNTER++;
+
             if (inputSys.InputToMovement()) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
@@ -122,18 +143,18 @@ int main() {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
+
+            //only updating the physics at max 60hz while everything else updates at max speed
+            if (timeUntilPhysicsUpdate.count() <= 0.0f) {
+                physicsSys.stepPhysics();
+                timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
+                carSys.RespawnAllCars();
+            }
         }
 
         // render
         // ------
         renderingSystem.updateRenderer(std::make_shared<std::vector<Entity>>(dataSys.entityList), camera, totalTimeLeft);
-
-        //only updating the physics at max 60hz while everything else updates at max speed
-        if (timeUntilPhysicsUpdate.count() <= 0.0f) {
-            physicsSys.stepPhysics();
-            timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
-            carSys.RespawnAllCars();
-        }
 
         if (dataSys.quit) {
             break;

@@ -237,7 +237,7 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 }
 
 PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
-
+	
 	std::vector<PxVec2> locations;
 
 	//uses physics type to determine min spacing
@@ -422,6 +422,15 @@ void SharedDataSystem::ResolveCollisions() {
 
 	//resolved the collision
 	gContactReportCallback->contactDetected = false;
+}
+
+void SharedDataSystem::resetSharedDataSystem() {
+	// Clear all lists
+	entityList.clear();
+	carRigidDynamicList.clear();
+	gVehicleList.clear();
+	carInfoList.clear();
+	carProjectileRigidDynamicDict.clear();
 }
 
 void SharedDataSystem::menuEventHandler() {
