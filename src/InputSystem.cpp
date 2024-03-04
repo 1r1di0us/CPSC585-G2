@@ -234,7 +234,6 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 				}
 			}
 		}
-
 		else if (playerCar->mTransmissionCommandState.targetGear == 0) {
 			if (angle >= 7 * M_PI / 8 || angle <= -7 * M_PI / 8) {
 				playerCar->mCommandState.steer = angle;
