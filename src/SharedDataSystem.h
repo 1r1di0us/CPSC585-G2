@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <memory>
 #include <chrono>
+#include <queue>
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -24,6 +25,23 @@ struct CarInfo{
 	bool isAlive = true;
 	float respawnTimeLeft = 0;
 	float parryTimeLeft = 0;
+	int ammoCount = 5;
+};
+
+//powerup types
+enum PowerupType {
+	AMMO,
+	PROJECTILESPEED,
+	PROJECTILESIZE,
+	CARSPEED
+};
+
+//powerup info struct
+struct PowerupInfo {
+	std::shared_ptr<Entity> entity;
+	PowerupType powerupType;
+	bool needsRespawn = false;
+	float respawnTimeLeft = 0;
 };
 
 //respawn square struct
@@ -116,8 +134,11 @@ public:
 	//timestep value, easily modifiable
 	const PxReal TIMESTEP = 1.0f / 60.0f;
 
-	//respawn timer
-	const float RESPAWNLENGTH = 2.5f;
+	//car respawn timer
+	const float CARRESPAWNLENGTH = 3.0f;
+
+	//powerup respawn timer
+	const float POWERUPRESPAWNLENGTH = 2.0f;
 
 	//map coords for the corners
 	const PxVec2 BOTTOMLEFTMAPCOORD = PxVec2(-20.0f, -20.0f);
@@ -175,7 +196,7 @@ public:
 	std::vector<CarInfo*> GetListOfDeadCars();
 
 	//returns a location where an entity can be respawned
-	PxVec3 DetermineSpawnLocation(PhysicsType physType);
+	PxVec3 DetermineRespawnLocation(PhysicsType physType);
 
 	/*
 	* PROJECTILES
@@ -187,10 +208,23 @@ public:
 	//finds the car that shot a given projectile
 	std::shared_ptr<Entity> GetCarThatShotProjectile(PxRigidDynamic* projectile);
 
+	/*
+	* POWERUPS
+	*/
+
+	//list of all powerups on map
+	std::vector<PowerupInfo> allPowerupList;
+
+	//function to get list of powerups that need to be respawned
+	std::vector<PowerupInfo*> GetListOfDeadPowerups();
+
+	/*
+	* COLLISIONS
+	*/
+
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
-
 	//THIS MAY NOT WORK IN THE SWITCH DEPENDING ON HOW THE MAP EXISTS
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
 

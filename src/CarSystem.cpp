@@ -95,7 +95,7 @@ void CarSystem::RespawnAllCars() {
 		if (carInfo->respawnTimeLeft <= 0) {
 
 			//get the spawn location
-			PxVec3 spawnVec = dataSys->DetermineSpawnLocation(carInfo->entity->physType);
+			PxVec3 spawnVec = dataSys->DetermineRespawnLocation(carInfo->entity->physType);
 
 			//"spawn" the car
 			carInfo->isAlive = true;
@@ -117,6 +117,11 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
+		return;
+	}
+
+	//if the car has no ammo it can't shoot
+	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
 		return;
 	}
 
@@ -165,5 +170,8 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	projectile.collisionBox = projectileBody;
 
 	dataSys->entityList.emplace_back(projectile);
+
+	//subtract one ammo from the count
+	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
 
 }

@@ -1,5 +1,5 @@
 #include "SharedDataSystem.h"
-#include <queue>
+
 
 /*
 * PRIVATE FUNCTIONS
@@ -236,7 +236,7 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 	return deadCarVec;
 }
 
-PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
+PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 
 	std::vector<PxVec2> locations;
 
@@ -282,6 +282,19 @@ std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynami
 
 }
 
+std::vector<PowerupInfo*> SharedDataSystem::GetListOfDeadPowerups() {
+
+	std::vector<PowerupInfo*> deadPowerupVec;
+
+	for (int i = 0; i < allPowerupList.size(); i++) {
+		if (allPowerupList[i].needsRespawn == false) {
+			deadPowerupVec.emplace_back(&allPowerupList[i]);
+		}
+	}
+
+	return deadPowerupVec;
+}
+
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
@@ -317,7 +330,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 	//setting the data of the car that got hit to let it respawn
 	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	hitCar->respawnTimeLeft = RESPAWNLENGTH;
+	hitCar->respawnTimeLeft = CARRESPAWNLENGTH;
 	hitCar->isAlive = false;
 	//moving into the sky and disabling gravity to "delete it"
 	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);

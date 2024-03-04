@@ -11,8 +11,8 @@
 #include "SoundSystem.h"
 #include "CarSystem.h"
 #include "AiSystem.h"
-#include "PowerupSystem.h"
 #include "SharedDataSystem.h"
+#include "PowerupSystem.h"
 #include <chrono>
 #include <thread>
 
@@ -58,6 +58,8 @@ int main() {
     carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
     carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
     carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+
+    powerupSys.SpawnPowerup(PxVec3(0.0f, 3.0f, 0.0f), PowerupType::AMMO);
 
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
