@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include <vector>
 #include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
 #include "snippetvehicle2common/serialization/BaseSerialization.h"
@@ -10,6 +12,7 @@
 #include <unordered_map>
 #include <memory>
 #include <chrono>
+#include "math.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -206,6 +209,10 @@ public:
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();
 
+	//makes the rotation matrix for the camera
+	glm::mat3 getCamRotMat();
+	PxMat33 getCamRotMatPx(float angle);
+
 	// Flags
 	bool inMenu = true;
 	bool loading = false;
@@ -226,4 +233,6 @@ public:
 	//AudioManager* audio_ptr = nullptr;
 	//glm::vec3 listener_position;
 
+	// Camera
+	float cameraAngle = M_PI;
 };

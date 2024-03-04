@@ -430,3 +430,11 @@ void SharedDataSystem::menuEventHandler() {
 		menuOptionIndex = 0;
 	}
 }
+
+glm::mat3 SharedDataSystem::getCamRotMat() {
+	return glm::mat3({ cos(cameraAngle), 0, sin(cameraAngle) }, { 0, 1, 0 }, { -sin(cameraAngle), 0, -cos(cameraAngle) });
+}
+
+PxMat33 SharedDataSystem::getCamRotMatPx(float angle) {
+	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
+}

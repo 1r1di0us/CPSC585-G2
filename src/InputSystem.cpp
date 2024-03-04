@@ -7,13 +7,15 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
-		InputSystem::forward[i] = false;
-		InputSystem::backward[i] = false;
-		InputSystem::left[i] = false;
-		InputSystem::right[i] = false;
-		InputSystem::confirm[i] = false;
-		InputSystem::shoot[i] = 0;
-		InputSystem::reverse[i] = false;
+		forward[i] = false;
+		backward[i] = false;
+		left[i] = false;
+		right[i] = false;
+		confirm[i] = false;
+		shoot[i] = 0;
+		reverse[i] = false;
+		camLeft[i] = false;
+		camRight[i] = false;
 	}
 }
 
@@ -38,6 +40,14 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
 		reverse[0] = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		camLeft[0] = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		camRight[0] = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -82,27 +92,27 @@ void InputSystem::getGamePadInput() {
 				//movement, left joystick
 				float x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 				float y = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (x > 0.9f) {
-					right[j+1] = true;
-				}
-				else if (x < -sens) {
+				if (x < -sens) {
 					left[j+1] = true;
 				}
-				if (y > sens) {
-					backward[j+1] = true;
+				else if (x > sens) {
+					right[j+1] = true;
 				}
-				else if (y < -sens) {
+				if (y < -sens) {
 					forward[j+1] = true;
 				}
+				else if (y > sens) {
+					backward[j+1] = true;
+				}
 				//camera
-				//x = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+				x = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
 				//y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-				//if (x > sens) {
-				//	std::cout << "right ";
-				//}
-				//else if (x < -sens) {
-				//	std::cout << "left ";
-				//}
+				if (x < -sens) {
+					camLeft[j + 1] = true;
+				}
+				else if (x > sens) {
+					camRight[j + 1] = true;
+				}
 				//else {
 				//	std::cout << "mid ";
 				//}
@@ -137,7 +147,7 @@ void InputSystem::getGamePadInput() {
 					reverse[j + 1] = true;
 				}
 				else if (y < -sens) {
-					reverse[j + 1] = false;
+					//???
 				}
 			}
 		}
@@ -169,6 +179,8 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	bool l = false;
 	bool r = false;
 	bool rev = false;
+	bool cl = false;
+	bool cr = false;
 	for (int i : checkvals) if (forward[i]) {
 		f = true;
 		forward[i] = false;
@@ -189,32 +201,40 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		rev = true;
 		reverse[i] = false;
 	}
+	for (int i : checkvals) if (camLeft[i]) {
+		cl = true;
+		camLeft[i] = false;
+	}
+	for (int i : checkvals) if (camRight[i]) {
+		cr = true;
+		camRight[i] = false;
+	}
 
 	if (f && !b) {
 		
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(-1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(-1, 0, 0)).getNormalized();
 	}
 	else if (b && !f) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(1, 0, 0)).getNormalized();
 	}
 
 	if (l && !r) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(0, 0, 1)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, 1)).getNormalized();
 	}
 	else if (r && !l) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(0, 0, -1)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, -1)).getNormalized();
 	}
 
 	if (!r && !l && !f && !b) {
@@ -271,6 +291,14 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	else {
 		playerCar->mTransmissionCommandState.targetGear = 2;
 	}
+
+	if (cl && !cr) {
+		dataSys->cameraAngle += 1.5 * deltaTime.count();
+	}
+	else if (cr && !cl) {
+		dataSys->cameraAngle -= 1.5 * deltaTime.count();
+	}
+	dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
 
 	int s = 0;
 	for (int i : checkvals) if (shoot[i] == 1) {
