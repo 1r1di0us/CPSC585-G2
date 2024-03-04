@@ -51,11 +51,12 @@ int main() {
     //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
     carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 
-    //spawning more cars (need min 4 cars for respawning to work)
-    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+
+            carSys.SpawnNewCar(PxVec3(-19.0f + 8 * i, 0.0f, -19.0f + 8 * j), carRotateQuat);
+        }        
+    }
 
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
@@ -114,13 +115,13 @@ int main() {
         else {
             if (inputSys.InputToMovement(deltaTime)) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                //soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
+            /*if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
-            }
+            }*/
         }
 
         // render
