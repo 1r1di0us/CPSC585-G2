@@ -84,11 +84,13 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->building = LoadModelFromPath("./assets/Models/building_E.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
+    this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(building, &buildingVAO, &buildingVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
+    initOBJVAO(powerup, &powerupVAO, &powerupVBO);
 }
 
 
@@ -218,6 +220,17 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
             model = glm::translate(model, entityList->at(i).transform->getPos());
             shader.setMat4("model", model);
             renderObject(ball, &ballVAO);
+
+            break;
+        case (PhysicsType::POWERUP):
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, catTexture);
+
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, entityList->at(i).transform->getPos());
+            shader.setMat4("model", model);
+            renderObject(powerup, &powerupVAO);
 
             break;
         case (PhysicsType::STATIC):
