@@ -23,6 +23,7 @@ public:
 private:
 	double brakeTimer;
 	bool gpArr[16];
+	//make these arrays at some point
 	bool forward[17];
 	bool backward[17];
 	bool left[17];
@@ -33,6 +34,4 @@ private:
 	const float gasPedal = 1;
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
-
-	void reverseCar(EngineDriveVehicle* playerCar);
 };
