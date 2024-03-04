@@ -32,7 +32,7 @@ AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
-const double TIMELIMIT = 10.0f;
+const double TIMELIMIT = 180.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -87,6 +87,8 @@ int main() {
             previousIterationTime = startTime;
 
             if (!dataSys.carsInitialized) {
+                physicsSys.releaseActors();
+
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
                 carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 

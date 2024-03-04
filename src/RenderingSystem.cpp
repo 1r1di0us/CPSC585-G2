@@ -123,6 +123,10 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
         RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
+        // Need to add ammo count when implemented
+        std::string ammoCount = "Ammo: ";
+        RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
         std::string score = "Score:";
         RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 

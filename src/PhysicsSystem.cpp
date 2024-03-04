@@ -138,8 +138,31 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 }
 
+void PhysicsSystem::releaseActors() {
+	/*
+	* RIGID DYNAMIC ACTORS
+	*/
+
+	auto type = PxActorTypeFlag::eRIGID_DYNAMIC;
+	// Get the number of actors in the scene
+	PxU32 numActors = gScene->getNbActors(type);
+	// Allocate memory to store the actors
+	PxActor** userBuffer = new physx::PxActor * [numActors];
+	// Get all actors in the scene
+	gScene->getActors(type, userBuffer, numActors);
+
+	//delete all rigid dynamic actors
+	for (int i = 0; i < numActors; i++) {
+
+		gScene->removeActor(*userBuffer[i]);
+		userBuffer[i]->release();
+	}
+}
+
 //TODO: make this good
 void PhysicsSystem::cleanPhysicsSystem() {
-
+	//gScene->release();
 	gPhysics->release();
+	//gDispatcher->release();
+	//gMaterial->release();
 }
