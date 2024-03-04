@@ -13,6 +13,7 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 		InputSystem::right[i] = false;
 		InputSystem::confirm[i] = false;
 		InputSystem::shoot[i] = 0;
+		InputSystem::reverse[i] = false;
 	}
 }
 
@@ -35,15 +36,23 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		right[0] = true;
 	}
 
-	//will shoot a projectile
-	//FIXME: broken af rn. needs IO to be working to properly test
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		reverse[0] = true;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (shoot[0] == 0) {
-			shoot[0] = 1;
+		if (dataSys->inMenu) {
+			confirm[0] = true;
+			shoot[0] = 3;
+		}
+		else {
+			if (shoot[0] == 0) {
+				shoot[0] = 1;
+			}
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (shoot[0] == 2) {
+		if (shoot[0] >= 2) {
 			shoot[0] = 0;
 		}
 	}
@@ -109,20 +118,26 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (shoot[j+1] == 0) {
-						shoot[j+1] = 1;
+					if (dataSys->inMenu) {
+						confirm[0] = true;
+						shoot[0] = 3;
+					}
+					else {
+						if (shoot[0] == 0) {
+							shoot[0] = 1;
+						}
 					}
 				}
 				else if (x < -sens) {
-					if (shoot[j+1] == 2) {
+					if (shoot[j+1] >= 2) {
 						shoot[j+1] = 0;
 					}
 				}
 				if (y >= sens) { //right trigger
-					//?
+					reverse[j + 1] = true;
 				}
 				else if (y < -sens) {
-					//idk
+					reverse[j + 1] = false;
 				}
 			}
 		}
@@ -153,6 +168,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	bool b = false;
 	bool l = false;
 	bool r = false;
+	bool rev = false;
 	for (int i : checkvals) if (forward[i]) {
 		f = true;
 		forward[i] = false;
@@ -169,6 +185,11 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		r = true;
 		right[i] = false;
 	}
+	for (int i : checkvals) if (reverse[i]) {
+		rev = true;
+		reverse[i] = false;
+	}
+
 	if (f && !b) {
 		
 		playerCar->mCommandState.throttle = gasPedal;
@@ -239,6 +260,18 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		}
 	}
 
+	//reverse overrides all
+	if (rev) {
+		playerCar->mTransmissionCommandState.targetGear = 0;
+		playerCar->mCommandState.steer = 0;
+		playerCar->mCommandState.throttle = 1;
+		playerCar->mCommandState.nbBrakes = 0;
+		playerCar->mCommandState.brakes[0] = 0;
+	}
+	else {
+		playerCar->mTransmissionCommandState.targetGear = 2;
+	}
+
 	int s = 0;
 	for (int i : checkvals) if (shoot[i] == 1) {
 		s = 1;
@@ -246,7 +279,6 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 
 	if (s == 1) {
-		
 		return true;
 	}
 	else {

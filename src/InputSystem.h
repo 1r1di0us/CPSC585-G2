@@ -30,6 +30,7 @@ private:
 	bool right[17];
 	bool confirm[17];
 	int shoot[17];
+	bool reverse[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
 	bool menuLeftPressed = false;
