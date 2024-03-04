@@ -32,7 +32,7 @@ AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
-const double TIMELIMIT = 180.0f;
+const double TIMELIMIT = 10.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -49,14 +49,7 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-    carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
 
-    //spawning more cars (need min 4 cars for respawning to work)
-    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
-    carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
 
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
@@ -92,6 +85,19 @@ int main() {
             inputSys.InputToMenu();
             startTime = std::chrono::high_resolution_clock::now();
             previousIterationTime = startTime;
+
+            if (!dataSys.carsInitialized) {
+                //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
+                carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+
+                //spawning more cars (need min 4 cars for respawning to work)
+                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+
+                dataSys.carsInitialized = true;
+            }
         }
         else if (dataSys.inResults) {
             inputSys.InputToResults();

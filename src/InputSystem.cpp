@@ -146,12 +146,6 @@ void InputSystem::getGamePadInput() {
 }
 
 bool InputSystem::InputToMovement() {
-	std::cout << "Movement confirm array: ";
-	for (int i = 0; i < 17; i++) {
-		std::cout << confirm[i] << " ";
-	}
-	std::cout << std::endl;
-
 	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
@@ -299,12 +293,6 @@ void InputSystem::InputToMenu() {
 }
 
 void InputSystem::InputToResults() {
-	std::cout << "Results confirm array: ";
-	for (int i = 0; i < 17; i++) {
-		std::cout << confirm[i] << " ";
-	}
-	std::cout << std::endl;
-
 	std::vector<int> checkvals = { 0 };
 	for (int i = 0; i < 16; i++) {
 		if (gpArr[i]) checkvals.push_back(i + 1);
@@ -318,13 +306,13 @@ void InputSystem::InputToResults() {
 	}
 
 	if (conf) {
-		printf("here 2");
 		dataSys->inMenu = true;
 		dataSys->inResults = false;
 
 		dataSys->winningPlayer = 0;
 		dataSys->tieGame = false;
-		//dataSys->resetSharedDataSystem();
+		dataSys->carsInitialized = false;
+		dataSys->resetSharedDataSystem();
 	}
 }
 

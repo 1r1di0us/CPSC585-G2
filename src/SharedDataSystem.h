@@ -224,6 +224,7 @@ public:
 	// Reset these on game end
 	int winningPlayer = 0;
 	bool tieGame = false;
+	bool carsInitialized = false;
 
 	//// Audio 
 	//AudioManager* audio_ptr = nullptr;

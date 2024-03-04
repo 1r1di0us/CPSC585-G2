@@ -426,11 +426,11 @@ void SharedDataSystem::ResolveCollisions() {
 
 void SharedDataSystem::resetSharedDataSystem() {
 	// Clear all lists
+	carProjectileRigidDynamicDict.clear();
 	entityList.clear();
 	carRigidDynamicList.clear();
 	gVehicleList.clear();
 	carInfoList.clear();
-	carProjectileRigidDynamicDict.clear();
 }
 
 void SharedDataSystem::menuEventHandler() {
