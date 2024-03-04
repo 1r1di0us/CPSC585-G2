@@ -328,7 +328,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 }
 
 void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
-	printf("car hit powerup\n");
+	printf("car hit powerup shared data sys\n");
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {

@@ -11,6 +11,7 @@
 #include "SoundSystem.h"
 #include "CarSystem.h"
 #include "AiSystem.h"
+#include "PowerupSystem.h"
 #include "SharedDataSystem.h"
 #include <chrono>
 #include <thread>
@@ -25,6 +26,7 @@ const unsigned int SCR_HEIGHT = 600;
 SharedDataSystem dataSys;
 PhysicsSystem physicsSys(&dataSys);
 CarSystem carSys(&dataSys);
+PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
 SoundSystem soundSys;
