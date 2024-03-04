@@ -1,12 +1,17 @@
 #include "InputSystem.h"
 
-InputSystem::InputSystem() {
+InputSystem::InputSystem(SharedDataSystem* dataSys) {
+
+	this->dataSys = dataSys;
+	brakeTimer = 0.0;
+
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
 		InputSystem::forward[i] = false;
 		InputSystem::backward[i] = false;
 		InputSystem::left[i] = false;
 		InputSystem::right[i] = false;
+		InputSystem::confirm[i] = false;
 		InputSystem::shoot[i] = 0;
 	}
 }
@@ -42,6 +47,10 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 			shoot[0] = 0;
 		}
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+		confirm[0] = true;
+	}
 }
 
 void InputSystem::checkIfGamepadsPresent() {
@@ -55,6 +64,7 @@ void InputSystem::checkIfGamepadsPresent() {
 	}
 }
 
+// Need to add confirm button on controller
 void InputSystem::getGamePadInput() {
 	GLFWgamepadstate state;
 	for (int j = 0; j < 16; j++) {
@@ -120,10 +130,21 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
+bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
+
+	//update timer
+	if (brakeTimer < deltaTime.count()) {
+		brakeTimer = 0.0;
+	}
+	else {
+		brakeTimer -= deltaTime.count();
+	}
+
+	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+	float carSpeed = playerCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().magnitude();
 	std::vector<int> checkvals = {0};
 	for (int i = 0; i < 16; i++) {
 		if (gpArr[i]) checkvals.push_back(i + 1);
@@ -187,13 +208,34 @@ bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 		float angle = atan2(dot, det);
 
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
-			playerCar->mCommandState.steer = -4*angle;
+			playerCar->mCommandState.steer = -angle;
 		}
-		else if (angle > -M_PI/8) {
-			playerCar->mCommandState.steer = -2.5;
+		else if (angle < -M_PI/8) {
+			playerCar->mCommandState.steer = 1;
+			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
+				if (carSpeed > 19.0) {
+					brakeTimer = 0.35;
+				}
+			}
 		}
-		else if (angle < M_PI/8) {
-			playerCar->mCommandState.steer = 2.5;
+		else if (angle > M_PI/8) {
+			playerCar->mCommandState.steer = -1;
+			if (angle > M_PI / 4 && brakeTimer == 0.0) {
+				if (carSpeed > 19.0) {
+					brakeTimer = 0.35;
+				}
+			}
+		}
+		
+		if (brakeTimer > 0.0) {
+			if (carSpeed < 1.0) {
+				brakeTimer = 0.0;
+			}
+			else {
+				playerCar->mCommandState.throttle = 0;
+				playerCar->mCommandState.nbBrakes = 1;
+				playerCar->mCommandState.brakes[0] = 1;
+			}
 		}
 	}
 
@@ -209,6 +251,59 @@ bool InputSystem::InputToMovement(EngineDriveVehicle* playerCar) {
 	}
 	else {
 		return false;
+	}
+}
+
+void InputSystem::InputToMenu() {
+	std::vector<int> checkvals = { 0 };
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+
+	bool l = false;
+	bool r = false;
+	bool conf = false;
+
+	for (int i : checkvals) if (left[i]) {
+		l = true;
+		left[i] = false;
+	}
+	for (int i : checkvals) if (right[i]) {
+		r = true;
+		right[i] = false;
+	}
+	for (int i : checkvals) if (confirm[i]) {
+		conf = true;
+		confirm[i] = false;
+	}
+
+	// Check if left key is pressed and was not pressed before
+	if (l && !menuLeftPressed) {
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex - 1) % dataSys->nbMenuOptions;
+		menuLeftPressed = true;
+	}
+	else if (!l) {
+		menuLeftPressed = false;
+	}
+
+	// Check if right key is pressed and was not pressed before
+	if (r && !menuRightPressed) {
+		dataSys->menuOptionIndex = (dataSys->menuOptionIndex + 1) % dataSys->nbMenuOptions;
+		menuRightPressed = true;
+	}
+	else if (!r) {
+		menuRightPressed = false;
+	}
+
+	if (conf && dataSys->menuOptionIndex == 0) {
+		dataSys->inMenu = false;
+	}
+	else if (conf && dataSys->menuOptionIndex == 1) {
+		dataSys->quit = true;
+	}
+
+	if (dataSys->menuOptionIndex < 0) {
+		dataSys->menuOptionIndex = dataSys->nbMenuOptions - 1;
 	}
 }
 

@@ -17,8 +17,12 @@
 #include "vector"
 #include "Entity.h"
 #include "Camera.h"
+#include "SharedDataSystem.h"
 
 class RenderingSystem {
+
+private:
+	SharedDataSystem* dataSys;
 
 public:
 	// settings
@@ -32,19 +36,19 @@ public:
 	// variables
 	GLFWwindow* window;
 	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO, planeVAO, planeVBO;
+	unsigned int quadVAO, quadVBO;
 	Shader textShader;
 	Shader shader;
 	std::map<char, Character> Characters_gaegu;
 	OBJModel tank, building, ball, plane;
 
-	RenderingSystem();
+	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-	void updateRenderer(std::vector<Entity> entityList, Camera camera, std::chrono::duration<double> timeLeft);
+	void updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
-
 };
 
 //void drawFromModel(std::string modelFilePath);

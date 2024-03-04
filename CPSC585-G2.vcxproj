@@ -30,6 +30,7 @@
     <ClCompile Include="libraries\snippetvehicle2common\serialization\SerializationCommon.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleHelpers.cpp" />
     <ClCompile Include="libraries\snippetvehicle2common\SnippetVehicleRender.cpp" />
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\Boilerplate\glad.c" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CarSystem.cpp" />
@@ -41,12 +42,14 @@
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\SharedDataSystem.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Text.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
@@ -68,6 +71,7 @@
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\Text.h" />
@@ -79,6 +83,10 @@
     <None Include="assets\Models\bed_double_A.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
     <None Include="src\assets\models\bed_double_A.mtl" />
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
@@ -103,6 +111,10 @@
     <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio_vc.lib" />
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
     <Library Include="physx\debug\LowLevelDynamics_static_64.lib" />
     <Library Include="physx\debug\LowLevel_static_64.lib" />
