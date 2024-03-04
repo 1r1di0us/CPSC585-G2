@@ -50,17 +50,6 @@ int main() {
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
     previousIterationTime = startTime;
@@ -129,13 +118,4 @@ int main() {
 
     physicsSys.cleanPhysicsSystem();
     return 0;
-}
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }
