@@ -133,7 +133,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
     if (useBirdsEyeView) {
         // Bird's eye view
-        glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+        glm::vec3 cameraPosition = glm::vec3(0.0f, 70.0f, 0.0f);
         glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
 
