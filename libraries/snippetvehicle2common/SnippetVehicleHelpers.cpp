@@ -71,7 +71,6 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 		|| (filterData1.word0 == COLLISION_FLAG_POWERUP && filterData0.word0 == COLLISION_FLAG_CHASSIS)) {
 
 		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
-		printf("Car hit powerup.\n");
 	}
 
 	return physx::PxFilterFlags();
