@@ -79,7 +79,6 @@ private:
 				PX_UNUSED(nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
-				
 				contactPair = pairHeader;
 				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
 					contactDetected = true;
@@ -87,7 +86,16 @@ private:
 			void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
 			void onWake(physx::PxActor** actors, physx::PxU32 count) {}
 			void onSleep(physx::PxActor** actors, physx::PxU32 count) {}
-			void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {}
+			void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) {
+			
+				//used for trigger volumes
+				contactPair.actors[0] = pairs->triggerActor;
+				contactPair.actors[1] = pairs->otherActor;
+
+				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
+					contactDetected = true;
+
+			}
 			void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
 				const physx::PxTransform* poseBuffer,
 				const physx::PxU32 count) {}
@@ -135,30 +143,36 @@ public:
 	const PxReal TIMESTEP = 1.0f / 60.0f;
 
 	//car respawn timer
-	const float CARRESPAWNLENGTH = 3.0f;
+	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//powerup respawn timer
-	const float POWERUPRESPAWNLENGTH = 2.0f;
+	const float POWERUP_RESPAWN_LENGTH = 2.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOMLEFTMAPCOORD = PxVec2(-20.0f, -20.0f);
-	const PxVec2 TOPRIGHTMAPCOORD = PxVec2(20.0f, 20.0f);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-20.0f, -20.0f);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(20.0f, 20.0f);
 	
 	//the approximate size of the map. rectangular
-	const PxReal MAPLENGTHX = TOPRIGHTMAPCOORD.x - BOTTOMLEFTMAPCOORD.x;
-	const PxReal MAPLENGTHZ = TOPRIGHTMAPCOORD.y - BOTTOMLEFTMAPCOORD.y;
+	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
+	const PxReal MAPLENGTHZ = TOP_RIGHT_MAP_COORD.y - BOTTOM_LEFT_MAP_COORD.y;
 
 	//the min distance cars can spawn from other cars
-	const PxReal CARMINSPAWNDISTANCE = 10.0f;
+	const PxReal CAR_MIN_SPAWN_DISTANCE = 10.0f;
 
 	//the min spawn distance between powerups
-	const PxReal POWERUPSPAWNMINDISTANCE = 2.0f;
+	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 2.0f;
 
 	//the spawn height of cars
-	const PxReal CARSPAWNHEIGHT = 0.5f;
+	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
 
 	//the spawn height of powerups
-	const PxReal POWERUPSPAWNHEIGHT = 0.0f;
+	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
+
+	//the max number of ammo spawn powerups
+	const int NUMBER_OF_AMMO_POWERUPS = 5;
+
+	//the number of bullets given per ammo powerup
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 5;
 
 	//entity helper functions move from entity cpp?
 
@@ -217,6 +231,9 @@ public:
 
 	//function to get list of powerups that need to be respawned
 	std::vector<PowerupInfo*> GetListOfDeadPowerups();
+
+	//function to find a powerup info by entity
+	PowerupInfo* GetPowerupInfoStructFromEntity(std::shared_ptr<Entity> entity);
 
 	/*
 	* COLLISIONS

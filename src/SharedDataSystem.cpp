@@ -21,8 +21,8 @@ bool SharedDataSystem::IsPointInSquare(PxVec2 point, MapSquare& square) {
 bool SharedDataSystem::IsPointInBounds(PxVec2 point) {
 
 	MapSquare boundSquare;
-	boundSquare.bottomLeft = BOTTOMLEFTMAPCOORD;
-	boundSquare.topRight = TOPRIGHTMAPCOORD;
+	boundSquare.bottomLeft = BOTTOM_LEFT_MAP_COORD;
+	boundSquare.topRight = TOP_RIGHT_MAP_COORD;
 
 	return IsPointInSquare(point, boundSquare);
 }
@@ -114,8 +114,8 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 		for (int j = 0; j < zMapSquares; j++) {
 			MapSquare square;
 			square.id = i * zMapSquares + j;
-			square.bottomLeft = PxVec2(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + j * minDistance);
-			square.topRight = PxVec2(BOTTOMLEFTMAPCOORD.x + (i + 1) * minDistance, BOTTOMLEFTMAPCOORD.y + (j + 1) * minDistance);
+			square.bottomLeft = PxVec2(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
+			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
 			mapSquareList.emplace_back(square);
 		}
 	}
@@ -247,15 +247,19 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 		for (int i = 0; i < carRigidDynamicList.size(); i++) {
 			locations.emplace_back(PxVec2(carRigidDynamicList[i]->getGlobalPose().p.x, carRigidDynamicList[i]->getGlobalPose().p.z));
 		}
-		return GenerateSpawnPoint(locations, CARMINSPAWNDISTANCE, CARSPAWNHEIGHT);
+		return GenerateSpawnPoint(locations, CAR_MIN_SPAWN_DISTANCE, CAR_SPAWN_HEIGHT);
 
 		break;
 	case PhysicsType::POWERUP:
 
-		return PxVec3(0, 0, 0);
+		for (int i = 0; i < allPowerupList.size(); i++) {
+			locations.emplace_back(PxVec2(allPowerupList[i].entity->collisionBox->getGlobalPose().p.x, allPowerupList[i].entity->collisionBox->getGlobalPose().p.z));
+		}
+		return GenerateSpawnPoint(locations, POWERUP_MIN_SPAWN_DISTANCE, POWERUP_SPAWN_HEIGHT);
+
 		break;
 	default:
-		printf("this is a physics type that cannot be spawned");
+		printf("this is a physics type that cannot be respawned");
 		break;
 	}
 
@@ -295,6 +299,18 @@ std::vector<PowerupInfo*> SharedDataSystem::GetListOfDeadPowerups() {
 	return deadPowerupVec;
 }
 
+PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<Entity> entity) {
+
+	for (int i = 0; i < allPowerupList.size(); i++) {
+		if (allPowerupList[i].entity->name == entity->name) {
+			return &allPowerupList[i];
+		}
+	}
+
+	//unreachable code
+	exit(69);
+}
+
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
@@ -330,7 +346,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 	//setting the data of the car that got hit to let it respawn
 	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	hitCar->respawnTimeLeft = CARRESPAWNLENGTH;
+	hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
 	hitCar->isAlive = false;
 	//moving into the sky and disabling gravity to "delete it"
 	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
@@ -341,7 +357,36 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 }
 
 void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
-	printf("car hit powerup shared data sys\n");
+
+	//converting the actors to entities
+	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
+	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
+
+	GetPowerupInfoStructFromEntity(powerupEntity);
+
+	//gives the car the powerups effect
+	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
+	case PowerupType::AMMO:
+
+		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
+		break;
+	case PowerupType::CARSPEED:
+
+		break;
+	case PowerupType::PROJECTILESIZE:
+
+		break;
+	case PowerupType::PROJECTILESPEED:
+
+		break;
+	default:
+		printf("unknown powerup type\n");
+		break;
+	}
+
+	//send the powerup to hell
+	powerupEntity->collisionBox->setGlobalPose(PxTransform(0.0f, -100.0f, 0.0f));
+
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
@@ -422,7 +467,7 @@ void SharedDataSystem::ResolveCollisions() {
 		case PhysicsType::POWERUP:
 
 			if (entity2->physType == PhysicsType::CAR) {
-				CarProjectileCollisionLogic(actor2, actor1);
+				CarPowerupCollisionLogic(actor2, actor1);
 			}
 
 			break;
