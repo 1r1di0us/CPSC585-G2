@@ -13,6 +13,7 @@ public:
 	SharedDataSystem* dataSys;
 	State state;
 	double timer;
+	double brakeTimer;
 	std::default_random_engine rand;
 	std::normal_distribution<double> distribution;
 
