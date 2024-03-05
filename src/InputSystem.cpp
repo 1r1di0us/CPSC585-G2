@@ -53,7 +53,7 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (dataSys->inMenu) {
+		if (dataSys->inMenu || dataSys->inResults) {
 			if (confirm[0] == 0) confirm[0] = 1;
 			shoot[0] = 3; //won't shoot if its 3
 		}
@@ -62,20 +62,22 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (dataSys->inMenu) {
-			if (confirm[0] >= 2) confirm[0] = 0;
+		if (dataSys->inMenu || dataSys->inResults) {
+			if (confirm[0] >= 2) {
+				confirm[0] = 0;
+			}
 		}
 		else {
 			if (shoot[0] >= 2) shoot[0] = 0;
 		}
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		if (confirm[0] == 0) confirm[0] = 1;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE) {
-		if (confirm[0] == 2) confirm[0] = 0;
-	}
+	//if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+	//	if (confirm[0] == 0 && (dataSys->inMenu || dataSys->inResults)) confirm[0] = 1;
+	//}
+	//else if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE) {
+	//	if (confirm[0] >= 2 && (dataSys->inMenu || dataSys->inResults)) confirm[0] = 0;
+	//}
 
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
 		if (dataSys->useBirdsEyeView == 0) {
@@ -165,7 +167,7 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (dataSys->inMenu) {
+					if (dataSys->inMenu || dataSys->inResults) {
 						if (confirm[j + 1] == 0) confirm[j + 1] = 1;
 						shoot[0] = 3;
 					}
@@ -174,7 +176,7 @@ void InputSystem::getGamePadInput() {
 					}
 				}
 				else if (x < -sens) {
-					if (dataSys->inMenu) {
+					if (dataSys->inMenu || dataSys->inResults) {
 						if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
 					}
 					else {
@@ -187,15 +189,6 @@ void InputSystem::getGamePadInput() {
 				else if (y < -sens) {
 					//???
 				}
-
-
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
-					if (confirm[j+1] == 0) confirm[j+1] = 1;
-				}
-				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
-					if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
-				}
-
 			}
 		}
 	}

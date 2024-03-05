@@ -21,6 +21,7 @@ public:
 	bool InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
 	void InputToResults();
+	int confirm[17];
 
 private:
 	double brakeTimer;
@@ -30,7 +31,6 @@ private:
 	bool backward[17];
 	bool left[17];
 	bool right[17];
-	int confirm[17];
 	int shoot[17];
 	bool reverse[17];
 	bool camLeft[17];
