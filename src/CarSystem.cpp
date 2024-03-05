@@ -100,6 +100,7 @@ void CarSystem::RespawnAllCars() {
 			//"spawn" the car
 			carInfo->isAlive = true;
 			carInfo->respawnTimeLeft = 0;
+			carInfo->ammoCount = AMMO_START_AMOUNT;
 			carInfo->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, false);
 			carInfo->entity->collisionBox->setGlobalPose(PxTransform(spawnVec));
 		}

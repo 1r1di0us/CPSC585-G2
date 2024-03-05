@@ -16,6 +16,9 @@ using namespace physx;
 using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
+//needs to be here cause the struct wont see it below
+const int AMMO_START_AMOUNT = 5;
+
 //car info struct
 struct CarInfo{
 	//waow smart pointer! I HARDLY KNOW ER
@@ -25,7 +28,7 @@ struct CarInfo{
 	bool isAlive = true;
 	float respawnTimeLeft = 0;
 	float parryTimeLeft = 0;
-	int ammoCount = 5;
+	int ammoCount = AMMO_START_AMOUNT;
 };
 
 //powerup types
