@@ -160,19 +160,12 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (dataSys->inMenu || dataSys->inResults) {
-						if (confirm[j + 1] == 0) confirm[j + 1] = 1;
-						shoot[0] = 3;
-					}
-					else {
+					if (!dataSys->inMenu || !dataSys->inResults) {
 						if (shoot[j + 1] == 0) shoot[j + 1] = 1;
 					}
 				}
 				else if (x < -sens) {
-					if (dataSys->inMenu || dataSys->inResults) {
-						if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
-					}
-					else {
+					if (!dataSys->inMenu || !dataSys->inResults) {
 						if (shoot[j + 1] >= 2) shoot[j + 1] = 0;
 					}
 				}
@@ -181,6 +174,13 @@ void InputSystem::getGamePadInput() {
 				}
 				else if (y < -sens) {
 					//???
+				}
+
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+					if (confirm[j + 1] == 0) confirm[j + 1] = 1;
+				}
+				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+					if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
 				}
 			}
 		}
