@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int blueTexture, catTexture, redTexture, menuPlay, menuQuit;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, blueTexture, redTexture, menuPlay, menuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -56,10 +56,20 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     // create and set textures
     blueTexture = generateTexture("src/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
-    catTexture = generateTexture("src/Textures/cat.jpg", true);
+    player1Texture = generateTexture("src/Textures/player1.jpg", true);
+    player2Texture = generateTexture("src/Textures/player2.jpg", true);
+    player3Texture = generateTexture("src/Textures/player3.jpg", true);
+    player4Texture = generateTexture("src/Textures/player4.jpg", true);
+    player5Texture = generateTexture("src/Textures/player5.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
     menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
     menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
+    resultsP1 = generateTexture("src/Textures/UI/resultsP1.jpg", true);
+    resultsP2 = generateTexture("src/Textures/UI/resultsP2.jpg", true);
+    resultsP3 = generateTexture("src/Textures/UI/resultsP3.jpg", true);
+    resultsP4 = generateTexture("src/Textures/UI/resultsP4.jpg", true);
+    resultsP5 = generateTexture("src/Textures/UI/resultsP5.jpg", true);
+    resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -77,7 +87,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
-    Characters_gaegu = initFont("./assets/Gaegu-Bold.ttf");
+    Characters_gaegu = initFont("./assets/Candy Beans.otf");
     initTextVAO(&textVAO, &textVBO);
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
@@ -102,141 +112,200 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // rendering text
-    // Convert timeLeft to seconds
-    int timeLeftInSeconds = static_cast<int>(timeLeft.count());
+    if (!dataSys->inMenu) {
+        // rendering text
+        // Convert timeLeft to seconds
+        int timeLeftInSeconds = static_cast<int>(timeLeft.count());
 
-    // Convert timeLeftInSeconds to string
-    std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-    RenderText(textShader, textVAO, textVBO, timeLeftStr, 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f), Characters_gaegu);
+        // Convert timeLeftInSeconds to string
+        std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+        RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
-    // activate shader
-    shader.use();
+        // Need to add ammo count when implemented
+        std::string ammoCount = "Ammo: ";
+        RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
-    // camera setup stuff/ 3d transformations
-    glm::mat4 model = glm::mat4(1.0f);
+        std::string score = "Score:";
+        RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
-    // view matrix
-    glm::mat4 view = glm::mat4(1.0f);
-    // note that we're translating the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -7.0f));
+        for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+            float yOffset = i * 30;
+            std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
+            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+        }
 
-    // this should be the camera matrix
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        // activate shader
+        shader.use();
 
-    // getting the car position and rotation
-    glm::vec3 playerPos = entityList->at(0).transform->getPos();
-    glm::quat playerRot = entityList->at(0).transform->getRot();
-    //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
+        // camera setup stuff/ 3d transformations
+        glm::mat4 model = glm::mat4(1.0f);
 
+        // view matrix
+        glm::mat4 view = glm::mat4(1.0f);
+        // note that we're translating the scene in the reverse direction of where we want to move
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -7.0f));
 
-    if (useBirdsEyeView) {
-        // Bird's eye view
-        glm::vec3 cameraPosition = glm::vec3(0.0f, 70.0f, 0.0f);
-        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
+        // this should be the camera matrix
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-        view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-    }
-    else {
-        // Original view
-        glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-        camera.Position = playerPos + offsetFromPlayer;
-        glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
+        // getting the car position and rotation
+        glm::vec3 playerPos = entityList->at(0).transform->getPos();
+        glm::quat playerRot = entityList->at(0).transform->getRot();
+        //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
-        view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
-    }
+        if (useBirdsEyeView) {
+            // Bird's eye view
+            glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+            glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+            glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
 
-    // car translating
-    model = glm::translate(model, playerPos);
-    // make it look forward
-    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    model = applyQuaternionToMatrix(model, playerRot);
+            view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        }
+        else {
+            // Original view
+            glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+            camera.Position = playerPos + offsetFromPlayer;
+            glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
+            view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+        }
 
-    // sending our matrixes to the shader
-    shader.setMat4("projection", projection);
-    shader.setMat4("view", view);
+        // car translating
+        model = glm::translate(model, playerPos);
+        // make it look forward
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        model = applyQuaternionToMatrix(model, playerRot);
 
-    // binding textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, catTexture);
+        // sending our matrixes to the shader
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
 
-    //float angle = 45.0f;
-    shader.setMat4("model", model);
-    renderObject(tank, &tankVAO);
+        // binding textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, player1Texture);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, blueTexture);
+        //float angle = 45.0f;
+        shader.setMat4("model", model);
+        renderObject(tank, &tankVAO);
 
-    model = glm::mat4(1.0f);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, blueTexture);
 
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
-    shader.setMat4("model", model);
+        model = glm::mat4(1.0f);
 
-    renderObject(plane, &planeVAO);
+        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
+        shader.setMat4("model", model);
 
-    //rendering all other entities starting at 1 (skipping player car)
-    for (int i = 1; i < entityList->size(); i++) {
+        renderObject(plane, &planeVAO);
 
-        switch (entityList->at(i).physType) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
 
-        case (PhysicsType::CAR):
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, redTexture);
+        shader.setMat4("model", model);
+        renderObject(building, &buildingVAO);
 
-            //is the car alive? -> render it
-            if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(entityList->at(i)))->isAlive) {
+        //rendering all other entities starting at 1 (skipping player car)
+        for (int i = 1; i < entityList->size(); i++) {
+
+            switch (entityList->at(i).physType) {
+
+            case (PhysicsType::CAR):
+
+                //is the car alive? -> render it
+                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(entityList->at(i)))->isAlive) {
+                    if (i == 1) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player2Texture);
+                    }
+                    else if (i == 2) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player3Texture);
+                    }
+                    else if (i == 3) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player4Texture);
+                    }
+                    else {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player5Texture);
+                    }
+
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(model, entityList->at(i).transform->getPos());
+                    // make it look forward
+                    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+                    model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
+                    shader.setMat4("model", model);
+                    renderObject(tank, &tankVAO);
+                }
+
+                break;
+            case (PhysicsType::PROJECTILE):
 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, catTexture);
+                glBindTexture(GL_TEXTURE_2D, redTexture);
 
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, entityList->at(i).transform->getPos());
-                // make it look forward
-                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-                model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
                 shader.setMat4("model", model);
-                renderObject(tank, &tankVAO);
+                renderObject(ball, &ballVAO);
+
+                break;
+            case (PhysicsType::STATIC):
+
+                break;
+            default:
+
+                break;
             }
-
-            break;
-        case (PhysicsType::PROJECTILE):
-
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, redTexture);
-
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, entityList->at(i).transform->getPos());
-            shader.setMat4("model", model);
-            renderObject(ball, &ballVAO);
-
-            break;
-        case (PhysicsType::STATIC):
-
-            break;
-        default:
-
-            break;
         }
     }
 
     // Setup UI if necessary
-    if (dataSys->inMenu) {
+    if (dataSys->inMenu || dataSys->inResults) {
         GLuint fboId = 0;
         glGenFramebuffers(1, &fboId);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
-        if (dataSys->menuOptionIndex == 0) {
-            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                GL_TEXTURE_2D, menuPlay, 0);
+        if (dataSys->inMenu) {
+            if (dataSys->menuOptionIndex == 0) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuPlay, 0);
+            }
+            else if (dataSys->menuOptionIndex == 1) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuQuit, 0);
+            }
         }
-        else if (dataSys->menuOptionIndex == 1) {
-            glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                GL_TEXTURE_2D, menuQuit, 0);
+        else if(dataSys->inResults){
+            if (dataSys->tieGame) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsTie, 0);
+            }
+            else {
+                if (dataSys->winningPlayer == 0) {
+                    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP1, 0);
+                }
+                else if (dataSys->winningPlayer == 1) {
+                    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP2, 0);
+                }
+                else if (dataSys->winningPlayer == 2) {
+                    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP3, 0);
+                }
+                else if (dataSys->winningPlayer == 3) {
+                    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP4, 0);
+                }
+                else{
+                    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP5, 0);
+                }
+            }
+            
         }
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // if not already bound
         glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT,
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
+
+
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
