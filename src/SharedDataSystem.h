@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include <vector>
 #include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
 #include "snippetvehicle2common/serialization/BaseSerialization.h"
@@ -11,6 +13,7 @@
 #include <memory>
 #include <chrono>
 #include <queue>
+#include "math.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -126,13 +129,16 @@ private:
 	std::vector<PxVec2> GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType);
 
 	//finds the center of four points
-	PxVec2 FindCenterOfFourPoints(std::vector<PxVec2> pointsList);
+	PxVec2 FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList = {}, std::vector<PxVec2> generatedPointsList = {});
 
 	//populates the map square list with the points of the same type
 	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList);
 
 	//randomizes the map square list
 	void RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList);
+
+	//creates the map square list
+	void CreateMapSquareList();
 
 	//generates a point a min distance away from all points in given vec and within the map range
 	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
@@ -159,7 +165,7 @@ public:
 	const PxReal MAPLENGTHZ = TOP_RIGHT_MAP_COORD.y - BOTTOM_LEFT_MAP_COORD.y;
 
 	//the min distance cars can spawn from other cars
-	const PxReal CAR_MIN_SPAWN_DISTANCE = 10.0f;
+	const PxReal CAR_MIN_SPAWN_DISTANCE = 15.0f;
 
 	//the min spawn distance between powerups
 	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 10.0f;
@@ -201,6 +207,20 @@ public:
 	
 	//a vector of all car structs for car info
 	std::vector<CarInfo> carInfoList;
+
+	/*
+	* DEBUGGING STUFF
+	*/
+
+	//will make debug boxes at all the squares used in respawning
+	bool boxesMade = false;
+
+	//makes a floating box for boundary demo purposes
+	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
+
+	/*
+	* CAR FUNCTIONS
+	*/
 
 	//gets the car info struct using an entity
 	CarInfo* GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
@@ -263,14 +283,21 @@ public:
 	*/
 	void ResolveCollisions();
 
+	// Delete all lists in SharedDataSystem.h
+	void resetSharedDataSystem();
+
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();
+
+	//makes the rotation matrix for the camera
+	glm::mat3 getCamRotMat();
+	PxMat33 getCamRotMatPx(float angle);
 
 	// Flags
 	bool inMenu = true;
 	bool loading = false;
 	bool quit = false;
-	bool gameEnded = false;
+	bool inResults = false;
 	int menuOptionIndex = 0;
 	int nbMenuOptions = 2; // Currently options are play and quit
 
@@ -278,12 +305,16 @@ public:
 	int ingameOptionIndex = 0;
 	int nbIngameOptions = 2; // Options will be main menu and quit
 
-	// Game Parameters
-	int numPlayers = 1;
-	int numVehicles = 4;
+	// Reset these on game end
+	int winningPlayer = 0;
+	bool tieGame = false;
+	bool carsInitialized = false;
 
 	//// Audio 
 	//AudioManager* audio_ptr = nullptr;
 	//glm::vec3 listener_position;
 
+	// Camera
+	float cameraAngle = M_PI;
+	int useBirdsEyeView = 0;
 };
