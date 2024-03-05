@@ -61,12 +61,6 @@ void PowerupSystem::SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType) 
 	dataSys->allPowerupList.emplace_back(powerupInfo);
 }
 
-void PowerupSystem::SpawnAllPowerups() {
-
-	//for loops calling spawn powerup based on number of each one wanted
-
-}
-
 void PowerupSystem::RespawnAllPowerups() {
 
 	//decrement both respawn timers

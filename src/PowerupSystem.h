@@ -21,10 +21,6 @@ public:
 	//function to spawn a powerup
 	void SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType);
 
-	//function to spawn all powerups (creating them initially)
-	void SpawnAllPowerups();
-
-	//not actually gonna delete them (just move them into the sky)
-	//works same as car respawn
+	//creates new powerups depending on time variables
 	void RespawnAllPowerups();
 };
