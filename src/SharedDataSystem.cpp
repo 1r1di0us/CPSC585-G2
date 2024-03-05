@@ -82,9 +82,6 @@ PxVec2 SharedDataSystem::FindCenterOfFourPointsWithRandomOffset(PxReal minDistan
 
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
-	//strange bug where its not seeing that the point is out of bounds and deleting it
-		//something to do with is alive maybe?????
-
 	//go through the map square list and populate each one fully before moving on to the next one
 	while (pointsOfSameType.size() > 0) {
 		for (int i = 0; i < mapSquareList.size(); i++) {
@@ -138,6 +135,9 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 			square.bottomLeft = PxVec2(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + j * minDistance);
 			square.topRight = PxVec2(BOTTOMLEFTMAPCOORD.x + (i + 1) * minDistance, BOTTOMLEFTMAPCOORD.y + (j + 1) * minDistance);
 			mapSquareList.emplace_back(square);
+
+			MAKE_BOX_DEBUG(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + j * minDistance);
+			MAKE_BOX_DEBUG(BOTTOMLEFTMAPCOORD.x + (i + 1) * minDistance, BOTTOMLEFTMAPCOORD.y + (j + 1) * minDistance);
 		}
 	}
 
@@ -162,6 +162,9 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 			square.bottomLeft = PxVec2(TOPRIGHTMAPCOORD.x - remainingX, i);
 			square.topRight = PxVec2(TOPRIGHTMAPCOORD.x, i + minDistance);
 			mapSquareList.emplace_back(square);
+
+			MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x - remainingX, i);
+			MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x, i + minDistance);
 		}
 	}
 
@@ -179,6 +182,9 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 			square.bottomLeft = PxVec2(i, TOPRIGHTMAPCOORD.y - remainingZ);
 			square.topRight = PxVec2(i + minDistance, TOPRIGHTMAPCOORD.y);
 			mapSquareList.emplace_back(square);
+
+			MAKE_BOX_DEBUG(i, TOPRIGHTMAPCOORD.y - remainingZ);
+			MAKE_BOX_DEBUG(i + minDistance, TOPRIGHTMAPCOORD.y);
 		}
 
 	}
@@ -189,6 +195,9 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 	square.bottomLeft = PxVec2(TOPRIGHTMAPCOORD.x - remainingX, TOPRIGHTMAPCOORD.y - remainingZ);
 	square.topRight = TOPRIGHTMAPCOORD;
 	mapSquareList.emplace_back(square);
+
+	MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x - remainingX, TOPRIGHTMAPCOORD.y - remainingZ);
+	MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x, TOPRIGHTMAPCOORD.y);
 
 	//place the points in their respecitve squares
 	PopulateMapSquareList(pointsOfSameType, mapSquareList);
@@ -215,6 +224,10 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 			}
 		}
 	}
+
+	boxesMade = true;
+
+	printf("best square: %d\n", bestSquare->numPoints);
 
 	switch (bestSquare->numPoints) {
 	case 1:
@@ -246,6 +259,20 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 /*
 * PUBLIC FUNCTIONS
 */
+
+void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
+	
+	if (!boxesMade) {
+
+		//define a projectile
+		physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(0.25f, 0.25f, 0.25f), *gMaterial);
+
+		PxRigidStatic* projectileBody = gPhysics->createRigidStatic(PxTransform(x, 5, z));
+		projectileBody->attachShape(*shape);
+		projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+		gScene->addActor(*projectileBody);
+	}
+}
 
 CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
 	

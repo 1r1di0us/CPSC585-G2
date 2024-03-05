@@ -162,6 +162,20 @@ public:
 	//a vector of all car structs for car info
 	std::vector<CarInfo> carInfoList;
 
+	/*
+	* DEBUGGING STUFF
+	*/
+
+	//will make debug boxes at all the squares used in respawning
+	bool boxesMade = false;
+
+	//makes a floating box for boundary demo purposes
+	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
+
+	/*
+	* CAR FUNCTIONS
+	*/
+
 	//gets the car info struct using an entity
 	CarInfo* GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
 
