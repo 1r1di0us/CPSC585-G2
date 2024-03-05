@@ -41,8 +41,10 @@ public:
 	unsigned int quadVAO, quadVBO;
 	Shader textShader;
 	Shader shader;
+	Shader ourShader; // testing it
 	std::map<char, Character> Characters_gaegu;
 	OBJModel tank, building, ball, plane;
+	Model bedModel;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -57,3 +59,4 @@ public:
 void renderOBJ(const OBJModel& model);
 void renderObject(const OBJModel& model, unsigned int* VAO);
 void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
+

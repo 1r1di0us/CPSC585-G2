@@ -142,9 +142,8 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
                 model.normals.push_back(normal);
             }
 
-            //model.indices.push_back(model.indices.size());
-            model.indices.push_back(model.vertices.size() - 1);
-
+            // Add the index to the indices vector
+            model.indices.push_back(static_cast<uint32_t>(model.indices.size()));
         }
     }
 

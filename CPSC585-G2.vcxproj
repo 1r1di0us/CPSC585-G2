@@ -98,6 +98,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\fragment_shader_text.txt" />
+    <Text Include="src\model_loading_fragment.txt" />
+    <Text Include="src\model_loading_vertex.txt" />
     <Text Include="src\vertex_shader_text.txt" />
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
@@ -269,7 +271,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)physx\debug;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\lib-vc2019;$(SolutionDir)libraries\freetype-2.13.2\objs;$(SolutionDir)libraries\FMOD Studio API Windows\api\core\lib\x64;$(SolutionDir)libraries\FMOD Studio API Windows\api\studio\lib\x64;$(SolutionDir)libraries\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mtd.lib;fmodL_vc.lib;fmodstudioL_vc.lib;freetype.lib;glfw3_mt.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;SnippetRender_static_64.lib;SnippetUtils_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;fmodL_vc.lib;fmodstudioL_vc.lib;freetype.lib;glfw3_mt.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;SnippetRender_static_64.lib;SnippetUtils_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)src"
@@ -296,7 +298,7 @@ copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)physx\include;$(SolutionDir)libraries;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\include;$(SolutionDir)libraries\freetype-2.13.2\include;$(SolutionDir)libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)physx\include;$(SolutionDir)libraries;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\include;$(SolutionDir)libraries\freetype-2.13.2\include;$(SolutionDir)libraries\snippetvehicle2common;$(SolutionDir)libraries\snippetcommon;$(SolutionDir)libraries\FMOD Studio API Windows\api\core\inc;$(SolutionDir)libraries\FMOD Studio API Windows\api\studio\inc;$(SolutionDir)libraries\assimp\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)physx\include;$(SolutionDir)libraries;$(SolutionDir)libraries\glm;$(SolutionDir)libraries\glfw-3.3.9.bin.WIN64\include;$(SolutionDir)libraries\freetype-2.13.2\include;$(SolutionDir)libraries\snippetvehicle2common;$(SolutionDir)libraries\snippetcommon;$(SolutionDir)libraries\FMOD Studio API Windows\api\core\inc;$(SolutionDir)libraries\FMOD Studio API Windows\api\studio\inc;$(SolutionDir)libraries\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

@@ -52,6 +52,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     // geom shader
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     // create and set textures
     blueTexture = generateTexture("src/Textures/blue.jpg", true);
@@ -84,7 +85,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
-    Model model("./assets/Models/bed_double_A.obj");
+    Model bedModel("./assets/Models/bed_double_A.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
@@ -104,8 +105,6 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-    
     // rendering text
     // Convert timeLeft to seconds
     int timeLeftInSeconds = static_cast<int>(timeLeft.count());
@@ -179,6 +178,16 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     shader.setMat4("model", model);
 
     renderObject(plane, &planeVAO);
+
+
+    // render the loaded model
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, catTexture);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f)); // translate it down so it's at the center of the scene
+    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
+    ourShader.setMat4("model", model);
+    bedModel.Draw(ourShader);
 
     //rendering all other entities starting at 1 (skipping player car)
     for (int i = 1; i < entityList->size(); i++) {
@@ -257,13 +266,16 @@ void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
     glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+
+    // Vertex positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-    //Texture vertex attribute
+    // Texture coordinates
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 }
+
 
 void renderObject(const OBJModel& model, unsigned int* VAO) {
     glBindVertexArray(*VAO);
