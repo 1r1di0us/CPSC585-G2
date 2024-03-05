@@ -50,8 +50,8 @@ public:
 
 	void SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation);
 
-	//need to figure out where to respawn car (WIP)
-	void RespawnCar(EngineDriveVehicle* carToRespawn);
+	//respawn all dead cars
+	void RespawnAllCars();
 
 	/*
 	* PROJECTILES

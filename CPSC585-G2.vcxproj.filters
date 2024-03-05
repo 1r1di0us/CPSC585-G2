@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -27,6 +27,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\CarSystem.cpp" />
+    <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\SharedDataSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -55,10 +56,10 @@
     <ClInclude Include="libraries\snippetvehicle2common\enginedrivetrain\EngineDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\directdrivetrain\DirectDrivetrain.h" />
     <ClInclude Include="libraries\snippetvehicle2common\base\Base.h" />
-    <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
+    <ClInclude Include="src\AiSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
@@ -67,6 +68,10 @@
     <None Include="assets\Models\bed_double_A.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
+    <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />
@@ -123,6 +128,10 @@
     <Library Include="physx\release\SimulationController_static_64.lib" />
     <Library Include="physx\release\SnippetRender_static_64.lib" />
     <Library Include="physx\release\SnippetUtils_static_64.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio_vc.lib" />
+    <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL_vc.lib" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="assets\Models\bed_double_A.obj" />
