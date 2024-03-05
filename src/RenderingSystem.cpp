@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, blueTexture, redTexture, menuPlay, menuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, blueTexture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -62,8 +62,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     player4Texture = generateTexture("src/Textures/player4.jpg", true);
     player5Texture = generateTexture("src/Textures/player5.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
-    menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
-    menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
+    menuPlay = generateTexture("src/Textures/UI/menuPlay.jpg", true);
+    menuControls = generateTexture("src/Textures/UI/menuControls.jpg", true);
+    menuQuit = generateTexture("src/Textures/UI/menuQuit.jpg", true);
+    controlsMenu = generateTexture("src/Textures/UI/controlsMenu.jpg", true);
     resultsP1 = generateTexture("src/Textures/UI/resultsP1.jpg", true);
     resultsP2 = generateTexture("src/Textures/UI/resultsP2.jpg", true);
     resultsP3 = generateTexture("src/Textures/UI/resultsP3.jpg", true);
@@ -283,10 +285,16 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         glGenFramebuffers(1, &fboId);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
         if (dataSys->inMenu) {
-            if (dataSys->menuOptionIndex == 0) {
+            if (dataSys->inControlsMenu) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, controlsMenu, 0);
+            }
+            else if (dataSys->menuOptionIndex == 0) {
                 glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuPlay, 0);
             }
             else if (dataSys->menuOptionIndex == 1) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuControls, 0);
+            }
+            else if (dataSys->menuOptionIndex == 2) {
                 glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, menuQuit, 0);
             }
         }
