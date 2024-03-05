@@ -69,27 +69,41 @@ void PowerupSystem::SpawnAllPowerups() {
 
 void PowerupSystem::RespawnAllPowerups() {
 
-	//TODO: rework
+	//decrement both respawn timers
+	dataSys->timeUntilRandomPowerup -= dataSys->TIMESTEP;
+	dataSys->timeUntilAmmoPowerup -= dataSys->TIMESTEP;
+	
+	//spawning a new random powerup
+	if (dataSys->timeUntilRandomPowerup <= 0) {
 
-	//go through all dead powerups
-	//for (PowerupInfo* powerupInfo : dataSys->GetListOfDeadPowerups()) {
+		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
 
-	//	//if the car is ready to be respawned
-	//	if (powerupInfo->respawnTimeLeft <= 0) {
+		// Seed the random number generator
+			//might be worth having the generator based on the real time used in game
+		std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-	//		//get the spawn location
-	//		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
+		// Get the total number of enum values
+		int numPowerupTypes = static_cast<int>(PowerupType::NUM_POWERUP_TYPES);
 
-	//		//"spawn" the powerup
-	//		powerupInfo->needsRespawn = false;
-	//		powerupInfo->respawnTimeLeft = 0;
-	//	}
-	//	else {
+		// Generate a random index within the range of enum values
+		int randomPowerupType = std::rand() % numPowerupTypes;
 
-	//		//subtract the physics system update rate from the respawn timer
-	//			//real time instead maybe?
-	//		powerupInfo->respawnTimeLeft -= dataSys->TIMESTEP;
-	//	}
-	//}
+		SpawnPowerup(spawnVec, static_cast<PowerupType>(randomPowerupType));
+
+		//resetting the timer
+		dataSys->timeUntilRandomPowerup = dataSys->RANDOM_POWERUP_SPAWN_RATE;
+		
+	}
+
+	//spawning a new ammo powerup
+	if (dataSys->timeUntilAmmoPowerup <= 0) {
+
+		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
+
+		SpawnPowerup(spawnVec, PowerupType::AMMO);
+
+		//resetting the timer
+		dataSys->timeUntilAmmoPowerup = dataSys->AMMO_POWERUP_SPAWN_RATE;
+	}
 }
 

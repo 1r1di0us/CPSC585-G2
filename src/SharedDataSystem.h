@@ -33,7 +33,11 @@ enum PowerupType {
 	AMMO,
 	PROJECTILESPEED,
 	PROJECTILESIZE,
-	CARSPEED
+	CARSPEED, 
+	
+	//used for generating random powerup type
+		//set to 1 for now cause only ammo powerup exists
+	NUM_POWERUP_TYPES = 1
 };
 
 //powerup info struct
@@ -143,9 +147,6 @@ public:
 	//car respawn timer
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
-	//powerup respawn timer
-	const float POWERUP_RESPAWN_LENGTH = 2.0f;
-
 	//map coords for the corners
 	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-20.0f, -20.0f);
 	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(20.0f, 20.0f);
@@ -158,7 +159,7 @@ public:
 	const PxReal CAR_MIN_SPAWN_DISTANCE = 10.0f;
 
 	//the min spawn distance between powerups
-	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 2.0f;
+	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 10.0f;
 
 	//the spawn height of cars
 	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
@@ -166,11 +167,17 @@ public:
 	//the spawn height of powerups
 	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
 
+	//the spawn rate of a random powerup
+	const float RANDOM_POWERUP_SPAWN_RATE = 5.0f;
+
+	//the spawn rate of an ammo spawn powerup
+	const float AMMO_POWERUP_SPAWN_RATE = 3.0f;
+
 	//the max number of ammo spawn powerups
-	const int NUMBER_OF_AMMO_POWERUPS = 5;
+	const int NUMBER_OF_AMMO_POWERUPS = 3;
 
 	//the number of bullets given per ammo powerup
-	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 5;
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 2;
 
 	//entity helper functions move from entity cpp?
 
@@ -223,6 +230,10 @@ public:
 	/*
 	* POWERUPS
 	*/
+
+	//the modifiable time variables for respawning
+	float timeUntilRandomPowerup = RANDOM_POWERUP_SPAWN_RATE;
+	float timeUntilAmmoPowerup = AMMO_POWERUP_SPAWN_RATE;
 
 	//list of all powerups on map
 	std::vector<PowerupInfo> allPowerupList;

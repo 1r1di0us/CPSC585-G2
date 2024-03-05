@@ -286,19 +286,6 @@ std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynami
 
 }
 
-std::vector<PowerupInfo*> SharedDataSystem::GetListOfDeadPowerups() {
-
-	std::vector<PowerupInfo*> deadPowerupVec;
-
-	for (int i = 0; i < allPowerupList.size(); i++) {
-		if (allPowerupList[i].needsRespawn == false) {
-			deadPowerupVec.emplace_back(&allPowerupList[i]);
-		}
-	}
-
-	return deadPowerupVec;
-}
-
 PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<Entity> entity) {
 
 	for (int i = 0; i < allPowerupList.size(); i++) {

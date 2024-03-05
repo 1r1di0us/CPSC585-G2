@@ -137,6 +137,7 @@ int main() {
             physicsSys.stepPhysics();
             timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
             carSys.RespawnAllCars();
+            powerupSys.RespawnAllPowerups();
         }
 
         if (dataSys.quit) {
