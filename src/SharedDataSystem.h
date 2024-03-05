@@ -98,13 +98,16 @@ private:
 	std::vector<PxVec2> GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType);
 
 	//finds the center of four points
-	PxVec2 FindCenterOfFourPoints(std::vector<PxVec2> pointsList);
+	PxVec2 FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList = {}, std::vector<PxVec2> generatedPointsList = {});
 
 	//populates the map square list with the points of the same type
 	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList);
 
 	//randomizes the map square list
 	void RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList);
+
+	//creates the map square list
+	void CreateMapSquareList();
 
 	//generates a point a min distance away from all points in given vec and within the map range
 	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
@@ -131,7 +134,7 @@ public:
 	const PxReal MAPLENGTHZ = TOPRIGHTMAPCOORD.y - BOTTOMLEFTMAPCOORD.y;
 
 	//the min distance cars can spawn from other cars
-	const PxReal CARMINSPAWNDISTANCE = 10.0f;
+	const PxReal CARMINSPAWNDISTANCE = 15.0f;
 
 	//the min spawn distance between powerups
 	const PxReal POWERUPSPAWNMINDISTANCE = 2.0f;
@@ -161,6 +164,20 @@ public:
 	
 	//a vector of all car structs for car info
 	std::vector<CarInfo> carInfoList;
+
+	/*
+	* DEBUGGING STUFF
+	*/
+
+	//will make debug boxes at all the squares used in respawning
+	bool boxesMade = false;
+
+	//makes a floating box for boundary demo purposes
+	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
+
+	/*
+	* CAR FUNCTIONS
+	*/
 
 	//gets the car info struct using an entity
 	CarInfo* GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity);
