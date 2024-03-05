@@ -11,7 +11,7 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 		backward[i] = false;
 		left[i] = false;
 		right[i] = false;
-		confirm[i] = false;
+		confirm[i] = 0;
 		shoot[i] = 0;
 		reverse[i] = false;
 		camLeft[i] = false;
@@ -54,46 +54,43 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		if (dataSys->inMenu) {
-			confirm[0] = true;
-			shoot[0] = 3;
+			if (confirm[0] == 0) confirm[0] = 1;
+			shoot[0] = 3; //won't shoot if its 3
 		}
 		else {
-			if (shoot[0] == 0) {
-				shoot[0] = 1;
-			}
+			if (shoot[0] == 0) shoot[0] = 1;
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (shoot[0] >= 2) {
-			shoot[0] = 0;
+		if (dataSys->inMenu) {
+			if (confirm[0] >= 2) confirm[0] = 0;
+		}
+		else {
+			if (shoot[0] >= 2) shoot[0] = 0;
 		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		auto currentTime = std::chrono::steady_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
-
-		if (elapsed >= pressBuffer) {
-			confirm[0] = true;
-			lastConfirmPressTime = currentTime;
-		}
+		if (confirm[0] == 0) confirm[0] = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE) {
+		if (confirm[0] == 2) confirm[0] = 0;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
-		if (!birdsEyeTogglePressed) {
-			if (dataSys->useBirdsEyeView) {
-				dataSys->useBirdsEyeView = false;
-			}
-			else {
-				dataSys->useBirdsEyeView = true;
-			}
-			birdsEyeTogglePressed = true;
+		if (dataSys->useBirdsEyeView == 0) {
+			dataSys->useBirdsEyeView = 1;
 		}
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE) {
-		if (birdsEyeTogglePressed) {
-			birdsEyeTogglePressed = false;
+		else if (dataSys->useBirdsEyeView == 2) {
+			dataSys->useBirdsEyeView = 3;
+		}
+	} 
+	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE) {
+		if (dataSys->useBirdsEyeView == 1) {
+			dataSys->useBirdsEyeView = 2;
+		}
+		else if (dataSys->useBirdsEyeView == 3) {
+			dataSys->useBirdsEyeView = 0;
 		}
 	}
 
@@ -169,18 +166,19 @@ void InputSystem::getGamePadInput() {
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
 					if (dataSys->inMenu) {
-						confirm[0] = true;
+						if (confirm[j + 1] == 0) confirm[j + 1] = 1;
 						shoot[0] = 3;
 					}
 					else {
-						if (shoot[0] == 0) {
-							shoot[0] = 1;
-						}
+						if (shoot[j + 1] == 0) shoot[j + 1] = 1;
 					}
 				}
 				else if (x < -sens) {
-					if (shoot[j+1] >= 2) {
-						shoot[j+1] = 0;
+					if (dataSys->inMenu) {
+						if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
+					}
+					else {
+						if (shoot[j + 1] >= 2) shoot[j + 1] = 0;
 					}
 				}
 				if (y >= sens) { //right trigger
@@ -190,13 +188,12 @@ void InputSystem::getGamePadInput() {
 					//???
 				}
 
-				// Check the state of the A button with a buffer
-				auto currentTime = std::chrono::steady_clock::now();
-				auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
 
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && elapsed >= pressBuffer) {
-					confirm[j] = true;
-					lastConfirmPressTime = currentTime;
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+					if (confirm[j+1] == 0) confirm[j+1] = 1;
+				}
+				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+					if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
 				}
 
 			}
@@ -389,9 +386,9 @@ void InputSystem::InputToMenu() {
 		r = true;
 		right[i] = false;
 	}
-	for (int i : checkvals) if (confirm[i]) {
+	for (int i : checkvals) if (confirm[i] == 1) {
 		conf = true;
-		confirm[i] = false;
+		confirm[i] = 2;
 	}
 
 	// Check if left key is pressed and was not pressed before
@@ -433,9 +430,9 @@ void InputSystem::InputToResults() {
 
 	bool conf = false;
 
-	for (int i : checkvals) if (confirm[i]) {
+	for (int i : checkvals) if (confirm[i] == 1) {
 		conf = true;
-		confirm[i] = false;
+		confirm[i] = 2;
 	}
 
 	if (conf) {

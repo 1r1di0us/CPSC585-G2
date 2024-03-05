@@ -239,5 +239,5 @@ public:
 
 	// Camera
 	float cameraAngle = M_PI;
-	bool useBirdsEyeView = false;
+	int useBirdsEyeView = 0;
 };
