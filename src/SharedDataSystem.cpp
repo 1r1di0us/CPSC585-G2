@@ -181,6 +181,7 @@ CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> en
 	}
 
 	//unreachable code
+	printf("Failed to Get Car Info Struct From Entity");
 	exit(69);
 }
 
@@ -194,6 +195,7 @@ EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic*
 	}
 
 	//unreachable code
+	printf("Failed to Get Vehicle From Rigid Dynamic List.");
 	exit(69);
 }
 
@@ -207,6 +209,7 @@ PxRigidDynamic* SharedDataSystem::GetRigidDynamicFromVehicle(EngineDriveVehicle*
 	}
 
 	//unreachable code
+	printf("Failed to Get Rigid Dynamic From Vehicle.");
 	exit(69);
 }
 
@@ -220,6 +223,7 @@ std::shared_ptr<Entity> SharedDataSystem::GetEntityFromRigidDynamic(PxRigidDynam
 	}
 
 	//unreachable code
+	printf("Failed to Get Entity From Rigid Dynamic List.");
 	exit(69);
 }
 
@@ -237,7 +241,7 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 }
 
 PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
-
+	
 	std::vector<PxVec2> locations;
 
 	//uses physics type to determine min spacing
@@ -260,6 +264,7 @@ PxVec3 SharedDataSystem::DetermineSpawnLocation(PhysicsType physType) {
 	}
 
 	//unreachable code
+	printf("Failed to Determine Spawn Location.");
 	exit(69);
 }
 
@@ -278,6 +283,7 @@ std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynami
 	}
 
 	//unreachable code
+	printf("Failed Get Car That Shot Projectile.");
 	exit(69);
 
 }
@@ -422,6 +428,15 @@ void SharedDataSystem::ResolveCollisions() {
 
 	//resolved the collision
 	gContactReportCallback->contactDetected = false;
+}
+
+void SharedDataSystem::resetSharedDataSystem() {
+	// Clear all lists
+	carProjectileRigidDynamicDict.clear();
+	entityList.clear();
+	carRigidDynamicList.clear();
+	gVehicleList.clear();
+	carInfoList.clear();
 }
 
 void SharedDataSystem::menuEventHandler() {

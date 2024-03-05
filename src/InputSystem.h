@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream> //for now
 #include <math.h>
+#include <chrono>
 #include "PhysicsSystem.h"
 #include "SharedDataSystem.h"
 #include <chrono>
@@ -19,6 +20,7 @@ public:
 	void getKeyboardInput(GLFWwindow* window);
 	bool InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
+	void InputToResults();
 
 private:
 	double brakeTimer;
@@ -34,4 +36,6 @@ private:
 	const float gasPedal = 1;
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
+	std::chrono::steady_clock::time_point lastConfirmPressTime;
+	const std::chrono::seconds pressBuffer{ 1 };
 };
