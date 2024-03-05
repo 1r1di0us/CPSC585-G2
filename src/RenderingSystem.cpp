@@ -81,12 +81,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     initTextVAO(&textVAO, &textVBO);
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
-    this->building = LoadModelFromPath("./assets/Models/building_E.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
-    initOBJVAO(building, &buildingVAO, &buildingVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
 }
@@ -137,17 +135,22 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
     glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 
-    //// Camera things
-    view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+    if (useBirdsEyeView) {
+        // Bird's eye view
+        glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
 
-    //bird's eye view
-    //Define camera parameters
-    //glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f); // Position the camera above the scene
-    //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Look at the center of the scene
-    //glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f); // Define the up vector
+        view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+    }
+    else {
+        // Original view
+        glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+        camera.Position = playerPos + offsetFromPlayer;
+        glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 
-    //// Calculate the view matrix using glm::lookAt
-    //view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+    }
 
     // car translating
     model = glm::translate(model, playerPos);
@@ -177,14 +180,6 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     shader.setMat4("model", model);
 
     renderObject(plane, &planeVAO);
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, redTexture);
-    shader.setMat4("model", model);
-    renderObject(building, &buildingVAO);
 
     //rendering all other entities starting at 1 (skipping player car)
     for (int i = 1; i < entityList->size(); i++) {
