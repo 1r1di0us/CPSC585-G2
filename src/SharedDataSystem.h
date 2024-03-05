@@ -177,10 +177,10 @@ public:
 	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
 
 	//the spawn rate of a random powerup
-	const float RANDOM_POWERUP_SPAWN_RATE = 5.0f;
+	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
 
 	//the spawn rate of an ammo spawn powerup
-	const float AMMO_POWERUP_SPAWN_RATE = 3.0f;
+	const float AMMO_POWERUP_SPAWN_RATE = 10.0f;
 
 	//the max number of ammo spawn powerups
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
