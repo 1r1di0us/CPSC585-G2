@@ -45,7 +45,7 @@ void PhysicsSystem::initPhysX() {
 void PhysicsSystem::initGroundPlane()
 {
 	/////////////////////////////////////////////////////////////////////////
-	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeWithObstacles.obj");
+	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
 
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.setToDefault();

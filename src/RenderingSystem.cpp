@@ -52,7 +52,7 @@ RenderingSystem::RenderingSystem() {
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
 
     // create and set textures
-    blueTexture = generateTexture("src/Textures/blue.jpg", true);
+    blueTexture = generateTexture("src/Textures/cat.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     catTexture = generateTexture("src/Textures/cat.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
@@ -79,7 +79,7 @@ RenderingSystem::RenderingSystem() {
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->building = LoadModelFromPath("./assets/Models/building_E.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/plane.obj");
+    this->plane = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(building, &buildingVAO, &buildingVBO);
