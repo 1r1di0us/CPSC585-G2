@@ -206,6 +206,9 @@ public:
 	*/
 	void ResolveCollisions();
 
+	// Delete all lists in SharedDataSystem.h
+	void resetSharedDataSystem();
+
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();
 
@@ -217,7 +220,7 @@ public:
 	bool inMenu = true;
 	bool loading = false;
 	bool quit = false;
-	bool gameEnded = false;
+	bool inResults = false;
 	int menuOptionIndex = 0;
 	int nbMenuOptions = 2; // Currently options are play and quit
 
@@ -225,9 +228,10 @@ public:
 	int ingameOptionIndex = 0;
 	int nbIngameOptions = 2; // Options will be main menu and quit
 
-	// Game Parameters
-	int numPlayers = 1;
-	int numVehicles = 4;
+	// Reset these on game end
+	int winningPlayer = 0;
+	bool tieGame = false;
+	bool carsInitialized = false;
 
 	//// Audio 
 	//AudioManager* audio_ptr = nullptr;

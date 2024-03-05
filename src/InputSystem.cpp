@@ -70,7 +70,13 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		confirm[0] = true;
+		auto currentTime = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
+
+		if (elapsed >= pressBuffer) {
+			confirm[0] = true;
+			lastConfirmPressTime = currentTime;
+		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
@@ -183,6 +189,16 @@ void InputSystem::getGamePadInput() {
 				else if (y < -sens) {
 					//???
 				}
+
+				// Check the state of the A button with a buffer
+				auto currentTime = std::chrono::steady_clock::now();
+				auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
+
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && elapsed >= pressBuffer) {
+					confirm[j] = true;
+					lastConfirmPressTime = currentTime;
+				}
+
 			}
 		}
 	}
@@ -190,7 +206,6 @@ void InputSystem::getGamePadInput() {
 }
 
 bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
-
 	//update timer
 	if (brakeTimer < deltaTime.count()) {
 		brakeTimer = 0.0;
@@ -407,6 +422,30 @@ void InputSystem::InputToMenu() {
 
 	if (dataSys->menuOptionIndex < 0) {
 		dataSys->menuOptionIndex = dataSys->nbMenuOptions - 1;
+	}
+}
+
+void InputSystem::InputToResults() {
+	std::vector<int> checkvals = { 0 };
+	for (int i = 0; i < 16; i++) {
+		if (gpArr[i]) checkvals.push_back(i + 1);
+	}
+
+	bool conf = false;
+
+	for (int i : checkvals) if (confirm[i]) {
+		conf = true;
+		confirm[i] = false;
+	}
+
+	if (conf) {
+		dataSys->inMenu = true;
+		dataSys->inResults = false;
+
+		dataSys->winningPlayer = 0;
+		dataSys->tieGame = false;
+		dataSys->carsInitialized = false;
+		dataSys->resetSharedDataSystem();
 	}
 }
 
