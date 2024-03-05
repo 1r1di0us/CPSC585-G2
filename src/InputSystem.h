@@ -21,7 +21,6 @@ public:
 	bool InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
 	void InputToResults();
-	int confirm[17];
 
 private:
 	double brakeTimer;
@@ -33,6 +32,7 @@ private:
 	bool right[17];
 	int shoot[17];
 	bool reverse[17];
+	int confirm[17];
 	bool camLeft[17];
 	bool camRight[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity

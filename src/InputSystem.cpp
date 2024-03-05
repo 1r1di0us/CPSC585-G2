@@ -72,13 +72,6 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		}
 	}
 
-	//if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-	//	if (confirm[0] == 0 && (dataSys->inMenu || dataSys->inResults)) confirm[0] = 1;
-	//}
-	//else if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE) {
-	//	if (confirm[0] >= 2 && (dataSys->inMenu || dataSys->inResults)) confirm[0] = 0;
-	//}
-
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
 		if (dataSys->useBirdsEyeView == 0) {
 			dataSys->useBirdsEyeView = 1;
