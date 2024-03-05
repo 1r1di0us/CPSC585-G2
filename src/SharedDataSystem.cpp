@@ -384,8 +384,27 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	}
 
-	//send the powerup to hell
-	powerupEntity->collisionBox->setGlobalPose(PxTransform(0.0f, -100.0f, 0.0f));
+	/*
+	* kill the powerup (remove from all lists and scene)
+	*/
+
+	//all powerup list
+	for (int i = 0; i < allPowerupList.size(); i++) {
+		if (allPowerupList[i].entity->name == powerupEntity->name) {
+			allPowerupList.erase(allPowerupList.begin() + i);
+		}
+	}
+
+	//entity list
+	for (int i = 0; i < entityList.size(); i++) {
+		if (entityList[i].name == powerupEntity->name) {
+			entityList.erase(entityList.begin() + i);
+		}
+	}
+
+	//scene
+	gScene->removeActor(*powerupEntity->collisionBox);
+	powerupEntity->collisionBox->release();
 
 }
 

@@ -69,25 +69,27 @@ void PowerupSystem::SpawnAllPowerups() {
 
 void PowerupSystem::RespawnAllPowerups() {
 
+	//TODO: rework
+
 	//go through all dead powerups
-	for (PowerupInfo* powerupInfo : dataSys->GetListOfDeadPowerups()) {
+	//for (PowerupInfo* powerupInfo : dataSys->GetListOfDeadPowerups()) {
 
-		//if the car is ready to be respawned
-		if (powerupInfo->respawnTimeLeft <= 0) {
+	//	//if the car is ready to be respawned
+	//	if (powerupInfo->respawnTimeLeft <= 0) {
 
-			//get the spawn location
-			PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
+	//		//get the spawn location
+	//		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
 
-			//"spawn" the powerup
-			powerupInfo->needsRespawn = false;
-			powerupInfo->respawnTimeLeft = 0;
-		}
-		else {
+	//		//"spawn" the powerup
+	//		powerupInfo->needsRespawn = false;
+	//		powerupInfo->respawnTimeLeft = 0;
+	//	}
+	//	else {
 
-			//subtract the physics system update rate from the respawn timer
-				//real time instead maybe?
-			powerupInfo->respawnTimeLeft -= dataSys->TIMESTEP;
-		}
-	}
+	//		//subtract the physics system update rate from the respawn timer
+	//			//real time instead maybe?
+	//		powerupInfo->respawnTimeLeft -= dataSys->TIMESTEP;
+	//	}
+	//}
 }
 

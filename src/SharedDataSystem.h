@@ -40,8 +40,6 @@ enum PowerupType {
 struct PowerupInfo {
 	std::shared_ptr<Entity> entity;
 	PowerupType powerupType;
-	bool needsRespawn = false;
-	float respawnTimeLeft = 0;
 };
 
 //respawn square struct
@@ -228,9 +226,6 @@ public:
 
 	//list of all powerups on map
 	std::vector<PowerupInfo> allPowerupList;
-
-	//function to get list of powerups that need to be respawned
-	std::vector<PowerupInfo*> GetListOfDeadPowerups();
 
 	//function to find a powerup info by entity
 	PowerupInfo* GetPowerupInfoStructFromEntity(std::shared_ptr<Entity> entity);
