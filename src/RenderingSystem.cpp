@@ -85,7 +85,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
-    Model bedModel("./assets/Models/bed_double_A.obj");
+    this->bedModel = Model("./assets/Models/bed_double_A.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
@@ -177,15 +177,14 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
     shader.setMat4("model", model);
 
-    renderObject(plane, &planeVAO);
-
+    //renderObject(plane, &planeVAO);
 
     // render the loaded model
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, catTexture);
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f)); // translate it down so it's at the center of the scene
-    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
+    //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
     ourShader.setMat4("model", model);
     bedModel.Draw(ourShader);
 

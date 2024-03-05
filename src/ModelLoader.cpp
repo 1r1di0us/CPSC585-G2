@@ -116,6 +116,7 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
 
     OBJModel model;
     for (const auto& shape : shapes) {
+        //std::cout << "Number of mesh: " << shape.mesh.indices.size() << std::endl;
         for (const auto& index : shape.mesh.indices) {
             
             glm::vec3 vertices(

@@ -15,28 +15,10 @@
 
 #include "Shader.h"
 
-// no idea what this is, doing it for now 
-#define MAX_BONE_INFLUENCE 4
-
 struct Vertex {
     glm::vec3 Position;
     glm::vec3 Normal;
     glm::vec2 TexCoords;
-    //glm::vec3 Tangent;
-    //// bitangent
-    //glm::vec3 Bitangent;
-    ////bone indexes which will influence this vertex
-    //int m_BoneIDs[MAX_BONE_INFLUENCE];
-    ////weights from each bone
-    //float m_Weights[MAX_BONE_INFLUENCE];
-
-    Vertex(glm::vec3 positions, glm::vec3 normals, glm::vec2 texCoords) {
-        Position = positions;
-        Normal = normals;
-        TexCoords = texCoords;
-    }
-
-    Vertex() {} // Default constructor
 };
 
 struct Texture {
@@ -117,8 +99,7 @@ private:
 
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-            &indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
         // vertex positions
         glEnableVertexAttribArray(0);
