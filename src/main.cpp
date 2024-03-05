@@ -12,6 +12,7 @@
 #include "CarSystem.h"
 #include "AiSystem.h"
 #include "SharedDataSystem.h"
+#include "PowerupSystem.h"
 #include <chrono>
 #include <thread>
 
@@ -25,6 +26,7 @@ const unsigned int SCR_HEIGHT = 600;
 SharedDataSystem dataSys;
 PhysicsSystem physicsSys(&dataSys);
 CarSystem carSys(&dataSys);
+PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
 SoundSystem soundSys;
@@ -48,8 +50,6 @@ int main() {
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
-
-
 
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
@@ -173,6 +173,7 @@ int main() {
                 physicsSys.stepPhysics();
                 timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
                 carSys.RespawnAllCars();
+                powerupSys.RespawnAllPowerups();
             }
         }
 

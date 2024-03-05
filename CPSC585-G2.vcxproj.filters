@@ -29,6 +29,7 @@
     <ClCompile Include="src\CarSystem.cpp" />
     <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\SharedDataSystem.cpp" />
+    <ClCompile Include="src\PowerupSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
@@ -60,6 +61,7 @@
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
     <ClInclude Include="src\AiSystem.h" />
+    <ClInclude Include="src\PowerupSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />

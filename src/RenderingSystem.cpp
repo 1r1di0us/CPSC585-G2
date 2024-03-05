@@ -93,10 +93,12 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
+    this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
+    initOBJVAO(powerup, &powerupVAO, &powerupVBO);
 }
 
 
@@ -122,7 +124,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
         // Need to add ammo count when implemented
-        std::string ammoCount = "Ammo: ";
+        std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
         RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
         std::string score = "Score:";
@@ -252,6 +254,17 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
                 model = glm::translate(model, entityList->at(i).transform->getPos());
                 shader.setMat4("model", model);
                 renderObject(ball, &ballVAO);
+
+                break;
+            case (PhysicsType::POWERUP):
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, redTexture);
+
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, entityList->at(i).transform->getPos());
+                shader.setMat4("model", model);
+                renderObject(powerup, &powerupVAO);
 
                 break;
             case (PhysicsType::STATIC):

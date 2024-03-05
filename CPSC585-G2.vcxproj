@@ -40,6 +40,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
+    <ClCompile Include="src\PowerupSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\SharedDataSystem.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\OBJ_Loader.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
+    <ClInclude Include="src\PowerupSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SharedDataSystem.h" />
