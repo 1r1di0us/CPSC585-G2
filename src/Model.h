@@ -1,9 +1,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-
-
-
 #include "tiny_obj_loader.h"
 
 #include <glad/glad.h> 
@@ -14,13 +11,23 @@
 
 class Model {
 public:
+    std::vector<Mesh> meshes;
+    std::string directory;
 
+    //
     Model(std::string path) {
-        LoadModelFromPathMesh(path);
+        LoadModel(path);
     };
 
+    void Draw(Shader& shader)
+    {
+        for (unsigned int i = 0; i < meshes.size(); i++)
+            meshes[i].Draw(shader);
+    }
+
 private:
-    Mesh LoadModelFromPathMesh(std::string modelFilePath) {
+
+    Mesh LoadModel(std::string modelFilePath) {
         tinyobj::attrib_t attributes;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -92,6 +99,7 @@ private:
                         //std::cout << "Vertex index: " << shapes[s].mesh.indices[f].vertex_index << std::endl;
                         for (auto i = 0; i < shapes[s].mesh.material_ids.size(); i++)
                         {
+                            
                             //std::cout << shapes[s].mesh.material_ids[i] << std::endl;
                         }
 
