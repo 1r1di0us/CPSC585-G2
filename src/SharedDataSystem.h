@@ -298,11 +298,12 @@ public:
 
 	// Flags
 	bool inMenu = true;
+	bool inControlsMenu = false;
 	bool loading = false;
 	bool quit = false;
 	bool inResults = false;
 	int menuOptionIndex = 0;
-	int nbMenuOptions = 2; // Currently options are play and quit
+	int nbMenuOptions = 3; // Currently options are play and quit
 
 	bool inGameMenu = false;
 	int ingameOptionIndex = 0;
