@@ -131,6 +131,7 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
                     attributes.texcoords[2 * index.texcoord_index + 0],
                     attributes.texcoords[2 * index.texcoord_index + 1]
                 );
+                //std::cout << "texcoord: " << texCoord.x << "," << texCoord.y << std::endl;
                 model.textureCoordinates.push_back(texCoord);
             }
 
@@ -147,6 +148,7 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
             model.indices.push_back(static_cast<uint32_t>(model.indices.size()));
         }
     }
+
 
     return model;
 }
