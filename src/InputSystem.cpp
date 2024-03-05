@@ -73,6 +73,24 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		confirm[0] = true;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
+		if (!birdsEyeTogglePressed) {
+			if (dataSys->useBirdsEyeView) {
+				dataSys->useBirdsEyeView = false;
+			}
+			else {
+				dataSys->useBirdsEyeView = true;
+			}
+			birdsEyeTogglePressed = true;
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE) {
+		if (birdsEyeTogglePressed) {
+			birdsEyeTogglePressed = false;
+		}
+	}
+
 	prevx = xpos;
 	prevy = ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -84,8 +102,6 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
 		mouseControl = true;
 	}
-	//glfwSetCursorPos(window, 512, 512); //set it to the middle of the display so you don't move out of bounds
-
 }
 
 void InputSystem::checkIfGamepadsPresent() {

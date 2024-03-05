@@ -128,14 +128,8 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     // getting the car position and rotation
     glm::vec3 playerPos = entityList->at(0).transform->getPos();
     glm::quat playerRot = entityList->at(0).transform->getRot();
-    //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
-    // Calculate the point the camera should look at (e.g., slightly above the player)
-    glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-    camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
-    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
-
-    if (useBirdsEyeView) {
+    if (dataSys->useBirdsEyeView) {
         // Bird's eye view
         glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
         glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -146,7 +140,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     else {
         // Original view
         glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-        camera.Position = playerPos + offsetFromPlayer;
+        camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
         glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 
         view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);

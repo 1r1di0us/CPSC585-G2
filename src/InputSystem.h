@@ -37,6 +37,7 @@ private:
 	const float gasPedal = 1;
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
+	bool birdsEyeTogglePressed = false;
 
 	//mouse related things
 	bool initMouse = false;
