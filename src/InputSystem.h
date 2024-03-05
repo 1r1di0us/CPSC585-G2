@@ -39,7 +39,8 @@ private:
 	bool menuRightPressed = false;
 
 	//mouse related things
-	double xpos, ypos, prevx, prevy;
+	bool initMouse = false;
+	double xpos, ypos, prevx, prevy, initx, inity;
 	int screenWidth;
 	bool mouseControl;
 };

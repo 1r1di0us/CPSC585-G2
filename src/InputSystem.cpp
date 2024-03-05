@@ -76,6 +76,11 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 	prevx = xpos;
 	prevy = ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
+	if (initMouse) {
+		initMouse = false;
+		initx = xpos;
+		inity = ypos;
+	}
 	if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
 		mouseControl = true;
 	}
@@ -315,7 +320,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 
 
 	if (mouseControl) {
-		dataSys->cameraAngle = fmod(M_PI * (1 - (xpos / 1600)), 2 * M_PI);
+		dataSys->cameraAngle = fmod(M_PI * ((initx-xpos) / 1600), 2 * M_PI);
 	}
 	else {
 		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
@@ -377,6 +382,7 @@ void InputSystem::InputToMenu() {
 	}
 
 	if (conf && dataSys->menuOptionIndex == 0) {
+		initMouse = true;
 		dataSys->inMenu = false;
 	}
 	else if (conf && dataSys->menuOptionIndex == 1) {
