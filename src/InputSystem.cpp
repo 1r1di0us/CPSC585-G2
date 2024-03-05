@@ -395,11 +395,19 @@ void InputSystem::InputToMenu() {
 		menuRightPressed = false;
 	}
 
-	if (conf && dataSys->menuOptionIndex == 0) {
+	if (conf && dataSys->inControlsMenu) {
+		dataSys->menuOptionIndex = 0;
+		dataSys->inControlsMenu = false;
+	}
+
+	else if (conf && dataSys->menuOptionIndex == 0 && !dataSys->inControlsMenu){
 		initMouse = true;
 		dataSys->inMenu = false;
 	}
-	else if (conf && dataSys->menuOptionIndex == 1) {
+	else if (conf && dataSys->menuOptionIndex == 1 && !dataSys->inControlsMenu) {
+		dataSys->inControlsMenu = true;
+	}
+	else if (conf && dataSys->menuOptionIndex == 2 && !dataSys->inControlsMenu) {
 		dataSys->quit = true;
 	}
 
