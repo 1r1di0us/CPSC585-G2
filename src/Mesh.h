@@ -1,14 +1,18 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <glad/glad.h> // holds all OpenGL type declarations
+#include <glm/glm.hpp>
+
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <array>
 
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 #include "Shader.h"
 
 struct Vertex {
@@ -43,7 +47,7 @@ public:
         this->textures = textures;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
-        //setupMesh();
+        setupMesh();
     }
 
     Mesh() {
@@ -85,9 +89,6 @@ public:
         // always good practice to set everything back to defaults once configured.
         glActiveTexture(GL_TEXTURE0);
     }
-
-
-
 
 
 

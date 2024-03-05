@@ -18,6 +18,8 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "SharedDataSystem.h"
+#include "Model.h"
+#include "Mesh.h"
 
 class RenderingSystem {
 

@@ -10,7 +10,6 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="libraries\snippetcommon\ClassicMain.cpp" />
@@ -58,8 +57,8 @@
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\AiSystem.h" />
+    <ClInclude Include="src\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />

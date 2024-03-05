@@ -84,6 +84,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
 
+    Model model("./assets/Models/bed_double_A.obj");
+
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
@@ -102,6 +104,8 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    
     // rendering text
     // Convert timeLeft to seconds
     int timeLeftInSeconds = static_cast<int>(timeLeft.count());

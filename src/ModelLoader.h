@@ -26,4 +26,3 @@ public:
 
 
 OBJModel LoadModelFromPath(std::string modelFilePath);
-Mesh LoadModelFromPathMesh(std::string modelFilePath);
