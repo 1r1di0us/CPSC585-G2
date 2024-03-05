@@ -136,8 +136,8 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
 			mapSquareList.emplace_back(square);
 
-			MAKE_BOX_DEBUG(BOTTOMLEFTMAPCOORD.x + i * minDistance, BOTTOMLEFTMAPCOORD.y + j * minDistance);
-			MAKE_BOX_DEBUG(BOTTOMLEFTMAPCOORD.x + (i + 1) * minDistance, BOTTOMLEFTMAPCOORD.y + (j + 1) * minDistance);
+			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
+			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
 		}
 	}
 
@@ -155,16 +155,16 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 		//constant z size
 
 		//loops "up" in the z-direction
-		for (int i = BOTTOMLEFTMAPCOORD.y; i < TOPRIGHTMAPCOORD.y - minDistance; i += minDistance) {
+		for (int i = BOTTOM_LEFT_MAP_COORD.y; i < TOP_RIGHT_MAP_COORD.y - minDistance; i += minDistance) {
 
 			MapSquare square;
 			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(TOPRIGHTMAPCOORD.x - remainingX, i);
-			square.topRight = PxVec2(TOPRIGHTMAPCOORD.x, i + minDistance);
+			square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, i);
+			square.topRight = PxVec2(TOP_RIGHT_MAP_COORD.x, i + minDistance);
 			mapSquareList.emplace_back(square);
 
-			MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x - remainingX, i);
-			MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x, i + minDistance);
+			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, i);
+			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, i + minDistance);
 		}
 	}
 
@@ -175,16 +175,16 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 		//constant x size
 
 		//loops "right" in the x-direction
-		for (int i = BOTTOMLEFTMAPCOORD.x; i < TOPRIGHTMAPCOORD.x - minDistance; i += minDistance) {
+		for (int i = BOTTOM_LEFT_MAP_COORD.x; i < TOP_RIGHT_MAP_COORD.x - minDistance; i += minDistance) {
 
 			MapSquare square;
 			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(i, TOPRIGHTMAPCOORD.y - remainingZ);
-			square.topRight = PxVec2(i + minDistance, TOPRIGHTMAPCOORD.y);
+			square.bottomLeft = PxVec2(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
+			square.topRight = PxVec2(i + minDistance, TOP_RIGHT_MAP_COORD.y);
 			mapSquareList.emplace_back(square);
 
-			MAKE_BOX_DEBUG(i, TOPRIGHTMAPCOORD.y - remainingZ);
-			MAKE_BOX_DEBUG(i + minDistance, TOPRIGHTMAPCOORD.y);
+			MAKE_BOX_DEBUG(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
+			MAKE_BOX_DEBUG(i + minDistance, TOP_RIGHT_MAP_COORD.y);
 		}
 
 	}
@@ -192,12 +192,12 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 	//add the corner fucked square
 	MapSquare square;
 	square.id = mapSquareList.size() + 1;
-	square.bottomLeft = PxVec2(TOPRIGHTMAPCOORD.x - remainingX, TOPRIGHTMAPCOORD.y - remainingZ);
-	square.topRight = TOPRIGHTMAPCOORD;
+	square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
+	square.topRight = TOP_RIGHT_MAP_COORD;
 	mapSquareList.emplace_back(square);
 
-	MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x - remainingX, TOPRIGHTMAPCOORD.y - remainingZ);
-	MAKE_BOX_DEBUG(TOPRIGHTMAPCOORD.x, TOPRIGHTMAPCOORD.y);
+	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
+	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, TOP_RIGHT_MAP_COORD.y);
 
 	//place the points in their respecitve squares
 	PopulateMapSquareList(pointsOfSameType, mapSquareList);
