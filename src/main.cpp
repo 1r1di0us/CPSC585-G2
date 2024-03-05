@@ -51,9 +51,6 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    //spawning powerups
-    powerupSys.SpawnPowerup(PxVec3(0.0f, 0.0f, 5.0f), PowerupType::AMMO);
-
     soundSys.Init();
     soundSys.LoadSound("assets/PianoClusterThud.wav", false);
 
