@@ -30,9 +30,9 @@ private:
 	bool backward[17];
 	bool left[17];
 	bool right[17];
-	int confirm[17];
 	int shoot[17];
 	bool reverse[17];
+	int confirm[17];
 	bool camLeft[17];
 	bool camRight[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity

@@ -118,7 +118,7 @@ int main() {
 
             if (totalTimeLeft <= durationZero) {
                 for (int i = 0; i < dataSys.carInfoList.size(); i++) {
-                    if (dataSys.carInfoList[i].score > dataSys.winningPlayer) {
+                    if (dataSys.carInfoList[i].score > dataSys.carInfoList[dataSys.winningPlayer].score) {
                         dataSys.winningPlayer = i;
                     }
                 }
@@ -184,7 +184,6 @@ int main() {
         if (dataSys.quit) {
             break;
         }
-
     }
 
     //game loop ends
