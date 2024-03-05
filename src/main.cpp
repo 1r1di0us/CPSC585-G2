@@ -34,7 +34,7 @@ AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
-const double TIMELIMIT = 180.0f;
+const double TIMELIMIT = 10.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -44,6 +44,10 @@ std::chrono::high_resolution_clock::time_point previousIterationTime;
 std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
+
+std::string menuMusic = "assets/Cianwood City Remix.wav";
+std::string gameMusic = "assets/Miror B Remix.wav";
+std::string resultsMusic = "assets/Mario Strikers Results.wav";
 
 int main() {
 
@@ -86,6 +90,19 @@ int main() {
             inputSys.InputToMenu();
             startTime = std::chrono::high_resolution_clock::now();
             previousIterationTime = startTime;
+            
+            if (dataSys.resultsMusicPlaying) {
+                soundSys.UnLoadSound(resultsMusic);
+
+                dataSys.resultsMusicPlaying = false;
+            }
+
+            if (!dataSys.menuMusicPlaying) {
+                soundSys.LoadSound(menuMusic, false, true);
+                soundSys.PlaySound(menuMusic);
+
+                dataSys.menuMusicPlaying = true;
+            }
 
             if (!dataSys.carsInitialized) {
                 physicsSys.releaseActors();
@@ -103,9 +120,34 @@ int main() {
             }
         }
         else if (dataSys.inResults) {
+            if (dataSys.gameMusicPlaying) {
+                soundSys.UnLoadSound(gameMusic);
+
+                dataSys.gameMusicPlaying = false;
+            }
+
+            if (!dataSys.resultsMusicPlaying) {
+                soundSys.LoadSound(resultsMusic, false, true);
+                soundSys.PlaySound(resultsMusic);
+
+                dataSys.resultsMusicPlaying = true;
+            }
+
             inputSys.InputToResults();
         }
         else {
+            if (dataSys.menuMusicPlaying) {
+                soundSys.UnLoadSound(menuMusic);
+
+                dataSys.menuMusicPlaying = false;
+            }
+
+            if (!dataSys.gameMusicPlaying) {
+                 soundSys.LoadSound(gameMusic, false, true);
+                 soundSys.PlaySound(gameMusic);
+
+                 dataSys.gameMusicPlaying = true;
+            }
             //updating how much time has passed
             currentTime = std::chrono::high_resolution_clock::now();
             totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);

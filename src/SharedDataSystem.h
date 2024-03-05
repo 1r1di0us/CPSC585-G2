@@ -312,6 +312,9 @@ public:
 	int winningPlayer = 0;
 	bool tieGame = false;
 	bool carsInitialized = false;
+	bool menuMusicPlaying = false;
+	bool gameMusicPlaying = false;
+	bool resultsMusicPlaying = false;
 
 	//// Audio 
 	//AudioManager* audio_ptr = nullptr;
