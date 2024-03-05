@@ -142,7 +142,7 @@ int main() {
             //increases the frame counter
             FPSCOUNTER++;
 
-            if (inputSys.InputToMovement()) {
+            if (inputSys.InputToMovement(deltaTime)) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
