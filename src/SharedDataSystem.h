@@ -261,6 +261,9 @@ public:
 	//list of all powerups on map
 	std::vector<PowerupInfo> allPowerupList;
 
+	//an int to make the powerup names unique (cant do it based on list size)
+	int spawnedPowerupCounter = 0;
+
 	//function to find a powerup info by entity
 	PowerupInfo* GetPowerupInfoStructFromEntity(std::shared_ptr<Entity> entity);
 

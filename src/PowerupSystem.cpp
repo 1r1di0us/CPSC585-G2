@@ -46,7 +46,7 @@ void PowerupSystem::SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType) 
 
 	//creating the powerup entity to add to the entity list
 	Entity powerup;
-	powerup.name = PowerupTypeToString(powerupType) + "powerup" + std::to_string(dataSys->allPowerupList.size());
+	powerup.name = PowerupTypeToString(powerupType) + "powerup" + std::to_string(dataSys->spawnedPowerupCounter++);
 	powerup.CreateTransformFromPhysX(PxTransform(spawnPosition));
 	powerup.physType = PhysicsType::POWERUP;
 	powerup.collisionBox = powerupBody;

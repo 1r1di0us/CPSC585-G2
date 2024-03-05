@@ -461,8 +461,6 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
 
-	GetPowerupInfoStructFromEntity(powerupEntity);
-
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
 	case PowerupType::AMMO:
@@ -607,6 +605,10 @@ void SharedDataSystem::resetSharedDataSystem() {
 	carRigidDynamicList.clear();
 	gVehicleList.clear();
 	carInfoList.clear();
+	allPowerupList.clear();
+
+	//reset variables
+	spawnedPowerupCounter = 0;
 }
 
 void SharedDataSystem::menuEventHandler() {
