@@ -23,7 +23,6 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	bool useBirdsEyeView = false;
 
 public:
 	// settings

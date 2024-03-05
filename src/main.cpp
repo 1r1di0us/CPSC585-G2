@@ -78,6 +78,7 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         // input
         // -----
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         inputSys.checkIfGamepadsPresent(); //this is very crude, we are checking every frame how many controllers are connected.
         inputSys.getGamePadInput();
         inputSys.getKeyboardInput(window);
@@ -147,8 +148,23 @@ int main() {
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime)) {
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime, PxVec3(0, 0, 0))) {
                 carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
+
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[2].collisionBox), deltaTime, PxVec3(20, 0, -20))) {
+                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[2])->collisionBox);
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
+
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[3].collisionBox), deltaTime, PxVec3(15, 0, 25))) {
+                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[3])->collisionBox);
+                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            }
+
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[4].collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
+                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[4])->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
@@ -173,7 +189,6 @@ int main() {
     //game loop ends
     printf("\nGAME LOOP ENDED\n");
     soundSys.Shutdown();
-
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();

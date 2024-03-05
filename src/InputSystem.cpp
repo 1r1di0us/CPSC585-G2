@@ -7,12 +7,15 @@ InputSystem::InputSystem(SharedDataSystem* dataSys) {
 
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
-		InputSystem::forward[i] = false;
-		InputSystem::backward[i] = false;
-		InputSystem::left[i] = false;
-		InputSystem::right[i] = false;
-		InputSystem::confirm[i] = false;
-		InputSystem::shoot[i] = 0;
+		forward[i] = false;
+		backward[i] = false;
+		left[i] = false;
+		right[i] = false;
+		confirm[i] = 0;
+		shoot[i] = 0;
+		reverse[i] = false;
+		camLeft[i] = false;
+		camRight[i] = false;
 	}
 }
 
@@ -35,27 +38,72 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		right[0] = true;
 	}
 
-	//will shoot a projectile
-	//FIXME: broken af rn. needs IO to be working to properly test
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		reverse[0] = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		camLeft[0] = true;
+		mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		camRight[0] = true;
+		mouseControl = false;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (shoot[0] == 0) {
-			shoot[0] = 1;
+		if (dataSys->inMenu) {
+			if (confirm[0] == 0) confirm[0] = 1;
+			shoot[0] = 3; //won't shoot if its 3
+		}
+		else {
+			if (shoot[0] == 0) shoot[0] = 1;
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
-		if (shoot[0] == 2) {
-			shoot[0] = 0;
+		if (dataSys->inMenu) {
+			if (confirm[0] >= 2) confirm[0] = 0;
+		}
+		else {
+			if (shoot[0] >= 2) shoot[0] = 0;
 		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-		auto currentTime = std::chrono::steady_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
+		if (confirm[0] == 0) confirm[0] = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE) {
+		if (confirm[0] == 2) confirm[0] = 0;
+	}
 
-		if (elapsed >= pressBuffer) {
-			confirm[0] = true;
-			lastConfirmPressTime = currentTime;
+	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
+		if (dataSys->useBirdsEyeView == 0) {
+			dataSys->useBirdsEyeView = 1;
 		}
+		else if (dataSys->useBirdsEyeView == 2) {
+			dataSys->useBirdsEyeView = 3;
+		}
+	} 
+	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE) {
+		if (dataSys->useBirdsEyeView == 1) {
+			dataSys->useBirdsEyeView = 2;
+		}
+		else if (dataSys->useBirdsEyeView == 3) {
+			dataSys->useBirdsEyeView = 0;
+		}
+	}
+
+	prevx = xpos;
+	prevy = ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	if (initMouse) {
+		initMouse = false;
+		initx = xpos;
+		inity = ypos;
+	}
+	if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
+		mouseControl = true;
 	}
 }
 
@@ -79,27 +127,29 @@ void InputSystem::getGamePadInput() {
 				//movement, left joystick
 				float x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 				float y = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (x > 0.9f) {
-					right[j+1] = true;
-				}
-				else if (x < -sens) {
+				if (x < -sens) {
 					left[j+1] = true;
 				}
-				if (y > sens) {
-					backward[j+1] = true;
+				else if (x > sens) {
+					right[j+1] = true;
 				}
-				else if (y < -sens) {
+				if (y < -sens) {
 					forward[j+1] = true;
 				}
+				else if (y > sens) {
+					backward[j+1] = true;
+				}
 				//camera
-				//x = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+				x = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
 				//y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-				//if (x > sens) {
-				//	std::cout << "right ";
-				//}
-				//else if (x < -sens) {
-				//	std::cout << "left ";
-				//}
+				if (x < -sens) {
+					camLeft[j + 1] = true;
+					mouseControl = false;
+				}
+				else if (x > sens) {
+					camRight[j + 1] = true;
+					mouseControl = false;
+				}
 				//else {
 				//	std::cout << "mid ";
 				//}
@@ -115,29 +165,35 @@ void InputSystem::getGamePadInput() {
 				x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
 				y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER];
 				if (x >= sens) { //left trigger
-					if (shoot[j+1] == 0) {
-						shoot[j+1] = 1;
+					if (dataSys->inMenu) {
+						if (confirm[j + 1] == 0) confirm[j + 1] = 1;
+						shoot[0] = 3;
+					}
+					else {
+						if (shoot[j + 1] == 0) shoot[j + 1] = 1;
 					}
 				}
 				else if (x < -sens) {
-					if (shoot[j+1] == 2) {
-						shoot[j+1] = 0;
+					if (dataSys->inMenu) {
+						if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
+					}
+					else {
+						if (shoot[j + 1] >= 2) shoot[j + 1] = 0;
 					}
 				}
 				if (y >= sens) { //right trigger
-					//?
+					reverse[j + 1] = true;
 				}
 				else if (y < -sens) {
-					//idk
+					//???
 				}
 
-				// Check the state of the A button with a buffer
-				auto currentTime = std::chrono::steady_clock::now();
-				auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastConfirmPressTime);
 
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && elapsed >= pressBuffer) {
-					confirm[j] = true;
-					lastConfirmPressTime = currentTime;
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+					if (confirm[j+1] == 0) confirm[j+1] = 1;
+				}
+				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+					if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
 				}
 
 			}
@@ -168,6 +224,9 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	bool b = false;
 	bool l = false;
 	bool r = false;
+	bool rev = false;
+	bool cl = false;
+	bool cr = false;
 	for (int i : checkvals) if (forward[i]) {
 		f = true;
 		forward[i] = false;
@@ -184,32 +243,44 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		r = true;
 		right[i] = false;
 	}
+	for (int i : checkvals) if (reverse[i]) {
+		rev = true;
+		reverse[i] = false;
+	}
+	for (int i : checkvals) if (camLeft[i]) {
+		cl = true;
+		camLeft[i] = false;
+	}
+	for (int i : checkvals) if (camRight[i]) {
+		cr = true;
+		camRight[i] = false;
+	}
 
 	if (f && !b) {
 		
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(-1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(-1, 0, 0)).getNormalized();
 	}
 	else if (b && !f) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(1, 0, 0)).getNormalized();
 	}
 
 	if (l && !r) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(0, 0, 1)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, 1)).getNormalized();
 	}
 	else if (r && !l) {
 		playerCar->mCommandState.throttle = gasPedal;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + PxVec3(0, 0, -1)).getNormalized();
+		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, -1)).getNormalized();
 	}
 
 	if (!r && !l && !f && !b) {
@@ -255,6 +326,34 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		}
 	}
 
+	//reverse overrides all
+	if (rev) {
+		playerCar->mTransmissionCommandState.targetGear = 0;
+		playerCar->mCommandState.steer = 0;
+		playerCar->mCommandState.throttle = 1;
+		playerCar->mCommandState.nbBrakes = 0;
+		playerCar->mCommandState.brakes[0] = 0;
+	}
+	else {
+		playerCar->mTransmissionCommandState.targetGear = 2;
+	}
+
+	//camera shenanigans	
+	if (cl && !cr) {
+		dataSys->cameraAngle += 1.5 * deltaTime.count();
+	}
+	else if (cr && !cl) {
+		dataSys->cameraAngle -= 1.5 * deltaTime.count();
+	}
+
+
+	if (mouseControl) {
+		dataSys->cameraAngle = fmod(M_PI * ((initx-xpos) / 1600), 2 * M_PI);
+	}
+	else {
+		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
+	}
+
 	int s = 0;
 	for (int i : checkvals) if (shoot[i] == 1) {
 		s = 1;
@@ -262,7 +361,6 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 
 	if (s == 1) {
-		
 		return true;
 	}
 	else {
@@ -288,9 +386,9 @@ void InputSystem::InputToMenu() {
 		r = true;
 		right[i] = false;
 	}
-	for (int i : checkvals) if (confirm[i]) {
+	for (int i : checkvals) if (confirm[i] == 1) {
 		conf = true;
-		confirm[i] = false;
+		confirm[i] = 2;
 	}
 
 	// Check if left key is pressed and was not pressed before
@@ -312,6 +410,7 @@ void InputSystem::InputToMenu() {
 	}
 
 	if (conf && dataSys->menuOptionIndex == 0) {
+		initMouse = true;
 		dataSys->inMenu = false;
 	}
 	else if (conf && dataSys->menuOptionIndex == 1) {
@@ -331,9 +430,9 @@ void InputSystem::InputToResults() {
 
 	bool conf = false;
 
-	for (int i : checkvals) if (confirm[i]) {
+	for (int i : checkvals) if (confirm[i] == 1) {
 		conf = true;
-		confirm[i] = false;
+		confirm[i] = 2;
 	}
 
 	if (conf) {
