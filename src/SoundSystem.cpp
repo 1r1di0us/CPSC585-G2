@@ -59,7 +59,7 @@ void SoundSystem::LoadSound(const std::string& strSoundName, bool b3d, bool bLoo
     eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 
     FMOD::Sound* pSound = nullptr;
-    SoundSystem::ErrorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
+    SoundSystem::ErrorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), FMOD_3D, 0, &pSound));
     if (pSound) {
         sgpImplementation->mSounds[strSoundName] = pSound;
     }
@@ -244,7 +244,7 @@ void SoundSystem::PlayAllSounds() {
     for (std::pair <std::string, PxVec3> soundPair : dataSys->SoundsToPlay) {
         for (std::pair <std::string, std::string> dictPair : SoundDict) {
             if (soundPair.first == dictPair.first) {
-                FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x, soundPair.second.y, soundPair.second.z };
+                FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x/15, soundPair.second.y/15, soundPair.second.z/15 };
                 PlaySound(dictPair.second, location, GameVolume);
             }
         }

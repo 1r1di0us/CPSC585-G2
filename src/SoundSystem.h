@@ -39,7 +39,7 @@ class SoundSystem {
 public:
 
     std::vector <std::pair <std::string, std::string> > SoundDict;
-    float GameVolume = -15.0;
+    float GameVolume = -25.0;
 
     static void Init(SharedDataSystem* sharedDataSys);
     static void Update();

@@ -443,6 +443,9 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	gScene->removeActor(*projectile);
 	projectile->release();
 
+	//make a sound
+	SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+
 	//setting the data of the car that got hit to let it respawn
 	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
 	hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
