@@ -57,7 +57,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     // create and set textures
-    planeTexture = generateTexture("src/Textures/KiddieCarpet.jpg", true);
+    planeTexture = generateTexture("src/Textures/wood.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     player1Texture = generateTexture("src/Textures/player1.jpg", true);
     player2Texture = generateTexture("src/Textures/player2.jpg", true);
@@ -102,7 +102,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->plane = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
-    this->bedModel = Model("./assets/Models/bed_double_A.obj");
+    this->bedModel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
@@ -283,8 +283,8 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
             }
         }
 
-        ourShader.use();
-        bedModel.Draw(shader);
+        //ourShader.use();
+        //bedModel.Draw(shader);
 
     }
 

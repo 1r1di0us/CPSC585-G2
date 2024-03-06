@@ -29,7 +29,6 @@
     <ClCompile Include="src\AiSystem.cpp" />
     <ClCompile Include="src\SharedDataSystem.cpp" />
     <ClCompile Include="src\PowerupSystem.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />

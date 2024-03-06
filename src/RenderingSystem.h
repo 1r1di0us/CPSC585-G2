@@ -49,8 +49,7 @@ public:
 	Shader shader;
 	Shader ourShader; // testing it
 	std::map<char, Character> Characters_gaegu;
-	OBJModel tank, building, ball, plane, powerup;
-	Model bedModel;
+	OBJModel tank, building, ball, plane, powerup, bedModel;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
