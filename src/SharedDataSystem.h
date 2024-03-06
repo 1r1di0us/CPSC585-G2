@@ -174,7 +174,7 @@ public:
 	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
 
 	//the spawn height of powerups
-	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
+	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
