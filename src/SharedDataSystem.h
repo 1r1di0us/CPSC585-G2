@@ -321,6 +321,8 @@ public:
 
 	// Audio
 	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	float MusicVolume = -30.0;
+	float SfxVolume = -20.0;
 
 	// Camera
 	float cameraAngle = M_PI;

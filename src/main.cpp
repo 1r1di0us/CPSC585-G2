@@ -102,7 +102,7 @@ int main() {
 
             if (!dataSys.menuMusicPlaying) {
                 soundSys.LoadSound(menuMusic, false, true);
-                soundSys.PlaySound(menuMusic, FMOD_VECTOR{ 0, 0, 0 }, soundSys.MusicVolume);
+                soundSys.PlaySound(menuMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                 dataSys.menuMusicPlaying = true;
             }
@@ -131,7 +131,7 @@ int main() {
 
             if (!dataSys.resultsMusicPlaying) {
                 soundSys.LoadSound(resultsMusic, false, true);
-                soundSys.PlaySound(resultsMusic, FMOD_VECTOR{ 0, 0, 0 }, soundSys.MusicVolume);
+                soundSys.PlaySound(resultsMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                 dataSys.resultsMusicPlaying = true;
             }
@@ -147,7 +147,7 @@ int main() {
 
             if (!dataSys.gameMusicPlaying) {
                  soundSys.LoadSound(gameMusic, false, true);
-                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, soundSys.MusicVolume);
+                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                  dataSys.gameMusicPlaying = true;
             }
