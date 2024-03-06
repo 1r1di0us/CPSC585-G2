@@ -612,6 +612,9 @@ void SharedDataSystem::resetSharedDataSystem() {
 
 	//reset variables
 	spawnedPowerupCounter = 0;
+
+	//add the map to the entity list
+	entityList.emplace_back(MAP);
 }
 
 void SharedDataSystem::menuEventHandler() {
