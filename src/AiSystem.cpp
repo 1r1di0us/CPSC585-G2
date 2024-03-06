@@ -6,7 +6,7 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 	timer = 0.0;
 	state = MOVETO;
-
+	moveLocation = PxVec3(0, 0, 0);
 }
 
 //TODO: add randomness and timing.
@@ -15,7 +15,8 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 //TODO: ask matt why anyone would want to use quaternions to find the direction the guy is facing.
 //TODO: actually think of an ai
 
-bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
+bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc) {
+	moveLocation = movLoc;
 	bool fire = false;
 	//update timers
 	if (timer < deltaTime.count()) {
@@ -30,7 +31,7 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 		brakeTimer -= deltaTime.count();
 	}
 
-	if (aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.magnitude() > 30.f) {
+	if (aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p.magnitude() > 50.f) { //leashes the ai to the origin point
 		state = MOVETO;
 	}
 
@@ -41,7 +42,7 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 		fire = spin_behaviour(aiCar, fire);
 	}
 	else if (state == MOVETO) {
-		fire = moveto_behaviour(aiCar, PxVec3(0, 0, 0), fire);
+		fire = moveto_behaviour(aiCar, fire);
 	}
 	return fire;
 }
@@ -72,12 +73,12 @@ bool AiSystem::spin_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	return fire;
 }
 
-bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, PxVec3 goal, bool fire) {
+bool AiSystem::moveto_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 
 	PxVec3 carPos = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p;
 	float carSpeed = aiCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().magnitude();
-	float dist = (goal - carPos).magnitude();
-	PxVec3 intentDir = (goal - carPos).getNormalized();
+	float dist = (moveLocation - carPos).magnitude();
+	PxVec3 intentDir = (moveLocation - carPos).getNormalized();
 	float x = intentDir.x;
 	intentDir.x = intentDir.z;
 	intentDir.z = -x; //rotate it 90 degrees

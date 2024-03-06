@@ -62,4 +62,5 @@ public:
 	PhysicsSystem(SharedDataSystem* dataSys); // Constructor
 
 	void cleanPhysicsSystem();
+	void releaseActors();
 };
