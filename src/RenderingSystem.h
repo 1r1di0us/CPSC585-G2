@@ -52,7 +52,7 @@ public:
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-	void updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft);
+	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 };
