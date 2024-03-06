@@ -83,7 +83,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	CarInfo carInfo;
 	carInfo.entity = std::make_shared<Entity>(dataSys->entityList.back());
 	dataSys->carInfoList.emplace_back(carInfo);
-	
+
 }
 
 void CarSystem::RespawnAllCars() {
@@ -117,12 +117,16 @@ void CarSystem::RespawnAllCars() {
 void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
+	printf("before return 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
+		printf("Return 1\n");
 		return;
 	}
 
+	printf("before return 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
+		printf("Return 2\n");
 		return;
 	}
 
@@ -162,17 +166,20 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
-
+	printf("kill me 1\n");
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
 	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->carProjectileRigidDynamicDict[shootingCar].size());
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
+	printf("kill me out 1\n");
 
 	dataSys->entityList.emplace_back(projectile);
 
+	printf("pp 1\n");
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
+	printf("pp end 1\n");
 
 }
