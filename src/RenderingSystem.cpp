@@ -50,14 +50,15 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     }
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
+    stbi_set_flip_vertically_on_load(true); // to vertically flip the image
+
     // geom shader
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     // create and set textures
     blueTexture = generateTexture("src/Textures/blue.jpg", true);
-    stbi_set_flip_vertically_on_load(true); // to vertically flip the image
-    catTexture = generateTexture("src/Textures/cat.jpg", true);
+    catTexture = generateTexture("src/Textures/player1.jpg", true);
     redTexture = generateTexture("src/Textures/red.jpg", true);
     menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
     menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
@@ -93,13 +94,11 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     initOBJVAO(plane, &planeVAO, &planeVBO);
     initOBJVAO(cube, &roadVAO, &roadVBO);
 
-    //this->bedModel = Model(const_cast <char*>("./assets/Models/backpack.obj"));
+    bedModel = Model("./assets/Models/bed_double_A.obj");
 }
 
 
 void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
 
     // input
     processInput(window);
@@ -193,14 +192,19 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     //shader.use();
     //renderObject(cube, &roadVAO);
 
-    ////Model something = Model(const_cast <char*>("./assets/Models/backpack.obj"));
-    //// bed model
-    //ourShader.use();
+    //Model something = Model(const_cast <char*>("./assets/Models/backpack.obj"));
+    // bed model
+    //for (auto i = 0; i < bedModel.meshes.size(); i++)
+    //{
+    //    std::cout << bedModel.meshes[i].vertices.size() << std::endl;
+    //}
+    //shader.use();
     //model = glm::mat4(1.0f);
     //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f)); // translate it down so it's at the center of the scene
     //model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));	// it's a bit too big for our scene, so scale it down
-    //ourShader.setMat4("model", model);
-    //bedModel.Draw(ourShader);
+    //shader.setMat4("model", model);
+    //bedModel.Draw(shader);
+
 
     shader.use();
     //rendering all other entities starting at 1 (skipping player car)
@@ -277,18 +281,41 @@ void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
     glBindVertexArray(*VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    // Calculate total size needed for vertex attributes
+    size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
+        model.textureCoordinates.size() * sizeof(glm::vec2) +
+        model.normals.size() * sizeof(glm::vec3);
+
+    // Allocate buffer memory
+    glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
+
+    // Copy vertex data
+    glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
+
+    // Copy texture coordinate data
+    glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
+        model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
+
+    // Copy normal data
+    glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
+        model.textureCoordinates.size() * sizeof(glm::vec2),
+        model.normals.size() * sizeof(glm::vec3), model.normals.data());
 
     // Vertex positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
     // Texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(5), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
     glEnableVertexAttribArray(1);
+
+    // Normals
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
+        model.textureCoordinates.size() * sizeof(glm::vec2)));
+    glEnableVertexAttribArray(2);
 }
+
 
 //void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
 //    glGenVertexArrays(1, VAO);
@@ -296,29 +323,19 @@ void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
 //
 //    glBindVertexArray(*VAO);
 //
-//    // Bind and buffer the vertex data (positions)
 //    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
 //    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
 //
+//    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+//
 //    // Vertex positions
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void*)0);
 //    glEnableVertexAttribArray(0);
 //
-//    // Bind and buffer the texture coordinate data
-//    unsigned int textureVBO;
-//    glGenBuffers(1, &textureVBO);
-//    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-//    glBufferData(GL_ARRAY_BUFFER, model.textureCoordinates.size() * sizeof(glm::vec2), &model.textureCoordinates[0], GL_STATIC_DRAW);
-//
 //    // Texture coordinates
-//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(5), (void*)(3 * sizeof(float)));
 //    glEnableVertexAttribArray(1);
-//
-//    // Cleanup
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindVertexArray(0);
 //}
-
 
 
 void renderObject(const OBJModel& model, unsigned int* VAO) {

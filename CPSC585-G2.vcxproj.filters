@@ -99,6 +99,7 @@
     <Image Include="assets\Models\normal.png" />
     <Image Include="assets\Models\diffuse.jpg" />
     <Image Include="assets\Models\specular.jpg" />
+    <Image Include="src\Textures\player1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

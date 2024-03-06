@@ -114,6 +114,7 @@
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="src\Textures\Cube.png" />
+    <Image Include="src\Textures\player1.jpg" />
     <Image Include="src\Textures\red.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
     <Image Include="src\Textures\wood.jpg" />

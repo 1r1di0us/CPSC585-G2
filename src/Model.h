@@ -3,7 +3,7 @@
 
 #include <glad/glad.h> 
 #include <glm/glm.hpp>
-
+#include "stb_image.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -15,13 +15,13 @@ inline unsigned int TextureFromFile(const char* path, const std::string& directo
 
 class Model {
 public:
-    std::vector<Mesh> meshes;
     std::vector<Texture> textures_loaded;
+    std::vector<Mesh> meshes;
     std::string directory;
     bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
-    Model(char* const& path, bool gamma = false) : gammaCorrection(gamma)
+    Model(std::string const path, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
         //std::cout << "Size:" << meshes.size() << std::endl;
