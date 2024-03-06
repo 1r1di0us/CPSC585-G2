@@ -147,7 +147,7 @@ int main() {
 
             if (!dataSys.gameMusicPlaying) {
                  soundSys.LoadSound(gameMusic, false, true);
-                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, soundSys.MusicVolume;
+                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, soundSys.MusicVolume);
 
                  dataSys.gameMusicPlaying = true;
             }
