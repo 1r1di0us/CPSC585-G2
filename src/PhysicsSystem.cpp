@@ -69,15 +69,21 @@ void PhysicsSystem::initGroundPlane()
 	PxTriangleMeshGeometry meshGeom = PxTriangleMeshGeometry(trimesh, PxMeshScale(1));
 	PxShape* meshShape = gPhysics->createShape(meshGeom, *gMaterial, true);
 
-	// VVV This is just the collision code logic for Matt's entity system. Need to adapt to ours  
-	//if(gameState->entityList.at(i).name != "map_border")
-	//{
-	//	PxFilterData meshFilter(COLLISION_FLAG_GROUND, COLLISION_FLAG_GROUND_AGAINST, 0, 0);
-	//	meshShape->setSimulationFilterData(meshFilter);
-	//}
+	//setting the collision mesh for the map to be a statics
+	PxFilterData mapFilter(COLLISION_FLAG_STATIC, COLLISION_FLAG_STATIC_AGAINST, 0, 0);
+	meshShape->setSimulationFilterData(mapFilter);
 
 	PxTransform meshTrans(PxVec3(0, 0, 0), PxQuat(PxIdentity));
 	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
+
+	//making the map entity and adding it to the entity list (for collisions n shit)
+	Entity map;
+	map.collisionBox = (PxRigidDynamic*) meshStatic;
+	map.name = "MAP";
+	map.physType = PhysicsType::STATIC;
+	map.CreateTransformFromPhysX(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+
+	dataSys->entityList.emplace_back(map);
 
 	meshStatic->attachShape(*meshShape);
 	gScene->addActor(*meshStatic);
