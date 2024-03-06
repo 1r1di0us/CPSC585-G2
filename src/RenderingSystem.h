@@ -37,14 +37,14 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO, planeVAO, planeVBO;
+	unsigned int VAO, VBO, textVAO, textVBO, tankVAO, tankVBO, ballVAO, ballVBO, buildingVAO, buildingVBO, planeVAO, planeVBO, roadVAO, roadVBO;
 	unsigned int quadVAO, quadVBO;
 	Shader textShader;
 	Shader shader;
 	Shader ourShader; // testing it
 	std::map<char, Character> Characters_gaegu;
-	OBJModel tank, building, ball, plane;
-	Model bedModel;
+    OBJModel tank, building, ball, plane, cube;
+	//Model bedModel;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);

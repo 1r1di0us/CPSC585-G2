@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int blueTexture, catTexture, redTexture, menuPlay, menuQuit;
+unsigned int blueTexture, catTexture, redTexture, menuPlay, menuQuit, cubeRainbow;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -61,11 +61,13 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     redTexture = generateTexture("src/Textures/red.jpg", true);
     menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
     menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
+    cubeRainbow = generateTexture("src/Textures/Cube.png", false);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
     shader.setInt("texture3", 2);
-
+    shader.setInt("texture4", 3);
+    
     // depth for 3d rendering
     glEnable(GL_DEPTH_TEST);
 
@@ -84,12 +86,14 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
     this->plane = LoadModelFromPath("./assets/Models/plane.obj");
-
-    this->bedModel = Model("./assets/Models/bed_double_A.obj");
+    this->cube = LoadModelFromPath("./assets/Models/bed_double_A.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
     initOBJVAO(plane, &planeVAO, &planeVBO);
+    initOBJVAO(cube, &roadVAO, &roadVBO);
+
+    //this->bedModel = Model(const_cast <char*>("./assets/Models/backpack.obj"));
 }
 
 
@@ -172,7 +176,6 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     glBindTexture(GL_TEXTURE_2D, blueTexture);
 
     model = glm::mat4(1.0f);
-
     model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
     model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
     shader.setMat4("model", model);
@@ -181,14 +184,22 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
     //ourShader.use();
     //// render the loaded model
-    ////glActiveTexture(GL_TEXTURE0);
-    ////glBindTexture(GL_TEXTURE_2D, catTexture);
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, cubeRainbow);
     //model = glm::mat4(1.0f);
-    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f)); // translate it down so it's at the center of the scene
-    //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
+    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+    //model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));	// it's a bit too big for our scene, so scale it down
+    //shader.setMat4("model", model);
+    //shader.use();
+    //renderObject(cube, &roadVAO);
+
+    ////Model something = Model(const_cast <char*>("./assets/Models/backpack.obj"));
+    //// bed model
+    //ourShader.use();
+    //model = glm::mat4(1.0f);
+    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f)); // translate it down so it's at the center of the scene
+    //model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));	// it's a bit too big for our scene, so scale it down
     //ourShader.setMat4("model", model);
-    //GLuint objectColorLoc = glGetUniformLocation(ourShader.ID, "objectColor");
-    //glUniform3f(objectColorLoc, 1.0f, 0.0f, 0.0f); // Red color, for example
     //bedModel.Draw(ourShader);
 
     shader.use();
@@ -259,53 +270,54 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
 }
 
-//void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
-//    glGenVertexArrays(1, VAO);
-//    glGenBuffers(1, VBO);
-//
-//    glBindVertexArray(*VAO);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-//    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
-//
-//    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-//
-//    // Vertex positions
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-//    glEnableVertexAttribArray(0);
-//
-//    // Texture coordinates
-//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-//    glEnableVertexAttribArray(1);
-//}
 void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
     glGenVertexArrays(1, VAO);
     glGenBuffers(1, VBO);
 
     glBindVertexArray(*VAO);
 
-    // Bind and buffer the vertex data (positions)
     glBindBuffer(GL_ARRAY_BUFFER, *VBO);
     glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
 
     // Vertex positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Bind and buffer the texture coordinate data
-    unsigned int textureVBO;
-    glGenBuffers(1, &textureVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-    glBufferData(GL_ARRAY_BUFFER, model.textureCoordinates.size() * sizeof(glm::vec2), &model.textureCoordinates[0], GL_STATIC_DRAW);
-
     // Texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(5), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    // Cleanup
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
+
+//void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
+//    glGenVertexArrays(1, VAO);
+//    glGenBuffers(1, VBO);
+//
+//    glBindVertexArray(*VAO);
+//
+//    // Bind and buffer the vertex data (positions)
+//    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+//    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
+//
+//    // Vertex positions
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//    glEnableVertexAttribArray(0);
+//
+//    // Bind and buffer the texture coordinate data
+//    unsigned int textureVBO;
+//    glGenBuffers(1, &textureVBO);
+//    glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+//    glBufferData(GL_ARRAY_BUFFER, model.textureCoordinates.size() * sizeof(glm::vec2), &model.textureCoordinates[0], GL_STATIC_DRAW);
+//
+//    // Texture coordinates
+//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//    glEnableVertexAttribArray(1);
+//
+//    // Cleanup
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindVertexArray(0);
+//}
 
 
 

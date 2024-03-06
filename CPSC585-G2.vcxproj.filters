@@ -56,9 +56,9 @@
     <ClInclude Include="src\CarSystem.h" />
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
-    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\AiSystem.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fragment_shader.txt" />
@@ -71,6 +71,7 @@
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
+    <None Include="assets\Models\backpack.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />
@@ -92,6 +93,12 @@
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
     <Image Include="src\Textures\red.jpg" />
+    <Image Include="src\Textures\Cube.png" />
+    <Image Include="assets\Models\ao.jpg" />
+    <Image Include="assets\Models\roughness.jpg" />
+    <Image Include="assets\Models\normal.png" />
+    <Image Include="assets\Models\diffuse.jpg" />
+    <Image Include="assets\Models\specular.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
@@ -138,5 +145,7 @@
     <Object Include="assets\Models\bed_double_A.obj" />
     <Object Include="assets\Models\box_A.obj" />
     <Object Include="assets\Models\building_E.obj" />
+    <Object Include="assets\Models\cube.obj" />
+    <Object Include="assets\Models\backpack.obj" />
   </ItemGroup>
 </Project>

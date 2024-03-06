@@ -21,10 +21,10 @@ public:
     bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
-    Model(std::string const& path, bool gamma = false) : gammaCorrection(gamma)
+    Model(char* const& path, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
-        std::cout << "Size:" << meshes.size() << std::endl;
+        //std::cout << "Size:" << meshes.size() << std::endl;
     }
 
     Model() {};
@@ -32,7 +32,7 @@ public:
     void Draw(Shader& shader)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
-            meshes[i].Draw(shader);
+           meshes[i].Draw(shader);
     }
 
 private:
@@ -84,6 +84,7 @@ private:
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
             vertex.Position = vector;
+            //std::cout << "Size of vertex:" << meshes.size() << std::endl;
             // normals
             if (mesh->HasNormals())
             {
@@ -101,6 +102,7 @@ private:
                 vec.x = mesh->mTextureCoords[0][i].x;
                 vec.y = mesh->mTextureCoords[0][i].y;
                 vertex.TexCoords = vec;
+                //std::cout << "texcoords" << vec.x << ", " << vec.y << std::endl;
             }
             else vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 
