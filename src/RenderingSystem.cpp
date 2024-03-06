@@ -57,7 +57,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     // create and set textures
-    planeTexture = generateTexture("src/Textures/wood.jpg", true);
+    planeTexture = generateTexture("src/Textures/KiddieCarpet.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
     player1Texture = generateTexture("src/Textures/player1.jpg", true);
     player2Texture = generateTexture("src/Textures/player2.jpg", true);
@@ -99,8 +99,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/plane.obj");
+    this->plane = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
+
+    this->bedModel = Model("./assets/Models/bed_double_A.obj");
 
     initOBJVAO(tank, &tankVAO, &tankVBO);
     initOBJVAO(ball, &ballVAO, &ballVBO);
@@ -118,6 +120,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
     // clear the colorbuffer and the depthbuffer
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     if (!dataSys->inMenu) {
         // rendering text
@@ -154,7 +157,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
         // this should be the camera matrix
         glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         // getting the car position and rotation
         glm::vec3 playerPos = entityList->at(0).transform->getPos();
@@ -199,7 +202,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(5.0f, 0.0f, 5.0f));
+        model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
 
         renderObject(plane, &planeVAO);
@@ -207,6 +210,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
 
+        shader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, redTexture);
         shader.setMat4("model", model);
@@ -278,6 +282,10 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
                 break;
             }
         }
+
+        ourShader.use();
+        bedModel.Draw(shader);
+
     }
 
     // Setup UI if necessary

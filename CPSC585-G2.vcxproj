@@ -37,6 +37,7 @@
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\PowerupSystem.cpp" />
@@ -85,6 +86,7 @@
     <None Include="assets\Models\bed_double_A.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="assets\Models\planeHugeWithWalls.mtl" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
@@ -115,7 +117,7 @@
     <Image Include="assets\Models\specular.jpg" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\cat.jpg" />
-    <Image Include="src\Textures\Cube.png" />
+    <Image Include="src\Textures\KiddieCarpet.jpg" />
     <Image Include="src\Textures\player1.jpg" />
     <Image Include="src\Textures\red.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
@@ -182,6 +184,10 @@
     <Object Include="assets\Models\cube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="assets\Models\planeHugeWithWalls.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -77,7 +77,7 @@ public:
 
         // draw mesh
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()) * 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // it says that it is drawing
