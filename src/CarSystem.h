@@ -62,6 +62,6 @@ public:
 	const PxReal projectileRadius = 1.0f;
 	const float shootForce = 100;
 
-	void Shoot(PxRigidDynamic* shootingCar);
+	bool Shoot(PxRigidDynamic* shootingCar);
 
 };

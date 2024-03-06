@@ -114,16 +114,16 @@ void CarSystem::RespawnAllCars() {
 
 }
 
-void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
+bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		return;
+		return false;
 	}
 
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		return;
+		return false;
 	}
 
 	//gets the forward vector of the car
@@ -174,5 +174,5 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
-
+	return true;
 }

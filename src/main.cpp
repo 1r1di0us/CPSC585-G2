@@ -52,7 +52,8 @@ int main() {
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
     soundSys.Init();
-    soundSys.LoadSound("assets/PianoClusterThud.wav", false);
+    soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
+    soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -144,28 +145,28 @@ int main() {
             FPSCOUNTER++;
 
             if (inputSys.InputToMovement(deltaTime)) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox))
+                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime, PxVec3(0, 0, 0))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox))
+                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[2].collisionBox), deltaTime, PxVec3(20, 0, -20))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[2])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[2])->collisionBox))
+                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[3].collisionBox), deltaTime, PxVec3(15, 0, 25))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[3])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[3])->collisionBox))
+                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[4].collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[4])->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[4])->collisionBox))
+                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
             }
 
             //only updating the physics at max 60hz while everything else updates at max speed

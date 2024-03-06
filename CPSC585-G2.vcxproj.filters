@@ -76,10 +76,10 @@
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="assets\Gaegu-Bold.ttf" />
-    <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
-    <Font Include="assets\arial.ttf" />
+    <Font Include="assets\Fonts\Gaegu-Bold.ttf" />
+    <Font Include="assets\Fonts\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\Fonts\arial.ttf" />
+    <Font Include="assets\Fonts\Candy Beans.otf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\vertex_shader_text.txt" />
@@ -87,12 +87,12 @@
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\Textures\wood.jpg" />
-    <Image Include="src\Textures\cat.jpg" />
+    <Image Include="assets\Textures\wood.jpg" />
+    <Image Include="assets\Textures\cat.jpg" />
     <Image Include="assets\Models\furniturebits_texture.png" />
-    <Image Include="src\Textures\Blue.jpg" />
-    <Image Include="src\Textures\tvblueorange.gif" />
-    <Image Include="src\Textures\red.jpg" />
+    <Image Include="assets\Textures\Blue.jpg" />
+    <Image Include="assets\Textures\tvblueorange.gif" />
+    <Image Include="assets\Textures\red.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

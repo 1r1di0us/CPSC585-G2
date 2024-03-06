@@ -54,22 +54,22 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
 
     // create and set textures
-    blueTexture = generateTexture("src/Textures/blue.jpg", true);
+    blueTexture = generateTexture("assets/Textures/blue.jpg", true);
     stbi_set_flip_vertically_on_load(true); // to vertically flip the image
-    player1Texture = generateTexture("src/Textures/player1.jpg", true);
-    player2Texture = generateTexture("src/Textures/player2.jpg", true);
-    player3Texture = generateTexture("src/Textures/player3.jpg", true);
-    player4Texture = generateTexture("src/Textures/player4.jpg", true);
-    player5Texture = generateTexture("src/Textures/player5.jpg", true);
-    redTexture = generateTexture("src/Textures/red.jpg", true);
-    menuPlay = generateTexture("src/Textures/UI/menuPlay.png", false);
-    menuQuit = generateTexture("src/Textures/UI/menuQuit.png", false);
-    resultsP1 = generateTexture("src/Textures/UI/resultsP1.jpg", true);
-    resultsP2 = generateTexture("src/Textures/UI/resultsP2.jpg", true);
-    resultsP3 = generateTexture("src/Textures/UI/resultsP3.jpg", true);
-    resultsP4 = generateTexture("src/Textures/UI/resultsP4.jpg", true);
-    resultsP5 = generateTexture("src/Textures/UI/resultsP5.jpg", true);
-    resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
+    player1Texture = generateTexture("assets/Textures/player1.jpg", true);
+    player2Texture = generateTexture("assets/Textures/player2.jpg", true);
+    player3Texture = generateTexture("assets/Textures/player3.jpg", true);
+    player4Texture = generateTexture("assets/Textures/player4.jpg", true);
+    player5Texture = generateTexture("assets/Textures/player5.jpg", true);
+    redTexture = generateTexture("assets/Textures/red.jpg", true);
+    menuPlay = generateTexture("assets/Textures/UI/menuPlay.png", false);
+    menuQuit = generateTexture("assets/Textures/UI/menuQuit.png", false);
+    resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
+    resultsP2 = generateTexture("assets/Textures/UI/resultsP2.jpg", true);
+    resultsP3 = generateTexture("assets/Textures/UI/resultsP3.jpg", true);
+    resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
+    resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
+    resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
     shader.use();
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
@@ -87,7 +87,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
-    Characters_gaegu = initFont("./assets/Candy Beans.otf");
+    Characters_gaegu = initFont("./assets/Fonts/Candy Beans.otf");
     initTextVAO(&textVAO, &textVBO);
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");

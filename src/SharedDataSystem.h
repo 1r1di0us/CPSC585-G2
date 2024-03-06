@@ -14,6 +14,8 @@
 #include <chrono>
 #include <queue>
 #include "math.h"
+#include <utility>
+#include "SoundSystem.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -314,8 +316,7 @@ public:
 	bool carsInitialized = false;
 
 	//// Audio 
-	//AudioManager* audio_ptr = nullptr;
-	//glm::vec3 listener_position;
+	//std::vector<std::pair<std::string, SoundSystem::Vector3>> SoundsToPlay;
 
 	// Camera
 	float cameraAngle = M_PI;

@@ -74,7 +74,7 @@ void SoundSystem::UnLoadSound(const std::string& strSoundName)
     sgpImplementation->mSounds.erase(tFoundIt);
 }
 
-int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosition, float fVolumedB)
+int SoundSystem::PlaySound(const std::string& strSoundName, const FMOD_VECTOR& vPosition, float fVolumedB)
 {
     int nChannelId = sgpImplementation->mnNextChannelId++;
     auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
@@ -94,8 +94,7 @@ int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosi
         FMOD_MODE currMode;
         tFoundIt->second->getMode(&currMode);
         if (currMode & FMOD_3D) {
-            FMOD_VECTOR position = VectorToFmod(vPosition);
-            SoundSystem::ErrorCheck(pChannel->set3DAttributes(&position, nullptr));
+            SoundSystem::ErrorCheck(pChannel->set3DAttributes(&vPosition, nullptr));
         }
         SoundSystem::ErrorCheck(pChannel->setVolume(dbToVolume(fVolumedB)));
         SoundSystem::ErrorCheck(pChannel->setPaused(false));
@@ -104,14 +103,13 @@ int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosi
     return nChannelId;
 }
 
-void SoundSystem::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
+void SoundSystem::SetChannel3dPosition(int nChannelId, const FMOD_VECTOR& vPosition)
 {
     auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
     if (tFoundIt == sgpImplementation->mChannels.end())
         return;
 
-    FMOD_VECTOR position = VectorToFmod(vPosition);
-    SoundSystem::ErrorCheck(tFoundIt->second->set3DAttributes(&position, NULL));
+    SoundSystem::ErrorCheck(tFoundIt->second->set3DAttributes(&vPosition, NULL));
 }
 
 void SoundSystem::SetChannelVolume(int nChannelId, float fVolumedB)
@@ -205,13 +203,13 @@ bool SoundSystem::IsEventPlaying(const std::string& strEventName) const {
     //SoundSystem::ErrorCheck(pParameter->setValue(fValue));
 //}
 
-FMOD_VECTOR SoundSystem::VectorToFmod(const Vector3& vPosition) {
-    FMOD_VECTOR fVec;
-    fVec.x = vPosition.x;
-    fVec.y = vPosition.y;
-    fVec.z = vPosition.z;
-    return fVec;
-}
+//FMOD_VECTOR SoundSystem::VectorToFmod(const Vector3& vPosition) {
+//    FMOD_VECTOR fVec;
+//    fVec.x = vPosition.x;
+//    fVec.y = vPosition.y;
+//    fVec.z = vPosition.z;
+//    return fVec;
+//}
 
 float  SoundSystem::dbToVolume(float dB)
 {

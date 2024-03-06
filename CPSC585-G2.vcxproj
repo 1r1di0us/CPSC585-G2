@@ -94,10 +94,10 @@
     <None Include="src\vertex_shader.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="assets\arial.ttf" />
-    <Font Include="assets\Gaegu-Bold.ttf" />
-    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\Fonts\arial.ttf" />
+    <Font Include="assets\Fonts\Candy Beans.otf" />
+    <Font Include="assets\Fonts\Gaegu-Bold.ttf" />
+    <Font Include="assets\Fonts\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\fragment_shader_text.txt" />
@@ -106,11 +106,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Models\furniturebits_texture.png" />
-    <Image Include="src\Textures\Blue.jpg" />
-    <Image Include="src\Textures\cat.jpg" />
-    <Image Include="src\Textures\red.jpg" />
-    <Image Include="src\Textures\tvblueorange.gif" />
-    <Image Include="src\Textures\wood.jpg" />
+    <Image Include="assets\Textures\Blue.jpg" />
+    <Image Include="assets\Textures\cat.jpg" />
+    <Image Include="assets\Textures\red.jpg" />
+    <Image Include="assets\Textures\tvblueorange.gif" />
+    <Image Include="assets\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL_vc.lib" />
@@ -285,9 +285,9 @@ mkdir "$(TargetDir)assets"
 
 copy "$(SolutionDir)assets\" "$(TargetDir)assets\"
 
-mkdir "$(TargetDir)src\Textures"
+mkdir "$(TargetDir)assets\Textures"
 
-copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
+copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -333,9 +333,9 @@ mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
 
-mkdir "$(TargetDir)src\Textures"
+mkdir "$(TargetDir)assets\Textures"
 
-copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
+copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

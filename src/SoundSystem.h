@@ -12,11 +12,11 @@
 
 #endif
 
-struct Vector3 {
-    float x;
-    float y;
-    float z;
-}; //I am embarrassed this is here
+//struct Vector3 {
+//    float x;
+//    float y;
+//    float z;
+//}; //I am embarrassed this is here
 
 struct Implementation {
     Implementation();
@@ -52,18 +52,18 @@ public:
     void LoadSound(const std::string& strSoundName, bool b3d = true, bool bLooping = false, bool bStream = false);
     void UnLoadSound(const std::string& strSoundName);
     //void Set3dListenerAndOrientation(const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f); not implemented
-    int PlaySound(const std::string& strSoundName, const Vector3& vPos = Vector3{ 0, 0, 0 }, float fVolumedB = 0.0f);
+    int PlaySound(const std::string& strSoundName, const FMOD_VECTOR& vPos = FMOD_VECTOR{ 0, 0, 0 }, float fVolumedB = 0.0f);
     void PlayEvent(const std::string& strEventName);
     //void StopChannel(int nChannelId); not implemented
     void StopEvent(const std::string& strEventName, bool bImmediate = false);
     //void GetEventParameter(const std::string& strEventName, const std::string& strEventParameter, float* parameter); doesn't work
     //void SetEventParameter(const std::string& strEventName, const std::string& strParameterName, float fValue); doesn't work
     //void StopAllChannels(); not implemented
-    void SetChannel3dPosition(int nChannelId, const Vector3& vPosition);
+    void SetChannel3dPosition(int nChannelId, const FMOD_VECTOR& vPosition);
     void SetChannelVolume(int nChannelId, float fVolumedB);
     //bool IsPlaying(int nChannelId) const; not implemented
     bool IsEventPlaying(const std::string& strEventName) const;
     float dbToVolume(float db);
     float VolumeTodb(float volume);
-    FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
+    //FMOD_VECTOR VectorToFmod(const FMOD_VECTOR& vPosition);
 };
