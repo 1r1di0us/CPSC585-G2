@@ -1,6 +1,18 @@
 #include "PhysicsSystem.h"
 #include "RenderingSystem.h"
 
+PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
+
+	this->dataSys = dataSys;
+
+	//physx setup
+	initPhysX();
+	initGroundPlane();
+	initMaterialFrictionTable();
+	initVehicleSimContext();
+
+}
+
 //initializes physx
 void PhysicsSystem::initPhysX() {
 
@@ -45,7 +57,7 @@ void PhysicsSystem::initPhysX() {
 void PhysicsSystem::initGroundPlane()
 {
 	/////////////////////////////////////////////////////////////////////////
-	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
+	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/MapNoObstacles.obj");
 
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.setToDefault();
@@ -77,13 +89,12 @@ void PhysicsSystem::initGroundPlane()
 	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
 
 	//making the map entity and adding it to the entity list (for collisions n shit)
-	Entity map;
-	map.collisionBox = (PxRigidDynamic*) meshStatic;
-	map.name = "MAP";
-	map.physType = PhysicsType::STATIC;
-	map.CreateTransformFromPhysX(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+	dataSys->MAP.collisionBox = (PxRigidDynamic*) meshStatic;
+	dataSys->MAP.name = "MAP";
+	dataSys->MAP.physType = PhysicsType::STATIC;
+	dataSys->MAP.CreateTransformFromPhysX(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
 
-	dataSys->entityList.emplace_back(map);
+	dataSys->entityList.emplace_back(dataSys->MAP);
 
 	meshStatic->attachShape(*meshShape);
 	gScene->addActor(*meshStatic);
@@ -169,18 +180,6 @@ void PhysicsSystem::stepPhysics() {
 		entity.updateTransform();
 	}
 	
-}
-
-PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
-
-	this->dataSys = dataSys;
-
-	//physx setup
-	initPhysX();
-	initGroundPlane();
-	initMaterialFrictionTable();
-	initVehicleSimContext();
-
 }
 
 void PhysicsSystem::releaseActors() {

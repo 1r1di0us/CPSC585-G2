@@ -21,7 +21,7 @@ using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 //needs to be here cause the struct wont see it below
-const int AMMO_START_AMOUNT = 5;
+const int AMMO_START_AMOUNT = 5000000;
 
 //car info struct
 struct CarInfo{
@@ -85,7 +85,9 @@ private:
 			void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
 				//PX_UNUSED(pairHeader);
 				//PX_UNUSED(pairs);
-				PX_UNUSED(nbPairs);
+				//PX_UNUSED(nbPairs);
+
+				printf("nPairs: %d\n", nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
 				contactPair = pairHeader;
@@ -188,6 +190,9 @@ public:
 
 	//the number of bullets given per ammo powerup
 	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
+
+	//adding a map entity that persists through games
+	Entity MAP;
 
 	//entity helper functions move from entity cpp?
 
