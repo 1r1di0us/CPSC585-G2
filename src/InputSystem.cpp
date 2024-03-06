@@ -197,7 +197,7 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		brakeTimer -= deltaTime.count();
 	}
 
-	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->entityList[0].collisionBox);
+	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->carInfoList[0].entity->collisionBox);
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();

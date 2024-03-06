@@ -175,27 +175,27 @@ int main() {
             FPSCOUNTER++;
 
             if (inputSys.InputToMovement(deltaTime)) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox);
+                carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime, PxVec3(0, 0, 0))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox);
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
+                carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[2].collisionBox), deltaTime, PxVec3(20, 0, -20))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[2])->collisionBox);
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
+                carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[3].collisionBox), deltaTime, PxVec3(15, 0, 25))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[3])->collisionBox);
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
+                carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[4].collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
-                carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[4])->collisionBox);
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
+                carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox);
                 soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
@@ -210,7 +210,7 @@ int main() {
 
         // render
         // ------
-        renderingSystem.updateRenderer(std::make_shared<std::vector<Entity>>(dataSys.entityList), camera, totalTimeLeft);
+        renderingSystem.updateRenderer(camera, totalTimeLeft);
 
         if (dataSys.quit) {
             break;

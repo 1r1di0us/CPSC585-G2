@@ -111,7 +111,9 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 }
 
 
-void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft) {
+void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft) {
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
 
     // input
     processInput(window);
@@ -160,8 +162,8 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         // getting the car position and rotation
-        glm::vec3 playerPos = entityList->at(0).transform->getPos();
-        glm::quat playerRot = entityList->at(0).transform->getRot();
+        glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;
+        glm::quat playerRot = dataSys->carInfoList[0].entity->transform->rot;
         //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
         if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
@@ -216,15 +218,15 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
         shader.setMat4("model", model);
         renderObject(building, &buildingVAO);
 
-        //rendering all other entities starting at 1 (skipping player car)
-        for (int i = 1; i < entityList->size(); i++) {
+        //rendering all other entities starting at 2 (skipping player car and map)
+        for (int i = 2; i < dataSys->entityList.size(); i++) {
 
-            switch (entityList->at(i).physType) {
+            switch (dataSys->entityList[i].physType) {
 
             case (PhysicsType::CAR):
 
                 //is the car alive? -> render it
-                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(entityList->at(i)))->isAlive) {
+                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
                     if (i == 1) {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player2Texture);
@@ -243,10 +245,10 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
                     }
 
                     model = glm::mat4(1.0f);
-                    model = glm::translate(model, entityList->at(i).transform->getPos());
+                    model = glm::translate(model, dataSys->entityList[i].transform->getPos());
                     // make it look forward
                     model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-                    model = applyQuaternionToMatrix(model, entityList->at(i).transform->getRot());
+                    model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
                     shader.setMat4("model", model);
                     renderObject(tank, &tankVAO);
                 }
@@ -258,7 +260,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
                 glBindTexture(GL_TEXTURE_2D, redTexture);
 
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, entityList->at(i).transform->getPos());
+                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
                 shader.setMat4("model", model);
                 renderObject(ball, &ballVAO);
 
@@ -269,7 +271,7 @@ void RenderingSystem::updateRenderer(std::shared_ptr<std::vector<Entity>> entity
                 glBindTexture(GL_TEXTURE_2D, redTexture);
 
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, entityList->at(i).transform->getPos());
+                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
                 shader.setMat4("model", model);
                 renderObject(powerup, &powerupVAO);
 

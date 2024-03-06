@@ -419,8 +419,6 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
-	printf("score of %s: %d\n", shootingCarInfo->entity->name.c_str(), shootingCarInfo->score);
-
 	/*
 	* remove the projectile from all lists
 	*/
@@ -508,6 +506,11 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+	PxRigidDynamic* carThatShotProjectile = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
+
+	/*
+	* remove the projectile from all lists
+	*/
 
 	//entity list
 	for (int i = 0; i < entityList.size(); i++) {
@@ -517,11 +520,9 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 	}
 
 	//car projectile dict
-	for (auto& entry : carProjectileRigidDynamicDict) {
-		for (int i = 0; i < entry.second.size(); i++) {
-			if (carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first][i] == (PxRigidDynamic*)projectile) {
-				carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].erase(carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].begin() + i);
-			}
+	for (int i = 0; i < carProjectileRigidDynamicDict[carThatShotProjectile].size(); i++) {
+		if (carProjectileRigidDynamicDict[carThatShotProjectile][i] == (PxRigidDynamic*)projectile) {
+			carProjectileRigidDynamicDict[carThatShotProjectile].erase(carProjectileRigidDynamicDict[carThatShotProjectile].begin() + i);
 		}
 	}
 
