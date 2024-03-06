@@ -186,7 +186,7 @@ public:
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
 
 	//the number of bullets given per ammo powerup
-	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 2;
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
 	//entity helper functions move from entity cpp?
 
