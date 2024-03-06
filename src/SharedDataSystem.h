@@ -158,8 +158,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-20.0f, -20.0f);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(20.0f, 20.0f);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -11);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 24);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -175,7 +175,7 @@ public:
 	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
 
 	//the spawn height of powerups
-	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
+	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
@@ -187,7 +187,7 @@ public:
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
 
 	//the number of bullets given per ammo powerup
-	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 2;
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
 	//entity helper functions move from entity cpp?
 

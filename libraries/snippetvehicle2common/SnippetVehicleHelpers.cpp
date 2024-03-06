@@ -64,7 +64,6 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 		|| (filterData1.word0 == COLLISION_FLAG_STATIC && filterData0.word0 == COLLISION_FLAG_PROJECTILE)) {
 
 		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
-		printf("Projectile hit static object.\n");
 	}
 	//if a car collides with a powerup
 	else if ((filterData0.word0 == COLLISION_FLAG_POWERUP && filterData1.word0 == COLLISION_FLAG_CHASSIS)

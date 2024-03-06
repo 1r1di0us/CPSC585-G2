@@ -1,11 +1,45 @@
 #version 330 core
 out vec4 FragColor;
 in vec2 TexCoord;
+in vec3 FragPos;
+in vec3 Normal;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 
 void main()
 {
-    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.0);
+    vec3 lightPos = vec3(5.0f, 10.0f, 5.0f);
+
+    // Sample the texture at the specified texture coordinates
+    vec4 texColor = texture(texture1, TexCoord);
+    
+    // Calculate the normal vector
+    vec3 normal = normalize(Normal);
+
+    // Calculate the light direction
+    vec3 lightDir = normalize(lightPos - FragPos);
+
+    // Calculate the Lambertian reflection (diffuse lighting)
+    float diffuseFactor = max(dot(normal, lightDir), 0.0);
+    vec3 diffuseColor = vec3(1.0, 1.0, 1.0); // Set your diffuse color here
+
+    // Ambient lighting (increased intensity)
+    vec3 ambient = 0.8 * vec3(1.0, 1.0, 1.0); // Adjust ambient strength and color as needed
+
+    // Calculate the view direction
+    vec3 viewDir = normalize(-FragPos);
+
+    // Calculate the half vector for specular lighting
+    vec3 halfVec = normalize(lightDir + viewDir);
+
+    // Calculate the specular reflection (specular lighting)
+    float specularFactor = pow(max(dot(normal, halfVec), 0.0), 32.0); // Adjust the shininess value (32.0) as needed
+    vec3 specularColor = vec3(1.0, 1.0, 1.0); // Set your specular color here
+
+    // Calculate the final color using Lambertian reflection, specular reflection, and ambient lighting
+    vec3 finalColor = texColor.rgb * (diffuseColor * diffuseFactor + specularColor * specularFactor + ambient);
+
+    // Output the final color
+    FragColor = vec4(finalColor, texColor.a);
 }

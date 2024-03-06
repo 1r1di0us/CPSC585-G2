@@ -34,7 +34,7 @@ AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
-const double TIMELIMIT = 150.0f;
+const double TIMELIMIT = 50.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -60,17 +60,6 @@ int main() {
     soundSys.AddToSoundDict("Thud", "assets/Music/PianoClusterThud.wav");
     soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
     soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
-
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
@@ -234,7 +223,7 @@ int main() {
 
         // render
         // ------
-        renderingSystem.updateRenderer(std::make_shared<std::vector<Entity>>(dataSys.entityList), camera, totalTimeLeft);
+        renderingSystem.updateRenderer(camera, totalTimeLeft);
 
         if (dataSys.quit) {
             break;
@@ -250,13 +239,4 @@ int main() {
 
     physicsSys.cleanPhysicsSystem();
     return 0;
-}
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }

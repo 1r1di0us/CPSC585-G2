@@ -18,6 +18,8 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "SharedDataSystem.h"
+#include "Model.h"
+#include "Mesh.h"
 
 class RenderingSystem {
 
@@ -45,14 +47,15 @@ public:
 		quadVAO, quadVBO;
 	Shader textShader;
 	Shader shader;
+	Shader ourShader; // testing it
 	std::map<char, Character> Characters_gaegu;
-	OBJModel tank, building, ball, plane, powerup;
+	OBJModel tank, building, ball, plane, powerup, bedModel;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
 	void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-	void updateRenderer(std::shared_ptr<std::vector<Entity>> entityList, Camera camera, std::chrono::duration<double> timeLeft);
+	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 };
@@ -61,3 +64,4 @@ public:
 void renderOBJ(const OBJModel& model);
 void renderObject(const OBJModel& model, unsigned int* VAO);
 void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
+

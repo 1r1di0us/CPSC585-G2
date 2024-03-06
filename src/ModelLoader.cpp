@@ -32,9 +32,12 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
     //std::cout << "Number of shapes: " << shapes.size() << std::endl;
     //std::cout << "Number of materials: " << materials.size() << std::endl;
 
+
     OBJModel model;
     for (const auto& shape : shapes) {
+        //std::cout << "Number of mesh: " << shape.mesh.indices.size() << std::endl;
         for (const auto& index : shape.mesh.indices) {
+            
             glm::vec3 vertices(
                 attributes.vertices[3 * index.vertex_index + 0],
                 attributes.vertices[3 * index.vertex_index + 1],
@@ -47,6 +50,7 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
                     attributes.texcoords[2 * index.texcoord_index + 0],
                     attributes.texcoords[2 * index.texcoord_index + 1]
                 );
+                //std::cout << "texcoord: " << texCoord.x << "," << texCoord.y << std::endl;
                 model.textureCoordinates.push_back(texCoord);
             }
 
@@ -59,9 +63,11 @@ OBJModel LoadModelFromPath(std::string modelFilePath){
                 model.normals.push_back(normal);
             }
 
-            model.indices.push_back(model.indices.size());
+            // Add the index to the indices vector
+            model.indices.push_back(static_cast<uint32_t>(model.indices.size()));
         }
     }
+
 
     return model;
 }

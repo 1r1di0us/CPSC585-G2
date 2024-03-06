@@ -10,7 +10,6 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
     <ClCompile Include="src\InputSystem.cpp" />
     <ClCompile Include="libraries\snippetcommon\ClassicMain.cpp" />
@@ -33,7 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Entity.h" />
-    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\Shader.h" />
@@ -44,7 +42,6 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ModelLoader.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
-    <ClInclude Include="src\OBJ_Loader.h" />
     <ClInclude Include="src\InputSystem.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPrint.h" />
     <ClInclude Include="libraries\snippetcommon\SnippetPVD.h" />
@@ -61,6 +58,8 @@
     <ClInclude Include="src\SharedDataSystem.h" />
     <ClInclude Include="src\SoundSystem.h" />
     <ClInclude Include="src\AiSystem.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\PowerupSystem.h" />
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +73,8 @@
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
+    <None Include="assets\Models\backpack.mtl" />
+    <None Include="assets\Models\planeHugeWithWalls.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Fonts\Gaegu-Bold.ttf" />
@@ -85,14 +86,23 @@
     <Text Include="src\vertex_shader_text.txt" />
     <Text Include="src\fragment_shader_text.txt" />
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
+    <Text Include="src\model_loading_vertex.txt" />
+    <Text Include="src\model_loading_fragment.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Textures\wood.jpg" />
     <Image Include="assets\Textures\cat.jpg" />
     <Image Include="assets\Models\furniturebits_texture.png" />
-    <Image Include="assets\Textures\Blue.jpg" />
-    <Image Include="assets\Textures\tvblueorange.gif" />
-    <Image Include="assets\Textures\red.jpg" />
+    <Image Include="src\Textures\Blue.jpg" />
+    <Image Include="src\Textures\tvblueorange.gif" />
+    <Image Include="src\Textures\red.jpg" />
+    <Image Include="assets\Models\ao.jpg" />
+    <Image Include="assets\Models\roughness.jpg" />
+    <Image Include="assets\Models\normal.png" />
+    <Image Include="assets\Models\diffuse.jpg" />
+    <Image Include="assets\Models\specular.jpg" />
+    <Image Include="src\Textures\player1.jpg" />
+    <Image Include="src\Textures\KiddieCarpet.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
@@ -139,5 +149,8 @@
     <Object Include="assets\Models\bed_double_A.obj" />
     <Object Include="assets\Models\box_A.obj" />
     <Object Include="assets\Models\building_E.obj" />
+    <Object Include="assets\Models\cube.obj" />
+    <Object Include="assets\Models\backpack.obj" />
+    <Object Include="assets\Models\planeHugeWithWalls.obj" />
   </ItemGroup>
 </Project>
