@@ -29,7 +29,7 @@ CarSystem carSys(&dataSys);
 PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
-SoundSystem soundSys();
+SoundSystem soundSys;
 AiSystem aiSys(&dataSys);
 Camera camera;
 
