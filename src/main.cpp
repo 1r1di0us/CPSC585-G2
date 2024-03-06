@@ -29,7 +29,7 @@ CarSystem carSys(&dataSys);
 PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
-SoundSystem soundSys;
+SoundSystem soundSys();
 AiSystem aiSys(&dataSys);
 Camera camera;
 
@@ -51,9 +51,11 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    soundSys.Init();
+    soundSys.Init(&dataSys); //basically the constructor
     soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
+    soundSys.AddToSoundDict("Thud", "assets/Music/PianoClusterThud.wav");
     soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
+    soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
 
     // glfw: initialize and configure
     // ------------------------------
@@ -145,28 +147,37 @@ int main() {
             FPSCOUNTER++;
 
             if (inputSys.InputToMovement(deltaTime)) {
-                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[0])->collisionBox))
-                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox)) {
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), PxVec3{ 0, 0, 0 }));
+                }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[1].collisionBox), deltaTime, PxVec3(0, 0, 0))) {
-                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[1])->collisionBox))
-                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
+                if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[2].collisionBox), deltaTime, PxVec3(20, 0, -20))) {
-                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[2])->collisionBox))
-                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
+                if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[3].collisionBox), deltaTime, PxVec3(15, 0, 25))) {
-                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[3])->collisionBox))
-                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
+                if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.entityList[4].collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
-                if (carSys.Shoot(std::make_shared<Entity>(dataSys.entityList[4])->collisionBox))
-                    soundSys.PlaySound("assets/Music/PianoClusterThud.wav");
+            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
+                if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
             //only updating the physics at max 60hz while everything else updates at max speed
@@ -176,6 +187,7 @@ int main() {
                 carSys.RespawnAllCars();
                 powerupSys.RespawnAllPowerups();
             }
+            soundSys.PlayAllSounds();
         }
 
         // render

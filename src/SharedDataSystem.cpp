@@ -625,3 +625,7 @@ glm::mat3 SharedDataSystem::getCamRotMat() {
 PxMat33 SharedDataSystem::getCamRotMatPx(float angle) {
 	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
 }
+
+PxMat33 SharedDataSystem::getSoundRotMat() {
+	return PxMat33({ cos((float)M_PI - cameraAngle), 0, sin((float)M_PI - cameraAngle) }, { 0, 1, 0 }, { -sin((float)M_PI - cameraAngle), 0, -cos((float)M_PI - cameraAngle) });
+}

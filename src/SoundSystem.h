@@ -9,14 +9,9 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include "SharedDataSystem.h"
 
 #endif
-
-//struct Vector3 {
-//    float x;
-//    float y;
-//    float z;
-//}; //I am embarrassed this is here
 
 struct Implementation {
     Implementation();
@@ -42,7 +37,11 @@ struct Implementation {
 
 class SoundSystem {
 public:
-    static void Init();
+
+    std::vector <std::pair <std::string, std::string> > SoundDict;
+    float GameVolume = -15.0;
+
+    static void Init(SharedDataSystem* sharedDataSys);
     static void Update();
     static void Shutdown();
     static int ErrorCheck(FMOD_RESULT result);
@@ -66,4 +65,7 @@ public:
     float dbToVolume(float db);
     float VolumeTodb(float volume);
     //FMOD_VECTOR VectorToFmod(const FMOD_VECTOR& vPosition);
+
+    void AddToSoundDict(std::string name, std::string location);
+    void PlayAllSounds();
 };

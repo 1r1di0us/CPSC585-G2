@@ -15,7 +15,6 @@
 #include <queue>
 #include "math.h"
 #include <utility>
-#include "SoundSystem.h"
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -297,6 +296,7 @@ public:
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
 	PxMat33 getCamRotMatPx(float angle);
+	PxMat33 getSoundRotMat();
 
 	// Flags
 	bool inMenu = true;
@@ -315,8 +315,8 @@ public:
 	bool tieGame = false;
 	bool carsInitialized = false;
 
-	//// Audio 
-	//std::vector<std::pair<std::string, SoundSystem::Vector3>> SoundsToPlay;
+	// Audio
+	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
 
 	// Camera
 	float cameraAngle = M_PI;

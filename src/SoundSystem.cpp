@@ -36,9 +36,11 @@ void Implementation::Update() {
 }
 
 Implementation* sgpImplementation = nullptr;
+SharedDataSystem* dataSys = nullptr;
 
-void SoundSystem::Init() {
+void SoundSystem::Init(SharedDataSystem* sharedDataSys) {
     sgpImplementation = new Implementation;
+    dataSys = sharedDataSys;
 }
 
 void SoundSystem::Update() {
@@ -232,4 +234,20 @@ int SoundSystem::ErrorCheck(FMOD_RESULT result) {
 
 void SoundSystem::Shutdown() {
     delete sgpImplementation;
+}
+
+void SoundSystem::AddToSoundDict(std::string name, std::string location) {
+    SoundDict.push_back( std::pair < std::string, std::string> ( name, location ) );
+}
+
+void SoundSystem::PlayAllSounds() {
+    for (std::pair <std::string, PxVec3> soundPair : dataSys->SoundsToPlay) {
+        for (std::pair <std::string, std::string> dictPair : SoundDict) {
+            if (soundPair.first == dictPair.first) {
+                FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x, soundPair.second.y, soundPair.second.z };
+                PlaySound(dictPair.second, location, GameVolume);
+            }
+        }
+    }
+    dataSys->SoundsToPlay.clear(); //remove all sounds since we played them
 }
