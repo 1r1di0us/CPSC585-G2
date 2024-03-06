@@ -45,9 +45,9 @@ std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 
-std::string menuMusic = "assets/Cianwood City Remix.wav";
-std::string gameMusic = "assets/Miror B Remix.wav";
-std::string resultsMusic = "assets/Mario Strikers Results.wav";
+std::string menuMusic = "assets/Music/Cianwood City Remix.wav";
+std::string gameMusic = "assets/Music/Miror B Remix.wav";
+std::string resultsMusic = "assets/Music/Mario Strikers Results.wav";
 
 int main() {
 
