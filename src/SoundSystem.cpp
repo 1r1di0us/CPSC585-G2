@@ -245,7 +245,7 @@ void SoundSystem::PlayAllSounds() {
         for (std::pair <std::string, std::string> dictPair : SoundDict) {
             if (soundPair.first == dictPair.first) {
                 FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x/15, soundPair.second.y/15, soundPair.second.z/15 };
-                PlaySound(dictPair.second, location, GameVolume);
+                PlaySound(dictPair.second, location, SfxVolume);
             }
         }
     }
