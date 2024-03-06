@@ -168,7 +168,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
             // Bird's eye view
-            glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+            glm::vec3 cameraPosition = glm::vec3(0.0f, 200.0f, 0.0f);
             glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
             glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
 
