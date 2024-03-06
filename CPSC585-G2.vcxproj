@@ -357,7 +357,11 @@ copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
 
 mkdir "$(TargetDir)src\Textures"
 
-copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
+copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"
+
+mkdir "$(TargetDir)src\Textures\UI"
+
+copy "$(SolutionDir)src\Textures\UI" "$(TargetDir)src\Textures\UI"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -203,7 +203,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         glBindTexture(GL_TEXTURE_2D, planeTexture);
 
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
 
@@ -227,15 +227,15 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
                 //is the car alive? -> render it
                 if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
-                    if (i == 1) {
+                    if (i == 2) {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player2Texture);
                     }
-                    else if (i == 2) {
+                    else if (i == 3) {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player3Texture);
                     }
-                    else if (i == 3) {
+                    else if (i == 4) {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player4Texture);
                     }
