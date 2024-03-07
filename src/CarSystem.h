@@ -48,7 +48,7 @@ public:
 	//constructor
 	CarSystem(SharedDataSystem* dataSys);
 
-	void SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation);
+	void SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation);
 
 	//respawn all dead cars
 	void RespawnAllCars();

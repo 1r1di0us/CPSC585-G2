@@ -5,7 +5,7 @@ CarSystem::CarSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 }
 
-void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
+void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 
 	//every car has same name TODO: might change if need to sort by name
 	const char* name = "car";
@@ -28,7 +28,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform carTransform = PxTransform(spawnPosition, spawnRotation);
+	PxTransform carTransform = PxTransform(PxVec3(spawnPosition.x, dataSys->CAR_SPAWN_HEIGHT, spawnPosition.y), spawnRotation);
 	gVehicle->setUpActor(*dataSys->gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -117,16 +117,16 @@ void CarSystem::RespawnAllCars() {
 bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
-	printf("before return 1\n");
+	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		printf("Return 1\n");
+		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
 		return false;
 	}
 
-	printf("before return 2\n");
+	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		printf("Return 2\n");
+		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
 		return false;
 	}
 
@@ -137,9 +137,9 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * 5,
-			shootingCar->getGlobalPose().p.y + projectileRadius + 0.1f,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * 5),
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 6.5,
+			projectileRadius * 2,
+			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
@@ -158,29 +158,38 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//disables gravity for the projectile
 	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 
-	//FIXME
-	projectileBody->setName("temp");
+	//adds the projectile to the scene
 	dataSys->gScene->addActor(*projectileBody);
 
-	projectileBody->setLinearVelocity(shootForce * forwardVector);
+	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+	projectileBody->setLinearVelocity(shootForce * PxVec3(forwardVector.x, 0, forwardVector.z));
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
-	printf("kill me 1\n");
+
+	if (dataSys->DEBUG_MODE) printf("before projectile entity creation\n");
+
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
-	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->carProjectileRigidDynamicDict[shootingCar].size());
+	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->spawnedProjectileCounter++);
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
-	printf("kill me out 1\n");
+	
+	if (dataSys->DEBUG_MODE) printf("after projectile entity creation\n");
+
+	//makes its name smart for easy debugging
+	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
-	printf("pp 1\n");
+	if (dataSys->DEBUG_MODE) printf("before reduce ammo count\n");
+
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
-	printf("pp end 1\n");
+
+	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
+
 	return true;
 
 }

@@ -100,13 +100,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
 
                 dataSys.carsInitialized = true;
             }

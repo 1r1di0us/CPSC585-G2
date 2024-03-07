@@ -51,6 +51,8 @@ void PowerupSystem::SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType) 
 	powerup.physType = PhysicsType::POWERUP;
 	powerup.collisionBox = powerupBody;
 
+	powerupBody->setName(powerup.name.c_str());
+
 	dataSys->entityList.emplace_back(powerup);
 
 	//making the powerup info to add to the list
