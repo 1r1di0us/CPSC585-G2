@@ -84,9 +84,9 @@ private:
 			void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
 				//PX_UNUSED(pairHeader);
 				//PX_UNUSED(pairs);
-				//PX_UNUSED(nbPairs);
+				PX_UNUSED(nbPairs);
 
-				printf("nPairs: %d\n", nbPairs);
+				//printf("nPairs: %d\n", nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
 				contactPair = pairHeader;
@@ -248,6 +248,9 @@ public:
 	/*
 	* PROJECTILES
 	*/
+
+	//an int to make the projectile names unique (cant do it based on list size)
+	int spawnedProjectileCounter = 0;
 
 	//the dictionary for all projectiles for all cars
 	std::unordered_map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;

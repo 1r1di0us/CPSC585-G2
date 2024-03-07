@@ -137,9 +137,9 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * 5,
-			shootingCar->getGlobalPose().p.y + projectileRadius + 0.1f,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * 5),
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 7,
+			projectileRadius * 2,
+			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 7),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
@@ -158,22 +158,25 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//disables gravity for the projectile
 	projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 
-	//FIXME
-	projectileBody->setName("temp");
+	//adds the projectile to the scene
 	dataSys->gScene->addActor(*projectileBody);
 
-	projectileBody->setLinearVelocity(shootForce * forwardVector);
+	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+	projectileBody->setLinearVelocity(shootForce * PxVec3(forwardVector.x, 0, forwardVector.z));
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 	printf("kill me 1\n");
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
-	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->carProjectileRigidDynamicDict[shootingCar].size());
+	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->spawnedProjectileCounter++);
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
 	printf("kill me out 1\n");
+
+	//makes its name smart for easy debugging
+	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
