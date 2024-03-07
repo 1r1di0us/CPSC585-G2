@@ -90,8 +90,6 @@
     <Text Include="src\model_loading_fragment.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\Textures\wood.jpg" />
-    <Image Include="assets\Textures\cat.jpg" />
     <Image Include="assets\Models\furniturebits_texture.png" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
@@ -103,6 +101,8 @@
     <Image Include="assets\Models\specular.jpg" />
     <Image Include="src\Textures\player1.jpg" />
     <Image Include="src\Textures\KiddieCarpet.jpg" />
+    <Image Include="src\Textures\cat.jpg" />
+    <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

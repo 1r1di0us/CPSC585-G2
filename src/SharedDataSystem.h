@@ -21,7 +21,7 @@ using namespace physx::vehicle2;
 using namespace snippetvehicle2;
 
 //needs to be here cause the struct wont see it below
-const int AMMO_START_AMOUNT = 5000000;
+const int AMMO_START_AMOUNT = 5;
 
 //car info struct
 struct CarInfo{
@@ -150,7 +150,7 @@ private:
 public:
 
 	//debug mode
-	const bool DEBUG_MODE = true;
+	const bool DEBUG_MODE = false;
 
 	/*
 	* CONSTANTS:
