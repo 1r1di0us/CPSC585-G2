@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -65,6 +65,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     player4Texture = generateTexture("assets/Textures/player4.jpg", true);
     player5Texture = generateTexture("assets/Textures/player5.jpg", true);
     redTexture = generateTexture("assets/Textures/red.jpg", true);
+    gunMetalTexture = generateTexture("assets/Textures/gunMetal.jpg", true);
     menuPlay = generateTexture("assets/Textures/UI/menuPlay.jpg", true);
     menuControls = generateTexture("assets/Textures/UI/menuControls.jpg", true);
     menuQuit = generateTexture("assets/Textures/UI/menuQuit.jpg", true);
@@ -140,10 +141,31 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         std::string score = "Score:";
         RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
+        glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
+        glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
+        glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
+        glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
+        glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
         for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+            glm::vec3 color;
+            if (i == 0) {
+                color = red;
+            }
+            else if (i == 1) {
+                color = blue;
+            }
+            else if (i == 2) {
+                color = green;
+            }
+            else if (i == 3) {
+                color = yellow;
+            }
+            else if (i == 4) {
+                color = pink;
+            }
             float yOffset = i * 30;
             std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
         }
 
         // activate shader
@@ -214,7 +236,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         shader.use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, redTexture);
+        glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
         shader.setMat4("model", model);
         renderObject(building, &buildingVAO);
 
@@ -275,7 +297,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             case (PhysicsType::POWERUP):
 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, redTexture);
+                glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
 
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, dataSys->entityList[i].transform->getPos());
