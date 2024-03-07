@@ -387,7 +387,7 @@ std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynami
 
 		for (PxRigidDynamic* listProjectile : iterator->second) {
 			if (listProjectile == projectile) {
-				printf("not sure how debug 1\n");
+				if (DEBUG_MODE) printf("GetCarThatShotProjectile hard debug\n");
 				return GetEntityFromRigidDynamic(iterator->first);
 			}
 		}
@@ -412,10 +412,14 @@ PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<En
 }
 
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
-	printf("CarProjectileCollisionLogic before\n");
+
+	if (DEBUG_MODE) printf("CarProjectileCollisionLogic before\n");
+
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
-	printf("CarProjectileCollisionLogic after\n");
+
+	if (DEBUG_MODE) printf("CarProjectileCollisionLogic after\n");
+
 	//increase score of car that shot
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
@@ -455,11 +459,14 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 }
 
 void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
-	printf("CarPowerupCollisionLogic before\n");
+
+	if (DEBUG_MODE) printf("CarPowerupCollisionLogic before\n");
+
 	//converting the actors to entities
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
-	printf("CarPowerupCollisionLogic after\n");
+
+	if (DEBUG_MODE) printf("CarPowerupCollisionLogic after\n");
 
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
@@ -506,10 +513,14 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
-	printf("ProjectileStaticCollisionLogic before\n");
+
+	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic before\n");
+
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 	PxRigidDynamic* carThatShotProjectile = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
-	printf("ProjectileStaticCollisionLogic after\n");
+
+	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic after\n");
+
 	/*
 	* remove the projectile from all lists
 	*/
@@ -541,11 +552,15 @@ void SharedDataSystem::ResolveCollisions() {
 		//code readability variables
 		PxActor* actor1 = gContactReportCallback->contactPair.actors[0];
 		PxActor* actor2 = gContactReportCallback->contactPair.actors[1];
-		printf("resolve collisions before\n");
+
+		if (DEBUG_MODE) printf("ResolveCollisions before\n");
+
 		//get the two entities that collided
 		std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
 		std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
-		printf("resolve collisions after\n");
+
+		if (DEBUG_MODE) printf("ResolveCollisions after\n");
+
 		//determines the logic to use
 		switch (entity1->physType) {
 		case PhysicsType::CAR:

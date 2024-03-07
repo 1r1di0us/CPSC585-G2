@@ -148,6 +148,9 @@ private:
 
 public:
 
+	//debug mode
+	const bool DEBUG_MODE = false;
+
 	/*
 	* CONSTANTS:
 	*/

@@ -117,16 +117,16 @@ void CarSystem::RespawnAllCars() {
 void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
-	printf("before return 1\n");
+	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		printf("Return 1\n");
+		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
 		return;
 	}
 
-	printf("before return 2\n");
+	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		printf("Return 2\n");
+		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
 		return;
 	}
 
@@ -166,23 +166,28 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
-	printf("kill me 1\n");
+
+	if (dataSys->DEBUG_MODE) printf("before projectile entity creation\n");
+
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
 	projectile.name = dataSys->GetEntityFromRigidDynamic(shootingCar)->name + "projectile" + std::to_string(dataSys->spawnedProjectileCounter++);
 	projectile.CreateTransformFromPhysX(projectileBody->getGlobalPose());
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
-	printf("kill me out 1\n");
+	
+	if (dataSys->DEBUG_MODE) printf("after projectile entity creation\n");
 
 	//makes its name smart for easy debugging
 	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
-	printf("pp 1\n");
+	if (dataSys->DEBUG_MODE) printf("before reduce ammo count\n");
+
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
-	printf("pp end 1\n");
+
+	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
 
 }
