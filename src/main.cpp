@@ -37,7 +37,7 @@ AiSystem aiSys(&dataSys);
 Camera camera;
 
 //time related variables
-const double TIMELIMIT = 150.0f;
+const double TIMELIMIT = 50.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
