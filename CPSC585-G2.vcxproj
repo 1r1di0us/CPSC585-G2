@@ -355,6 +355,14 @@ mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
 
+mkdir "$(TargetDir)assets\Fonts"
+
+copy "$(SolutionDir)assets\Fonts" "$(TargetDir)assets\Fonts"
+
+mkdir "$(TargetDir)assets\Music"
+
+copy "$(SolutionDir)assets\Music" "$(TargetDir)assets\Music"
+
 mkdir "$(TargetDir)assets\Textures"
 
 copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"
