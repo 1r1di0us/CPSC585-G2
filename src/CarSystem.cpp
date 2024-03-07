@@ -5,7 +5,7 @@ CarSystem::CarSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 }
 
-void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
+void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 
 	//every car has same name TODO: might change if need to sort by name
 	const char* name = "car";
@@ -28,7 +28,7 @@ void CarSystem::SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation) {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform carTransform = PxTransform(spawnPosition, spawnRotation);
+	PxTransform carTransform = PxTransform(PxVec3(spawnPosition.x, dataSys->CAR_SPAWN_HEIGHT, spawnPosition.y), spawnRotation);
 	gVehicle->setUpActor(*dataSys->gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -114,20 +114,20 @@ void CarSystem::RespawnAllCars() {
 
 }
 
-void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
+bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
 	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
 		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
-		return;
+		return false;
 	}
 
 	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
 		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
-		return;
+		return false;
 	}
 
 	//gets the forward vector of the car
@@ -189,5 +189,7 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
 
 	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
+
+	return true;
 
 }

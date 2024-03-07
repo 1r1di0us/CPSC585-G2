@@ -97,13 +97,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
 
                 dataSys.carsInitialized = true;
             }
@@ -175,28 +175,28 @@ int main() {
             FPSCOUNTER++;
 
             if (inputSys.InputToMovement(deltaTime)) {
-                carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox))
+                    soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
-                carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox))
+                    soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
-                carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox))
+                    soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
-                carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox))
+                    soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
-                carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox))
+                    soundSys.PlaySound("assets/PianoClusterThud.wav");
             }
 
             //only updating the physics at max 60hz while everything else updates at max speed

@@ -452,7 +452,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	hitCar->isAlive = false;
 	//moving into the sky and disabling gravity to "delete it"
 	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
-	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 100;
+	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
 	PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
 	hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
 

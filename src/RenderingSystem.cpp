@@ -226,21 +226,23 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             case (PhysicsType::CAR):
 
                 //gets the car info struct of the car
-                CarInfo* car = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+                CarInfo* carInfo;
 
                 //is the car alive? -> render it
-                if (car->isAlive) {
+                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+
+                    carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
 
                     //different colors for different cars
-                    if (car->entity->name == "car2") {
+                    if (carInfo->entity->name == "car2") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player2Texture);
                     }
-                    else if (car->entity->name == "car3") {
+                    else if (carInfo->entity->name == "car3") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player3Texture);
                     }
-                    else if (car->entity->name == "car4") {
+                    else if (carInfo->entity->name == "car4") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player4Texture);
                     }
