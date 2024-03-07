@@ -137,9 +137,9 @@ void CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 7,
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 6.5,
 			projectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 7),
+			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
