@@ -70,6 +70,10 @@ struct CompareDistance {
 
 class SharedDataSystem {
 
+public:
+
+	static std::vector<PxContactPairHeader> contactPairs;
+
 private:
 	//custom collision callback system
 	class ContactReportCallback : public PxSimulationEventCallback {
@@ -84,14 +88,14 @@ private:
 			void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
 				//PX_UNUSED(pairHeader);
 				//PX_UNUSED(pairs);
-				PX_UNUSED(nbPairs);
-
-				//printf("nPairs: %d\n", nbPairs);
+				//PX_UNUSED(nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
 				contactPair = pairHeader;
-				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
+				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND)) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 			}
 			void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
 			void onWake(physx::PxActor** actors, physx::PxU32 count) {}
@@ -102,8 +106,10 @@ private:
 				contactPair.actors[0] = pairs->triggerActor;
 				contactPair.actors[1] = pairs->otherActor;
 
-				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
+				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 
 			}
 			void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
@@ -149,7 +155,7 @@ private:
 public:
 
 	//debug mode
-	const bool DEBUG_MODE = true;
+	const bool DEBUG_MODE = false;
 
 	/*
 	* CONSTANTS:
@@ -285,7 +291,6 @@ public:
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
-	//THIS MAY NOT WORK IN THE SWITCH DEPENDING ON HOW THE MAP EXISTS
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
 
 	//function to resolve all collisions

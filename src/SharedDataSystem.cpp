@@ -1,6 +1,5 @@
 #include "SharedDataSystem.h"
 
-
 /*
 * PRIVATE FUNCTIONS
 */
@@ -549,70 +548,76 @@ void SharedDataSystem::ResolveCollisions() {
 	//if a collision has occured
 	if (gContactReportCallback->contactDetected) {
 
-		//code readability variables
-		PxActor* actor1 = gContactReportCallback->contactPair.actors[0];
-		PxActor* actor2 = gContactReportCallback->contactPair.actors[1];
+		//goes through all contact pairs
+		for (int i = 0; i < SharedDataSystem::contactPairs.size(); i++) {
 
-		if (DEBUG_MODE) printf("ResolveCollisions before\n");
+			//code readability variables
+			PxActor* actor1 = SharedDataSystem::contactPairs[i].actors[0];
+			PxActor* actor2 = SharedDataSystem::contactPairs[i].actors[1];
 
-		//get the two entities that collided
-		std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
-		std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
+			if (DEBUG_MODE) printf("ResolveCollisions before\n");
 
-		if (DEBUG_MODE) printf("ResolveCollisions after\n");
+			//get the two entities that collided
+			std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
+			std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
 
-		//determines the logic to use
-		switch (entity1->physType) {
-		case PhysicsType::CAR:
+			if (DEBUG_MODE) printf("ResolveCollisions after\n");
 
-			switch (entity2->physType) {
-			case PhysicsType::PROJECTILE:
-				CarProjectileCollisionLogic(actor1, actor2);
-				break;
-			case PhysicsType::POWERUP:
-				CarPowerupCollisionLogic(actor1, actor2);
-				break;
-			default:
-				break;
-			}
-
-			break;
-		case PhysicsType::PROJECTILE:
-
-			switch (entity2->physType) {
+			//determines the logic to use
+			switch (entity1->physType) {
 			case PhysicsType::CAR:
-				CarProjectileCollisionLogic(actor2, actor1);
+
+				switch (entity2->physType) {
+				case PhysicsType::PROJECTILE:
+					CarProjectileCollisionLogic(actor1, actor2);
+					break;
+				case PhysicsType::POWERUP:
+					CarPowerupCollisionLogic(actor1, actor2);
+					break;
+				default:
+					break;
+				}
+
+				break;
+			case PhysicsType::PROJECTILE:
+
+				switch (entity2->physType) {
+				case PhysicsType::CAR:
+					CarProjectileCollisionLogic(actor2, actor1);
+					break;
+				case PhysicsType::STATIC:
+					ProjectileStaticCollisionLogic(actor1);
+					break;
+				default:
+					break;
+				}
+
 				break;
 			case PhysicsType::STATIC:
-				ProjectileStaticCollisionLogic(actor1);
+
+				if (entity2->physType == PhysicsType::PROJECTILE) {
+					ProjectileStaticCollisionLogic(actor2);
+				}
+
+				break;
+			case PhysicsType::POWERUP:
+
+				if (entity2->physType == PhysicsType::CAR) {
+					CarPowerupCollisionLogic(actor2, actor1);
+				}
+
 				break;
 			default:
+				printf("unknown physics type of colliding object\n");
 				break;
 			}
 
-			break;
-		case PhysicsType::STATIC:
-
-			if (entity2->physType == PhysicsType::PROJECTILE) {
-				ProjectileStaticCollisionLogic(actor2);
-			}
-
-			break;
-		case PhysicsType::POWERUP:
-
-			if (entity2->physType == PhysicsType::CAR) {
-				CarPowerupCollisionLogic(actor2, actor1);
-			}
-
-			break;
-		default:
-			printf("unknown physics type of colliding object\n");
-			break;
 		}
 
 	}
 
-	//resolved the collision
+	//resolved the collisions
+	SharedDataSystem::contactPairs.clear();
 	gContactReportCallback->contactDetected = false;
 }
 
