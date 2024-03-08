@@ -36,9 +36,11 @@ void Implementation::Update() {
 }
 
 Implementation* sgpImplementation = nullptr;
+SharedDataSystem* dataSys = nullptr;
 
-void SoundSystem::Init() {
+void SoundSystem::Init(SharedDataSystem* sharedDataSys) {
     sgpImplementation = new Implementation;
+    dataSys = sharedDataSys;
 }
 
 void SoundSystem::Update() {
@@ -57,7 +59,7 @@ void SoundSystem::LoadSound(const std::string& strSoundName, bool b3d, bool bLoo
     eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 
     FMOD::Sound* pSound = nullptr;
-    SoundSystem::ErrorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
+    SoundSystem::ErrorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), FMOD_3D, 0, &pSound));
     if (pSound) {
         sgpImplementation->mSounds[strSoundName] = pSound;
     }
@@ -74,7 +76,7 @@ void SoundSystem::UnLoadSound(const std::string& strSoundName)
     sgpImplementation->mSounds.erase(tFoundIt);
 }
 
-int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosition, float fVolumedB)
+int SoundSystem::PlaySound(const std::string& strSoundName, const FMOD_VECTOR& vPosition, float fVolumedB)
 {
     int nChannelId = sgpImplementation->mnNextChannelId++;
     auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
@@ -94,8 +96,7 @@ int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosi
         FMOD_MODE currMode;
         tFoundIt->second->getMode(&currMode);
         if (currMode & FMOD_3D) {
-            FMOD_VECTOR position = VectorToFmod(vPosition);
-            SoundSystem::ErrorCheck(pChannel->set3DAttributes(&position, nullptr));
+            SoundSystem::ErrorCheck(pChannel->set3DAttributes(&vPosition, nullptr));
         }
         SoundSystem::ErrorCheck(pChannel->setVolume(dbToVolume(fVolumedB)));
         SoundSystem::ErrorCheck(pChannel->setPaused(false));
@@ -104,14 +105,13 @@ int SoundSystem::PlaySound(const std::string& strSoundName, const Vector3& vPosi
     return nChannelId;
 }
 
-void SoundSystem::SetChannel3dPosition(int nChannelId, const Vector3& vPosition)
+void SoundSystem::SetChannel3dPosition(int nChannelId, const FMOD_VECTOR& vPosition)
 {
     auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
     if (tFoundIt == sgpImplementation->mChannels.end())
         return;
 
-    FMOD_VECTOR position = VectorToFmod(vPosition);
-    SoundSystem::ErrorCheck(tFoundIt->second->set3DAttributes(&position, NULL));
+    SoundSystem::ErrorCheck(tFoundIt->second->set3DAttributes(&vPosition, NULL));
 }
 
 void SoundSystem::SetChannelVolume(int nChannelId, float fVolumedB)
@@ -205,13 +205,13 @@ bool SoundSystem::IsEventPlaying(const std::string& strEventName) const {
     //SoundSystem::ErrorCheck(pParameter->setValue(fValue));
 //}
 
-FMOD_VECTOR SoundSystem::VectorToFmod(const Vector3& vPosition) {
-    FMOD_VECTOR fVec;
-    fVec.x = vPosition.x;
-    fVec.y = vPosition.y;
-    fVec.z = vPosition.z;
-    return fVec;
-}
+//FMOD_VECTOR SoundSystem::VectorToFmod(const Vector3& vPosition) {
+//    FMOD_VECTOR fVec;
+//    fVec.x = vPosition.x;
+//    fVec.y = vPosition.y;
+//    fVec.z = vPosition.z;
+//    return fVec;
+//}
 
 float  SoundSystem::dbToVolume(float dB)
 {
@@ -234,4 +234,20 @@ int SoundSystem::ErrorCheck(FMOD_RESULT result) {
 
 void SoundSystem::Shutdown() {
     delete sgpImplementation;
+}
+
+void SoundSystem::AddToSoundDict(std::string name, std::string location) {
+    SoundDict.push_back( std::pair < std::string, std::string> ( name, location ) );
+}
+
+void SoundSystem::PlayAllSounds() {
+    for (std::pair <std::string, PxVec3> soundPair : dataSys->SoundsToPlay) {
+        for (std::pair <std::string, std::string> dictPair : SoundDict) {
+            if (soundPair.first == dictPair.first) {
+                FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x/15, soundPair.second.y/15, soundPair.second.z/15 };
+                PlaySound(dictPair.second, location, dataSys->SfxVolume);
+            }
+        }
+    }
+    dataSys->SoundsToPlay.clear(); //remove all sounds since we played them
 }

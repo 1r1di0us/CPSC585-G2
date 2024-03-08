@@ -1,4 +1,3 @@
-
 #include "tiny_obj_loader.h"
 
 #include <vector>
@@ -10,6 +9,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include "Mesh.h"
 
 struct OBJModel {
     std::vector<glm::vec3> vertices;
@@ -22,7 +22,6 @@ class ModelLoader {
 public:
 
 	
-
 };
 
 

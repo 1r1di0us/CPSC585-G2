@@ -24,8 +24,8 @@ public:
 	//VEHICLE STUFF
 
 	//PhysX management class instances.
-	PxDefaultAllocator		gAllocator;
-	PxDefaultErrorCallback	gErrorCallback;
+	PxDefaultAllocator gAllocator;
+	PxDefaultErrorCallback gErrorCallback;
 	PxFoundation* gFoundation = NULL;
 	PxPhysics* gPhysics = NULL;
 	PxDefaultCpuDispatcher* gDispatcher = NULL;

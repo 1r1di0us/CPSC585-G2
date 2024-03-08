@@ -14,6 +14,7 @@
 #include <chrono>
 #include <queue>
 #include "math.h"
+#include <utility>
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -70,6 +71,10 @@ struct CompareDistance {
 
 class SharedDataSystem {
 
+public:
+
+	static std::vector<PxContactPairHeader> contactPairs;
+
 private:
 	//custom collision callback system
 	class ContactReportCallback : public PxSimulationEventCallback {
@@ -84,12 +89,14 @@ private:
 			void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
 				//PX_UNUSED(pairHeader);
 				//PX_UNUSED(pairs);
-				PX_UNUSED(nbPairs);
+				//PX_UNUSED(nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
 				contactPair = pairHeader;
-				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
+				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND)) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 			}
 			void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
 			void onWake(physx::PxActor** actors, physx::PxU32 count) {}
@@ -100,8 +107,10 @@ private:
 				contactPair.actors[0] = pairs->triggerActor;
 				contactPair.actors[1] = pairs->otherActor;
 
-				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
+				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 
 			}
 			void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
@@ -146,6 +155,9 @@ private:
 
 public:
 
+	//debug mode
+	const bool DEBUG_MODE = false;
+
 	/*
 	* CONSTANTS:
 	*/
@@ -157,8 +169,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-20.0f, -20.0f);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(20.0f, 20.0f);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -11);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 24);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -174,7 +186,7 @@ public:
 	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
 
 	//the spawn height of powerups
-	const PxReal POWERUP_SPAWN_HEIGHT = 0.0f;
+	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
@@ -186,7 +198,10 @@ public:
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
 
 	//the number of bullets given per ammo powerup
-	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 2;
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
+
+	//adding a map entity that persists through games
+	Entity MAP;
 
 	//entity helper functions move from entity cpp?
 
@@ -244,6 +259,9 @@ public:
 	* PROJECTILES
 	*/
 
+	//an int to make the projectile names unique (cant do it based on list size)
+	int spawnedProjectileCounter = 0;
+
 	//the dictionary for all projectiles for all cars
 	std::unordered_map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;
 
@@ -274,7 +292,6 @@ public:
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
-	//THIS MAY NOT WORK IN THE SWITCH DEPENDING ON HOW THE MAP EXISTS
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
 
 	//function to resolve all collisions
@@ -295,6 +312,7 @@ public:
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
 	PxMat33 getCamRotMatPx(float angle);
+	PxMat33 getSoundRotMat();
 
 	// Flags
 	bool inMenu = true;
@@ -317,9 +335,10 @@ public:
 	bool gameMusicPlaying = false;
 	bool resultsMusicPlaying = false;
 
-	//// Audio 
-	//AudioManager* audio_ptr = nullptr;
-	//glm::vec3 listener_position;
+	// Audio
+	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	float MusicVolume = -30.0;
+	float SfxVolume = -20.0;
 
 	// Camera
 	float cameraAngle = M_PI;

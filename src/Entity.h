@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Transform.h"
-#include "Model.h"
+//#include "Model.h"
 #include "snippetvehicle2common/enginedrivetrain/EngineDrivetrain.h"
 #include "snippetvehicle2common/serialization/BaseSerialization.h"
 #include "snippetvehicle2common/serialization/EngineDrivetrainSerialization.h"
@@ -27,7 +27,7 @@ public:
 	//NAMES MUST BE UNIQUE
 	std::string name;
 
-	Model* model;
+	//Model* model;
 	Transform* transform;
 
 	PhysicsType physType;

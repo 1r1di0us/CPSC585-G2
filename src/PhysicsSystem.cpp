@@ -1,4 +1,17 @@
 #include "PhysicsSystem.h"
+#include "RenderingSystem.h"
+
+PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
+
+	this->dataSys = dataSys;
+
+	//physx setup
+	initPhysX();
+	initGroundPlane();
+	initMaterialFrictionTable();
+	initVehicleSimContext();
+
+}
 
 //initializes physx
 void PhysicsSystem::initPhysX() {
@@ -41,8 +54,51 @@ void PhysicsSystem::initPhysX() {
 }
 
 //creates the ground
-void PhysicsSystem::initGroundPlane() {
+void PhysicsSystem::initGroundPlane()
+{
+	/////////////////////////////////////////////////////////////////////////
+	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
 
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.setToDefault();
+
+	meshDesc.points.count = (PxU32)groundObstacles.vertices.size();
+	meshDesc.points.data = groundObstacles.vertices.data();
+	meshDesc.points.stride = sizeof(PxVec3);
+
+	meshDesc.triangles.count = (PxU32)(groundObstacles.indices.size() / 3);
+	meshDesc.triangles.data = groundObstacles.indices.data();
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+
+	PxDefaultMemoryOutputStream writeBuffer;
+	PxCookingParams cookParams = gPhysics->getTolerancesScale();
+	bool status = PxCookTriangleMesh(cookParams, meshDesc, writeBuffer);
+	if (!status) std::cout << "Cooking failed! Get out of the kitchen!" << std::endl;
+
+	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+	PxTriangleMesh* trimesh = gPhysics->createTriangleMesh(readBuffer);
+
+	PxTriangleMeshGeometry meshGeom = PxTriangleMeshGeometry(trimesh, PxMeshScale(1));
+	PxShape* meshShape = gPhysics->createShape(meshGeom, *gMaterial, true);
+
+	//setting the collision mesh for the map to be a statics
+	PxFilterData mapFilter(COLLISION_FLAG_STATIC, COLLISION_FLAG_STATIC_AGAINST, 0, 0);
+	meshShape->setSimulationFilterData(mapFilter);
+
+	PxTransform meshTrans(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
+
+	//making the map entity and adding it to the entity list (for collisions n shit)
+	dataSys->MAP.collisionBox = (PxRigidDynamic*) meshStatic;
+	dataSys->MAP.name = "MAP";
+	dataSys->MAP.physType = PhysicsType::STATIC;
+	dataSys->MAP.CreateTransformFromPhysX(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+
+	dataSys->entityList.emplace_back(dataSys->MAP);
+
+	meshStatic->attachShape(*meshShape);
+	gScene->addActor(*meshStatic);
+	/////////////////////////////////////////////////////////////////////////
 	gGroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	for (PxU32 i = 0; i < gGroundPlane->getNbShapes(); i++)
 	{
@@ -124,18 +180,6 @@ void PhysicsSystem::stepPhysics() {
 		entity.updateTransform();
 	}
 	
-}
-
-PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
-
-	this->dataSys = dataSys;
-
-	//physx setup
-	initPhysX();
-	initGroundPlane();
-	initMaterialFrictionTable();
-	initVehicleSimContext();
-
 }
 
 void PhysicsSystem::releaseActors() {

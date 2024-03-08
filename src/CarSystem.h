@@ -48,7 +48,7 @@ public:
 	//constructor
 	CarSystem(SharedDataSystem* dataSys);
 
-	void SpawnNewCar(PxVec3 spawnPosition, PxQuat spawnRotation);
+	void SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation);
 
 	//respawn all dead cars
 	void RespawnAllCars();
@@ -62,6 +62,6 @@ public:
 	const PxReal projectileRadius = 1.0f;
 	const float shootForce = 100;
 
-	void Shoot(PxRigidDynamic* shootingCar);
+	bool Shoot(PxRigidDynamic* shootingCar);
 
 };

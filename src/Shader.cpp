@@ -111,7 +111,7 @@ void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
     glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 
     //Position vertex attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     //Color vertex attribute
@@ -119,7 +119,7 @@ void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
     glEnableVertexAttribArray(1);
 
     //Texture vertex attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 }
 

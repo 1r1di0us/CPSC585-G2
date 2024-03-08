@@ -1,6 +1,5 @@
 #include "SharedDataSystem.h"
 
-
 /*
 * PRIVATE FUNCTIONS
 */
@@ -261,7 +260,7 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 */
 
 void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
-	
+
 	if (!boxesMade) {
 
 		//define a projectile
@@ -275,7 +274,7 @@ void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
 }
 
 CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
-	
+
 	for (int i = 0; i < carInfoList.size(); i++) {
 		if (carInfoList[i].entity->name == entity->name) {
 			return &carInfoList[i];
@@ -288,7 +287,7 @@ CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> en
 }
 
 EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic) {
-	
+
 	for (int i = 0; i < carRigidDynamicList.size(); i++) {
 
 		if (carRigidDynamicList[i] == carRigidDynamic) {
@@ -384,9 +383,10 @@ std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynami
 	//go through every list of shot projectiles and search for the passed one
 	//return the car
 	for (auto iterator = carProjectileRigidDynamicDict.begin(); iterator != carProjectileRigidDynamicDict.end(); ++iterator) {
-		
+
 		for (PxRigidDynamic* listProjectile : iterator->second) {
 			if (listProjectile == projectile) {
+				if (DEBUG_MODE) printf("GetCarThatShotProjectile hard debug\n");
 				return GetEntityFromRigidDynamic(iterator->first);
 			}
 		}
@@ -412,14 +412,16 @@ PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<En
 
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
+	if (DEBUG_MODE) printf("CarProjectileCollisionLogic before\n");
+
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+
+	if (DEBUG_MODE) printf("CarProjectileCollisionLogic after\n");
 
 	//increase score of car that shot
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
-
-	printf("score of %s: %d\n", shootingCarInfo->entity->name.c_str(), shootingCarInfo->score);
 
 	/*
 	* remove the projectile from all lists
@@ -443,13 +445,16 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	gScene->removeActor(*projectile);
 	projectile->release();
 
+	//make a sound
+	SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+
 	//setting the data of the car that got hit to let it respawn
 	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
 	hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
 	hitCar->isAlive = false;
 	//moving into the sky and disabling gravity to "delete it"
 	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
-	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 100;
+	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
 	PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
 	hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
 
@@ -457,9 +462,13 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
 
+	if (DEBUG_MODE) printf("CarPowerupCollisionLogic before\n");
+
 	//converting the actors to entities
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
+
+	if (DEBUG_MODE) printf("CarPowerupCollisionLogic after\n");
 
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
@@ -507,7 +516,16 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
+	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic before\n");
+
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
+	PxRigidDynamic* carThatShotProjectile = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
+
+	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic after\n");
+
+	/*
+	* remove the projectile from all lists
+	*/
 
 	//entity list
 	for (int i = 0; i < entityList.size(); i++) {
@@ -517,11 +535,9 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 	}
 
 	//car projectile dict
-	for (auto& entry : carProjectileRigidDynamicDict) {
-		for (int i = 0; i < entry.second.size(); i++) {
-			if (carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first][i] == (PxRigidDynamic*)projectile) {
-				carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].erase(carProjectileRigidDynamicDict[(PxRigidDynamic*)entry.first].begin() + i);
-			}
+	for (int i = 0; i < carProjectileRigidDynamicDict[carThatShotProjectile].size(); i++) {
+		if (carProjectileRigidDynamicDict[carThatShotProjectile][i] == (PxRigidDynamic*)projectile) {
+			carProjectileRigidDynamicDict[carThatShotProjectile].erase(carProjectileRigidDynamicDict[carThatShotProjectile].begin() + i);
 		}
 	}
 
@@ -535,66 +551,76 @@ void SharedDataSystem::ResolveCollisions() {
 	//if a collision has occured
 	if (gContactReportCallback->contactDetected) {
 
-		//code readability variables
-		PxActor* actor1 = gContactReportCallback->contactPair.actors[0];
-		PxActor* actor2 = gContactReportCallback->contactPair.actors[1];
+		//goes through all contact pairs
+		for (int i = 0; i < SharedDataSystem::contactPairs.size(); i++) {
 
-		//get the two entities that collided
-		std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
-		std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
+			//code readability variables
+			PxActor* actor1 = SharedDataSystem::contactPairs[i].actors[0];
+			PxActor* actor2 = SharedDataSystem::contactPairs[i].actors[1];
 
-		//determines the logic to use
-		switch (entity1->physType) {
-		case PhysicsType::CAR:
+			if (DEBUG_MODE) printf("ResolveCollisions before\n");
 
-			switch (entity2->physType) {
-			case PhysicsType::PROJECTILE:
-				CarProjectileCollisionLogic(actor1, actor2);
-				break;
-			case PhysicsType::POWERUP:
-				CarPowerupCollisionLogic(actor1, actor2);
-				break;
-			default:
-				break;
-			}
+			//get the two entities that collided
+			std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
+			std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
 
-			break;
-		case PhysicsType::PROJECTILE:
+			if (DEBUG_MODE) printf("ResolveCollisions after\n");
 
-			switch (entity2->physType) {
+			//determines the logic to use
+			switch (entity1->physType) {
 			case PhysicsType::CAR:
-				CarProjectileCollisionLogic(actor2, actor1);
+
+				switch (entity2->physType) {
+				case PhysicsType::PROJECTILE:
+					CarProjectileCollisionLogic(actor1, actor2);
+					break;
+				case PhysicsType::POWERUP:
+					CarPowerupCollisionLogic(actor1, actor2);
+					break;
+				default:
+					break;
+				}
+
+				break;
+			case PhysicsType::PROJECTILE:
+
+				switch (entity2->physType) {
+				case PhysicsType::CAR:
+					CarProjectileCollisionLogic(actor2, actor1);
+					break;
+				case PhysicsType::STATIC:
+					ProjectileStaticCollisionLogic(actor1);
+					break;
+				default:
+					break;
+				}
+
 				break;
 			case PhysicsType::STATIC:
-				ProjectileStaticCollisionLogic(actor1);
+
+				if (entity2->physType == PhysicsType::PROJECTILE) {
+					ProjectileStaticCollisionLogic(actor2);
+				}
+
+				break;
+			case PhysicsType::POWERUP:
+
+				if (entity2->physType == PhysicsType::CAR) {
+					CarPowerupCollisionLogic(actor2, actor1);
+				}
+
 				break;
 			default:
+				printf("unknown physics type of colliding object\n");
 				break;
 			}
 
-			break;
-		case PhysicsType::STATIC:
-
-			if (entity2->physType == PhysicsType::PROJECTILE) {
-				ProjectileStaticCollisionLogic(actor2);
-			}
-
-			break;
-		case PhysicsType::POWERUP:
-
-			if (entity2->physType == PhysicsType::CAR) {
-				CarPowerupCollisionLogic(actor2, actor1);
-			}
-
-			break;
-		default:
-			printf("unknown physics type of colliding object\n");
-			break;
 		}
-	
+
 	}
 
-	//resolved the collision
+	//resolved the collisions
+	SharedDataSystem::contactPairs.clear();
 	gContactReportCallback->contactDetected = false;
 }
 
@@ -609,6 +635,9 @@ void SharedDataSystem::resetSharedDataSystem() {
 
 	//reset variables
 	spawnedPowerupCounter = 0;
+
+	//add the map to the entity list
+	entityList.emplace_back(MAP);
 }
 
 void SharedDataSystem::menuEventHandler() {
@@ -624,4 +653,8 @@ glm::mat3 SharedDataSystem::getCamRotMat() {
 
 PxMat33 SharedDataSystem::getCamRotMatPx(float angle) {
 	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
+}
+
+PxMat33 SharedDataSystem::getSoundRotMat() {
+	return PxMat33({ cos((float)M_PI - cameraAngle), 0, sin((float)M_PI - cameraAngle) }, { 0, 1, 0 }, { -sin((float)M_PI - cameraAngle), 0, -cos((float)M_PI - cameraAngle) });
 }
