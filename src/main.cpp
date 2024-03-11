@@ -219,6 +219,7 @@ int main() {
                 physicsSys.stepPhysics();
                 timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
                 carSys.RespawnAllCars();
+                carSys.UpdateAllCarCooldowns();
                 powerupSys.RespawnAllPowerups();
             }
             soundSys.PlayAllSounds();

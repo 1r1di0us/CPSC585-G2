@@ -31,7 +31,8 @@ struct CarInfo{
 	//THANKS MURTAZA!
 	bool isAlive = true;
 	float respawnTimeLeft = 0;
-	float parryTimeLeft = 0;
+	float parryActiveTimeLeft = 0;
+	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
 };
 
@@ -200,10 +201,20 @@ public:
 	//the number of bullets given per ammo powerup
 	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
+	//the cooldown time for the parry mechanic
+	const float PARRY_COOLDOWN_TIME_LEFT = 2.0f;
+
+	//how long can you parry for
+	const float PARRY_ACTIVE_DURATION = 1.0f;
+
+	//force at which to shoot the projectile
+	const float SHOOT_FORCE = 100;
+
+	//the projectile radius
+	const PxReal PROJECTILE_RADIUS = 1.0f;
+
 	//adding a map entity that persists through games
 	Entity MAP;
-
-	//entity helper functions move from entity cpp?
 
 	//the GOAT list of entities
 	std::vector<Entity> entityList;
@@ -254,6 +265,9 @@ public:
 
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
+
+	//activates parry for a given car
+	void Parry(PxRigidDynamic* carThatParried);
 
 	/*
 	* PROJECTILES
