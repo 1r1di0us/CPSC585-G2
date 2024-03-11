@@ -58,6 +58,9 @@ int main() {
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
+    //fake constructor (real one didnt like me)
+    dataSys.InitSharedDataSystem();
+
     soundSys.Init(&dataSys); //basically the constructor
     soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
     soundSys.AddToSoundDict("Thud", "assets/Music/PianoClusterThud.wav");

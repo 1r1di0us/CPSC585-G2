@@ -76,6 +76,7 @@ public:
 	static std::vector<PxContactPairHeader> contactPairs;
 
 private:
+
 	//custom collision callback system
 	class ContactReportCallback : public PxSimulationEventCallback {
 
@@ -146,21 +147,20 @@ private:
 	//randomizes the map square list
 	void RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList);
 
-	//creates the map square list
-	void CreateMapSquareList();
+	//function to check a potential spawn point against all obstacles
+	bool IsSpawnPointValid(PxVec2 potentialSpawnPoint);
 
 	//generates a point a min distance away from all points in given vec and within the map range
-	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
-
+	PxVec3 GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
 
 public:
-
-	//debug mode
-	const bool DEBUG_MODE = false;
 
 	/*
 	* CONSTANTS:
 	*/
+
+	//debug mode
+	const bool DEBUG_MODE = false;
 
 	//timestep value, easily modifiable
 	const PxReal TIMESTEP = 1.0f / 60.0f;
@@ -227,9 +227,6 @@ public:
 	* DEBUGGING STUFF
 	*/
 
-	//will make debug boxes at all the squares used in respawning
-	bool boxesMade = false;
-
 	//makes a floating box for boundary demo purposes
 	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
 
@@ -252,8 +249,22 @@ public:
 	//gets the list of dead cars to do shit to
 	std::vector<CarInfo*> GetListOfDeadCars();
 
+	/*
+	* RESPAWN
+	*/
+
+	//map square lists to populate
+	std::vector<MapSquare> carMapSquareList;
+	std::vector<MapSquare> powerupMapSquareList;
+
+	//obstacle list to do checking against
+	std::vector<MapSquare> obstacleList;
+
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
+
+	//adds the obstacle to its list of map squares to test against
+	void AddObstacleToObstacleList(PxRigidStatic* obstacle);
 
 	/*
 	* PROJECTILES
@@ -303,8 +314,18 @@ public:
 	*/
 	void ResolveCollisions();
 
+	//create the map square lists to use during respawn
+	void InitMapSquares(std::vector<MapSquare>& listToPopulate, PxReal minDistance);
+
 	// Delete all lists in SharedDataSystem.h
 	void resetSharedDataSystem();
+
+	/*
+	* GENERAL
+	*/
+
+	//fake constructor cause i couldnt get the real one to work
+	void InitSharedDataSystem();
 
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();

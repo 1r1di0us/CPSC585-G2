@@ -81,6 +81,13 @@ PxVec2 SharedDataSystem::FindCenterOfFourPointsWithRandomOffset(PxReal minDistan
 
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
+	//clear the data from the previous iteration
+	for (int i = 0; i < mapSquareList.size(); i++) {
+
+		mapSquareList[i].numPoints = 0;
+		mapSquareList[i].pointsInIt.clear();
+	}
+
 	//go through the map square list and populate each one fully before moving on to the next one
 	while (pointsOfSameType.size() > 0) {
 		for (int i = 0; i < mapSquareList.size(); i++) {
@@ -90,8 +97,7 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 				pointsOfSameType.erase(pointsOfSameType.begin());
 				break;
 			}
-
-			//the if statement is what crashes
+			
 			if (IsPointInSquare(pointsOfSameType.at(0), mapSquareList[i])) {
 				mapSquareList[i].numPoints++;
 				mapSquareList[i].pointsInIt.emplace_back(pointsOfSameType.at(0));
@@ -118,139 +124,81 @@ void SharedDataSystem::RandomizeMapSquareList(std::vector<MapSquare>& mapSquareL
 	}
 }
 
-PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
+bool SharedDataSystem::IsSpawnPointValid(PxVec2 potentialSpawnPoint) {
+
+	//go through all obstacles
+	for (int i = 0; i < obstacleList.size(); i++) {
+
+		//if the point is inside the square made by the max dimensions of an obstacle
+		if (IsPointInSquare(potentialSpawnPoint, obstacleList[i])) {
+			if (DEBUG_MODE) printf("CheckPotentialSpawnPoint spawnpoint is in obstacle\n");
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
 
 	PxVec2 spawnPoint;
-	std::vector<MapSquare> mapSquareList;
+	bool foundPoint;
+	MapSquare* bestSquare;
 
-	int xMapSquares = MAPLENGTHX / minDistance;
-	int zMapSquares = MAPLENGTHZ / minDistance;
+	do {
 
-	//divide the map into squares using the minDistance
-	for (int i = 0; i < xMapSquares; i++) {
-		for (int j = 0; j < zMapSquares; j++) {
-			MapSquare square;
-			square.id = i * zMapSquares + j;
-			square.bottomLeft = PxVec2(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
-			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
-			mapSquareList.emplace_back(square);
+		foundPoint = false;
 
-			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
-			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
-		}
-	}
+		//find the square with the least amount of points in it
+		//if the square has no points in it, find the center and return that
+		bestSquare = &mapSquareList[0];
 
-	//then make one more row of map squares to cover the last area of the map (in case it doesnt divide nicely)
-		//need to get the leftover bit and divide it as much as possible into good ish squares and have one bs square in the top right corner
+		for (int i = 0; i < mapSquareList.size(); i++) {
+			if (mapSquareList[i].numPoints == 0 || mapSquareList[i].numPoints < bestSquare->numPoints) {
+				bestSquare = &mapSquareList[i];
+				if (bestSquare->numPoints == 0) {
 
-	//the remaining distance to be split
-	float remainingX = MAPLENGTHX - xMapSquares * minDistance;
-	float remainingZ = MAPLENGTHZ - zMapSquares * minDistance;
+					//random offset
+					float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
 
-	//add semi nice squares in the z direction
-	if (remainingX > 0) {
-
-		//go from x = bottom left map x in increments of minDistance until hit either top right or just less than
-		//constant z size
-
-		//loops "up" in the z-direction
-		for (int i = BOTTOM_LEFT_MAP_COORD.y; i < TOP_RIGHT_MAP_COORD.y - minDistance; i += minDistance) {
-
-			MapSquare square;
-			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, i);
-			square.topRight = PxVec2(TOP_RIGHT_MAP_COORD.x, i + minDistance);
-			mapSquareList.emplace_back(square);
-
-			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, i);
-			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, i + minDistance);
-		}
-	}
-
-	//add semi nice squares in the x direction
-	if (remainingZ > 0) {
-
-		//go from z = bottom left map z in increments of minDistance until hit either top right or just less than
-		//constant x size
-
-		//loops "right" in the x-direction
-		for (int i = BOTTOM_LEFT_MAP_COORD.x; i < TOP_RIGHT_MAP_COORD.x - minDistance; i += minDistance) {
-
-			MapSquare square;
-			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
-			square.topRight = PxVec2(i + minDistance, TOP_RIGHT_MAP_COORD.y);
-			mapSquareList.emplace_back(square);
-
-			MAKE_BOX_DEBUG(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
-			MAKE_BOX_DEBUG(i + minDistance, TOP_RIGHT_MAP_COORD.y);
-		}
-
-	}
-
-	//add the corner fucked square
-	MapSquare square;
-	square.id = mapSquareList.size() + 1;
-	square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
-	square.topRight = TOP_RIGHT_MAP_COORD;
-	mapSquareList.emplace_back(square);
-
-	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
-	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, TOP_RIGHT_MAP_COORD.y);
-
-	//place the points in their respecitve squares
-	PopulateMapSquareList(pointsOfSameType, mapSquareList);
-
-	//randomize the list to prevent spawning in the same place always
-	RandomizeMapSquareList(mapSquareList);
-
-	//find the square with the least amount of points in it
-	//if the square has no points in it, find the center and return that
-	MapSquare* bestSquare = &mapSquareList[0];
-
-	for (int i = 0; i < mapSquareList.size(); i++) {
-		if (mapSquareList[i].numPoints == 0 || mapSquareList[i].numPoints < bestSquare->numPoints) {
-			bestSquare = &mapSquareList[i];
-			if (bestSquare->numPoints == 0) {
-
-				//random offset
-				float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
-
-				//setting the coords
-				spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
-				spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
-				return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
+					//setting the coords
+					spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
+					spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
+					foundPoint = true;
+				}
 			}
 		}
-	}
 
-	boxesMade = true;
+		if (!foundPoint) {
 
-	printf("best square: %d\n", bestSquare->numPoints);
+			switch (bestSquare->numPoints) {
+			case 1:
+				//need to find 3 nearest points
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 2:
+				//need to find 2 nearest points
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 3:
+				//need to find nearest point
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 4:
+				//make square, return middle
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
+				break;
+			default:
+				//make a random point in the square and return that
+				spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
+				spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
+				break;
+			}
+		}
 
-	switch (bestSquare->numPoints) {
-	case 1:
-		//need to find 3 nearest points
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 2:
-		//need to find 2 nearest points
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 3:
-		//need to find nearest point
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 4:
-		//make square, return middle
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
-		break;
-	default:
-		//make a random point in the square and return that
-		spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
-		spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
-		break;
-	}
+	//function to check the spawn point generated
+	} while (!IsSpawnPointValid(spawnPoint));
 
 	return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
 }
@@ -261,7 +209,7 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 
 void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
 
-	if (!boxesMade) {
+	if (DEBUG_MODE) {
 
 		//define a projectile
 		physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(0.25f, 0.25f, 0.25f), *gMaterial);
@@ -343,7 +291,10 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 
 PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 
+	//has some code re-use for easy function usage
+
 	std::vector<PxVec2> locations;
+	PxVec3 respawnPoint;
 
 	//uses physics type to determine min spacing
 	switch (physType) {
@@ -356,7 +307,14 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 				locations.emplace_back(carInfoList[i].entity->collisionBox->getGlobalPose().p.x, carInfoList[i].entity->collisionBox->getGlobalPose().p.z);
 			}
 		}
-		return GenerateSpawnPoint(locations, CAR_MIN_SPAWN_DISTANCE, CAR_SPAWN_HEIGHT);
+
+		//place the points in their respecitve squares
+		PopulateMapSquareList(locations, carMapSquareList);
+
+		//randomize the list to prevent spawning in the same place always
+		RandomizeMapSquareList(carMapSquareList);
+
+		return GenerateValidSpawnPoint(carMapSquareList, locations, CAR_MIN_SPAWN_DISTANCE, CAR_SPAWN_HEIGHT);
 
 		break;
 	case PhysicsType::POWERUP:
@@ -364,7 +322,14 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 		for (int i = 0; i < allPowerupList.size(); i++) {
 			locations.emplace_back(PxVec2(allPowerupList[i].entity->collisionBox->getGlobalPose().p.x, allPowerupList[i].entity->collisionBox->getGlobalPose().p.z));
 		}
-		return GenerateSpawnPoint(locations, POWERUP_MIN_SPAWN_DISTANCE, POWERUP_SPAWN_HEIGHT);
+
+		//place the points in their respecitve squares
+		PopulateMapSquareList(locations, powerupMapSquareList);
+
+		//randomize the list to prevent spawning in the same place always
+		RandomizeMapSquareList(powerupMapSquareList);
+
+		return GenerateValidSpawnPoint(powerupMapSquareList, locations, POWERUP_MIN_SPAWN_DISTANCE, POWERUP_SPAWN_HEIGHT);
 
 		break;
 	default:
@@ -375,6 +340,23 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 	//unreachable code
 	printf("Failed to Determine Spawn Location.");
 	exit(69);
+}
+
+void SharedDataSystem::AddObstacleToObstacleList(PxRigidStatic* obstacle) {
+
+	//getting half the size of the object
+	PxVec3 halfSize = obstacle->getWorldBounds().getDimensions() / 2;
+
+	//getting the center of the object
+	PxVec3 center = obstacle->getGlobalPose().p;
+
+	//creating the mapsquare for the obstacle
+	MapSquare obstacleMapSquare;
+	obstacleMapSquare.bottomLeft = PxVec2(center.x - halfSize.x, center.z - halfSize.z);
+	obstacleMapSquare.topRight = PxVec2(center.x + halfSize.x, center.z + halfSize.z);
+
+	//adding it to the list
+	obstacleList.emplace_back(obstacleMapSquare);
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
@@ -624,6 +606,85 @@ void SharedDataSystem::ResolveCollisions() {
 	gContactReportCallback->contactDetected = false;
 }
 
+void SharedDataSystem::InitMapSquares(std::vector<MapSquare>& listToPopulate, PxReal minDistance) {
+
+	int xMapSquares = MAPLENGTHX / minDistance;
+	int zMapSquares = MAPLENGTHZ / minDistance;
+
+	//divide the map into squares using the minDistance
+	for (int i = 0; i < xMapSquares; i++) {
+		for (int j = 0; j < zMapSquares; j++) {
+			MapSquare square;
+			square.id = i * zMapSquares + j;
+			square.bottomLeft = PxVec2(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
+			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
+			listToPopulate.emplace_back(square);
+
+			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
+			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
+		}
+	}
+
+	//then make one more row of map squares to cover the last area of the map (in case it doesnt divide nicely)
+		//need to get the leftover bit and divide it as much as possible into good ish squares and have one bs square in the top right corner
+
+	//the remaining distance to be split
+	float remainingX = MAPLENGTHX - xMapSquares * minDistance;
+	float remainingZ = MAPLENGTHZ - zMapSquares * minDistance;
+
+	//add semi nice squares in the z direction
+	if (remainingX > 0) {
+
+		//go from x = bottom left map x in increments of minDistance until hit either top right or just less than
+		//constant z size
+
+		//loops "up" in the z-direction
+		for (int i = BOTTOM_LEFT_MAP_COORD.y; i < TOP_RIGHT_MAP_COORD.y - minDistance; i += minDistance) {
+
+			MapSquare square;
+			square.id = listToPopulate.size() + 1;
+			square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, i);
+			square.topRight = PxVec2(TOP_RIGHT_MAP_COORD.x, i + minDistance);
+			listToPopulate.emplace_back(square);
+
+			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, i);
+			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, i + minDistance);
+		}
+	}
+
+	//add semi nice squares in the x direction
+	if (remainingZ > 0) {
+
+		//go from z = bottom left map z in increments of minDistance until hit either top right or just less than
+		//constant x size
+
+		//loops "right" in the x-direction
+		for (int i = BOTTOM_LEFT_MAP_COORD.x; i < TOP_RIGHT_MAP_COORD.x - minDistance; i += minDistance) {
+
+			MapSquare square;
+			square.id = listToPopulate.size() + 1;
+			square.bottomLeft = PxVec2(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
+			square.topRight = PxVec2(i + minDistance, TOP_RIGHT_MAP_COORD.y);
+			listToPopulate.emplace_back(square);
+
+			MAKE_BOX_DEBUG(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
+			MAKE_BOX_DEBUG(i + minDistance, TOP_RIGHT_MAP_COORD.y);
+		}
+
+	}
+
+	//add the corner fucked square
+	MapSquare square;
+	square.id = listToPopulate.size() + 1;
+	square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
+	square.topRight = TOP_RIGHT_MAP_COORD;
+	listToPopulate.emplace_back(square);
+
+	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
+	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, TOP_RIGHT_MAP_COORD.y);
+
+}
+
 void SharedDataSystem::resetSharedDataSystem() {
 	// Clear all lists
 	carProjectileRigidDynamicDict.clear();
@@ -638,6 +699,15 @@ void SharedDataSystem::resetSharedDataSystem() {
 
 	//add the map to the entity list
 	entityList.emplace_back(MAP);
+}
+
+void SharedDataSystem::InitSharedDataSystem() {
+
+	//generate the map squares for both cars and powerups
+	InitMapSquares(this->carMapSquareList, CAR_MIN_SPAWN_DISTANCE);
+	InitMapSquares(this->powerupMapSquareList, POWERUP_MIN_SPAWN_DISTANCE);
+
+	//add all the obstacles to the map
 }
 
 void SharedDataSystem::menuEventHandler() {
