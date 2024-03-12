@@ -289,10 +289,15 @@ public:
 	* COLLISIONS
 	*/
 
+	std::vector<std::shared_ptr<Entity>> collatCache;
+
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
+
+	//clean up any objects that could be collided with at the same time
+	void CleanCollatCache();
 
 	//function to resolve all collisions
 	/*

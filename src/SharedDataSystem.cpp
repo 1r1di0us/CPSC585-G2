@@ -423,27 +423,19 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
-	/*
-	* remove the projectile from all lists
-	*/
-
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == projectileEntity->name) {
-			entityList.erase(entityList.begin() + i);
+	//adding the projectile to the collat cache
+	bool isInCache = false;
+	for (int i = 0; i < collatCache.size(); i++) {
+		if (collatCache[i] == projectileEntity) {
+			isInCache = true;
 		}
+		collatCache.emplace_back(projectileEntity);
 	}
 
-	//car projectile dict
-	for (int i = 0; i < carProjectileRigidDynamicDict[(PxRigidDynamic*)car].size(); i++) {
-		if (carProjectileRigidDynamicDict[(PxRigidDynamic*)car][i] == (PxRigidDynamic*)projectile) {
-			carProjectileRigidDynamicDict[(PxRigidDynamic*)car].erase(carProjectileRigidDynamicDict[(PxRigidDynamic*)car].begin() + i);
-		}
+	//only add it to the cache if it isnt already in there
+	if (!isInCache) {
+		collatCache.emplace_back(projectileEntity);
 	}
-
-	//delete the projectile
-	gScene->removeActor(*projectile);
-	projectile->release();
 
 	//make a sound
 	SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
@@ -490,28 +482,6 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	}
 
-	/*
-	* kill the powerup (remove from all lists and scene)
-	*/
-
-	//all powerup list
-	for (int i = 0; i < allPowerupList.size(); i++) {
-		if (allPowerupList[i].entity->name == powerupEntity->name) {
-			allPowerupList.erase(allPowerupList.begin() + i);
-		}
-	}
-
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == powerupEntity->name) {
-			entityList.erase(entityList.begin() + i);
-		}
-	}
-
-	//scene
-	gScene->removeActor(*powerupEntity->collisionBox);
-	powerupEntity->collisionBox->release();
-
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
@@ -544,6 +514,52 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 	//delete the projectile
 	gScene->removeActor(*projectile);
 	projectile->release();
+}
+
+void SharedDataSystem::CleanCollatCache() {
+
+	while (collatCache.size() > 0) {
+
+		switch (collatCache.front()->physType) {
+		case PhysicsType::PROJECTILE:
+
+			//remove projectile from car projectile dict
+			for (int i = 0; i < carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].size(); i++) {
+				if (carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox][i] == collatCache.front()->collisionBox) {
+					carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].erase(carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].begin() + i);
+				}
+			}
+
+			break;
+		case PhysicsType::POWERUP:
+
+			//all powerup list
+			for (int i = 0; i < allPowerupList.size(); i++) {
+				if (allPowerupList[i].entity->name == collatCache.front()->name) {
+					allPowerupList.erase(allPowerupList.begin() + i);
+				}
+			}
+
+			break;
+		default:
+			break;
+		}
+
+		//delete the object
+		gScene->removeActor(*collatCache.front()->collisionBox);
+		collatCache.front()->collisionBox->release();
+
+		//remove from entity list
+		for (int i = 0; i < entityList.size(); i++) {
+			if (entityList[i].name == collatCache.front()->name) {
+				entityList.erase(entityList.begin() + i);
+			}
+		}
+
+		//remove it from the cache
+		collatCache.erase(collatCache.begin());
+
+	}
 }
 
 void SharedDataSystem::ResolveCollisions() {
