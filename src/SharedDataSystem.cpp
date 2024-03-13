@@ -428,8 +428,8 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	for (int i = 0; i < collatCache.size(); i++) {
 		if (collatCache[i] == projectileEntity) {
 			isInCache = true;
+			break;
 		}
-		collatCache.emplace_back(projectileEntity);
 	}
 
 	//only add it to the cache if it isnt already in there
@@ -518,15 +518,19 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
 void SharedDataSystem::CleanCollatCache() {
 
+	std::shared_ptr<Entity> shootingCar;
+
 	while (collatCache.size() > 0) {
 
 		switch (collatCache.front()->physType) {
 		case PhysicsType::PROJECTILE:
 
+			shootingCar = GetCarThatShotProjectile(collatCache.front()->collisionBox);
+
 			//remove projectile from car projectile dict
-			for (int i = 0; i < carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].size(); i++) {
-				if (carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox][i] == collatCache.front()->collisionBox) {
-					carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].erase(carProjectileRigidDynamicDict[GetCarThatShotProjectile(collatCache.front()->collisionBox)->collisionBox].begin() + i);
+			for (int i = 0; i < carProjectileRigidDynamicDict[shootingCar->collisionBox].size(); i++) {
+				if (carProjectileRigidDynamicDict[shootingCar->collisionBox][i] == collatCache.front()->collisionBox) {
+					carProjectileRigidDynamicDict[shootingCar->collisionBox].erase(carProjectileRigidDynamicDict[shootingCar->collisionBox].begin() + i);
 				}
 			}
 
