@@ -426,7 +426,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	//adding the projectile to the collat cache
 	bool isInCache = false;
 	for (int i = 0; i < collatCache.size(); i++) {
-		if (collatCache[i] == projectileEntity) {
+		if (collatCache[i]->name == projectileEntity->name) {
 			isInCache = true;
 			break;
 		}
