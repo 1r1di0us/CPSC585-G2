@@ -381,9 +381,10 @@ void SharedDataSystem::Parry(PxRigidDynamic* carThatParried) {
 
 	CarInfo* carInfo = GetCarInfoStructFromEntity(GetEntityFromRigidDynamic(carThatParried));
 
-	if (carInfo->parryCooldownTimeLeft == 0) {
+	if (carInfo->parryCooldownTimeLeft < 0 && carInfo->isAlive) {
 
 		carInfo->parryActiveTimeLeft = PARRY_ACTIVE_DURATION;
+		carInfo->parryCooldownTimeLeft = 0;
 	}
 }
 
