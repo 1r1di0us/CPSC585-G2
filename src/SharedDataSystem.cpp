@@ -410,6 +410,23 @@ PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<En
 	exit(69);
 }
 
+void SharedDataSystem::AddToCollatCache(std::shared_ptr<Entity> entityToAdd) {
+
+	//adding the projectile to the collat cache
+	bool isInCache = false;
+	for (int i = 0; i < collatCache.size(); i++) {
+		if (collatCache[i]->name == entityToAdd->name) {
+			isInCache = true;
+			break;
+		}
+	}
+
+	//only add it to the cache if it isnt already in there
+	if (!isInCache) {
+		collatCache.emplace_back(entityToAdd);
+	}
+}
+
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
 	if (DEBUG_MODE) printf("CarProjectileCollisionLogic before\n");
@@ -423,19 +440,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
 	shootingCarInfo->score++;
 
-	//adding the projectile to the collat cache
-	bool isInCache = false;
-	for (int i = 0; i < collatCache.size(); i++) {
-		if (collatCache[i]->name == projectileEntity->name) {
-			isInCache = true;
-			break;
-		}
-	}
-
-	//only add it to the cache if it isnt already in there
-	if (!isInCache) {
-		collatCache.emplace_back(projectileEntity);
-	}
+	AddToCollatCache(projectileEntity);
 
 	//make a sound
 	SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
@@ -481,6 +486,8 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		printf("unknown powerup type\n");
 		break;
 	}
+
+	AddToCollatCache(powerupEntity);
 
 }
 
