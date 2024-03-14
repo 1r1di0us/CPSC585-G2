@@ -203,7 +203,7 @@ int main() {
             if (timeUntilPhysicsUpdate.count() <= 0.0f) {
                 physicsSys.stepPhysics();
                 timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
-                carSys.RespawnAllCars();
+                //carSys.RespawnAllCars();
                 powerupSys.RespawnAllPowerups();
             }
         }
