@@ -82,7 +82,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     //shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
-    bedModel = Model("./assets/Models/bed_double_A.obj");
+    bedModel = Model("./assets/Models/bed_double_A1.obj");
     std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
 
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
@@ -133,59 +133,44 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         // activate shader
         ourShader.use();
 
-        //// camera setup stuff/ 3d transformations
-        //glm::mat4 model = glm::mat4(1.0f);
-
-        //// view matrix
-        //glm::mat4 view = glm::mat4(1.0f);
-        //// note that we're translating the scene in the reverse direction of where we want to move
-        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -7.0f));
-
-        //// this should be the camera matrix
-        //glm::mat4 projection = glm::mat4(1.0f);
-        //projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-
-        //// getting the car position and rotation
-        //glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;
-        //glm::quat playerRot = dataSys->carInfoList[0].entity->transform->rot;
-        ////std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
-
-        //if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
-        //    // Bird's eye view
-        //    glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
-        //    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-        //    glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
-
-        //    view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-        //}
-        //else {
-        //    // Original view
-        //    glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-        //    camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
-        //    glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
-        //    view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
-        //}
-
-        //// car translating
-        //model = glm::translate(model, playerPos);
-        //// make it look forward
-        //model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-        //model = applyQuaternionToMatrix(model, playerRot);
-
-        // Define the view matrix (static camera position and orientation)
-        glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-        glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-
-        // Define the projection matrix (static perspective projection)
-        float fov = 45.0f; // Field of view
-        float aspectRatio = (float)SCR_WIDTH / (float)SCR_HEIGHT; // Aspect ratio of the window
-        float nearPlane = 0.1f; // Near clipping plane
-        float farPlane = 1000.0f; // Far clipping plane
-        glm::mat4 projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+        // camera setup stuff/ 3d transformations
         glm::mat4 model = glm::mat4(1.0f);
 
+        // view matrix
+        glm::mat4 view = glm::mat4(1.0f);
+        // note that we're translating the scene in the reverse direction of where we want to move
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -7.0f));
+
+        // this should be the camera matrix
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+
+        // getting the car position and rotation
+        glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;
+        glm::quat playerRot = dataSys->carInfoList[0].entity->transform->rot;
+        //std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
+
+        if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
+            // Bird's eye view
+            glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+            glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+            glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
+
+            view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+        }
+        else {
+            // Original view
+            glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+            camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+            glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
+            view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+        }
+
+        // car translating
+        model = glm::translate(model, playerPos);
+        // make it look forward
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        model = applyQuaternionToMatrix(model, playerRot);
 
         // sending our matrixes to the shader
         ourShader.setMat4("projection", projection);
@@ -286,8 +271,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         //    }
         //}
 
-        //ourShader.use();
-        //bedModel.Draw(shader);
 
     }
 

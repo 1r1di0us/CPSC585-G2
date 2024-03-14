@@ -216,4 +216,4 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
     return textureID;
 }
 
-#endif // !MESH_H
+#endif // !MODEL_H

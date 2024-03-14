@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Models\backpack.mtl" />
-    <None Include="assets\Models\bed_double_A.mtl" />
+    <None Include="assets\Models\bed_double_A1.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
@@ -110,7 +110,7 @@
   <ItemGroup>
     <Image Include="assets\Models\ao.jpg" />
     <Image Include="assets\Models\diffuse.jpg" />
-    <Image Include="assets\Models\furniturebits_texture.png" />
+    <Image Include="assets\Models\bed_double_A1_diffuse.png" />
     <Image Include="assets\Models\normal.png" />
     <Image Include="assets\Models\roughness.jpg" />
     <Image Include="assets\Models\specular.jpg" />
@@ -168,7 +168,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Object>
-    <Object Include="assets\Models\bed_double_A.obj">
+    <Object Include="assets\Models\bed_double_A1.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>

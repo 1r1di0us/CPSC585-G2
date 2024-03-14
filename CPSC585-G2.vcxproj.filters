@@ -66,7 +66,7 @@
     <None Include="src\fragment_shader.txt" />
     <None Include="src\vertex_shader.txt" />
     <None Include="src\assets\models\bed_double_A.mtl" />
-    <None Include="assets\Models\bed_double_A.mtl" />
+    <None Include="assets\Models\bed_double_A1.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
@@ -92,7 +92,7 @@
   <ItemGroup>
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
-    <Image Include="assets\Models\furniturebits_texture.png" />
+    <Image Include="assets\Models\bed_double_A1_diffuse.png" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
     <Image Include="src\Textures\red.jpg" />
@@ -146,7 +146,7 @@
     <Library Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL_vc.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="assets\Models\bed_double_A.obj" />
+    <Object Include="assets\Models\bed_double_A1.obj" />
     <Object Include="assets\Models\box_A.obj" />
     <Object Include="assets\Models\building_E.obj" />
     <Object Include="assets\Models\cube.obj" />
