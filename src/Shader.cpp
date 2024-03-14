@@ -1,10 +1,5 @@
 #include "Shader.h"
 
-// redeclaration of variable??
-unsigned int ID;
-
-Shader::Shader() {};
-
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
     // 1. retrieve the vertex/fragment source code from filePath
@@ -60,7 +55,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragment);
 }
 
-void Shader::use() {
+Shader::Shader() {};
+
+void Shader::use() const {
     glUseProgram(ID);
 }
 void Shader::setBool(const std::string& name, bool value) const {
@@ -119,8 +116,11 @@ void initVAO(float* vertices, int size, unsigned int* VAO, unsigned int* VBO) {
     glEnableVertexAttribArray(1);
 
     //Texture vertex attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void initTextVAO(unsigned int* VAO, unsigned int* VBO) {
