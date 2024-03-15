@@ -1,11 +1,56 @@
 #include "RenderingSystem.h">
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+//void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+//void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void renderOBJ(const OBJModel& model);
+unsigned int loadCubemap(std::vector<std::string> faces);
 
 std::map<char, Character> Characters_gaegu;
+float skyboxVertices[] = {
+    // positions          
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+    -1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+     1.0f,  1.0f,  1.0f,
+     1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
+};
+
 
 unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture;
 
@@ -80,6 +125,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     // geom shaders
     shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    skyBoxShader = Shader("src/skybox_vertex.txt", "src/skybox_fragment.txt");
+    // setting the int has to do with something about the uniforms
+    skyBoxShader.setInt("skybox", 0);
+
     //ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     bedModel = Model("./assets/Models/bed_double_A1.obj");
@@ -91,6 +140,9 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     //std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
 
+    initVAO(skyboxVertices, sizeof(skyboxVertices), &skyVAO, &skyVBO);
+
+
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
     textShader.use();
@@ -98,6 +150,9 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     Characters_gaegu = initFont("./assets/Candy Beans.otf");
     initTextVAO(&textVAO, &textVBO);
+
+    // loading skymap texture
+    cubemapTexture = loadCubemap(faces);
 }
 
 
@@ -172,6 +227,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
         }
 
+        shader.use();
         // car translating
         model = glm::translate(model, playerPos);
         // make it look forward
@@ -314,6 +370,22 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
+    // I think I need to either give it a projection
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // Remove translation from the view matrix
+    skyBoxShader.use();
+    skyBoxShader.setMat4("projection", projection);
+    skyBoxShader.setMat4("view", view);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+    skyBoxShader.use();
+    // render skybox
+    glBindVertexArray(skyVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+
 
     // swap buffers and poll IO events
     glfwSwapBuffers(window);
@@ -341,4 +413,36 @@ void RenderingSystem::framebuffer_size_callback(GLFWwindow* window, int width, i
 
 GLFWwindow* RenderingSystem::getWindow() const {
     return window;
+}
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }

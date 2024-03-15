@@ -105,6 +105,8 @@
     <Text Include="src\fragment_shader_text.txt" />
     <Text Include="src\model_loading_fragment.txt" />
     <Text Include="src\model_loading_vertex.txt" />
+    <Text Include="src\skybox_fragment.txt" />
+    <Text Include="src\skybox_vertex.txt" />
     <Text Include="src\vertex_shader_text.txt" />
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
