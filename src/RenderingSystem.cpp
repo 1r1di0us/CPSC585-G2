@@ -79,8 +79,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
 
     // geom shaders
-    //ourShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
-    ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
+    ourShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    //ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     bedModel = Model("./assets/Models/bed_double_A1.obj");
     funkyCube = Model("./assets/Models/funky_cube.obj");
