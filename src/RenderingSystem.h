@@ -25,7 +25,7 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	Model bedModel;
+	Model bedModel, funkyCube;
 
 public:
 	// settings

@@ -85,6 +85,7 @@
     <None Include="assets\Models\bed_double_A1.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="assets\Models\funky_cube.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
@@ -111,6 +112,7 @@
     <Image Include="assets\Models\ao.jpg" />
     <Image Include="assets\Models\diffuse.jpg" />
     <Image Include="assets\Models\bed_double_A1_diffuse.png" />
+    <Image Include="assets\Models\funky_cube.png" />
     <Image Include="assets\Models\normal.png" />
     <Image Include="assets\Models\roughness.jpg" />
     <Image Include="assets\Models\specular.jpg" />
@@ -183,6 +185,10 @@
     <Object Include="assets\Models\cube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="assets\Models\funky_cube.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
     <Object Include="assets\Models\planeHugeWithWalls.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -75,6 +75,7 @@
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
     <None Include="assets\Models\backpack.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
+    <None Include="assets\Models\funky_cube.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />
@@ -103,6 +104,7 @@
     <Image Include="assets\Models\specular.jpg" />
     <Image Include="src\Textures\player1.jpg" />
     <Image Include="src\Textures\KiddieCarpet.jpg" />
+    <Image Include="assets\Models\funky_cube.png" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
@@ -152,5 +154,6 @@
     <Object Include="assets\Models\cube.obj" />
     <Object Include="assets\Models\backpack.obj" />
     <Object Include="assets\Models\planeHugeWithWalls.obj" />
+    <Object Include="assets\Models\funky_cube.obj" />
   </ItemGroup>
 </Project>

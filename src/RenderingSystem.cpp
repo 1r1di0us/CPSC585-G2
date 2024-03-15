@@ -79,11 +79,12 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
 
     // geom shaders
-    //shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    //ourShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     bedModel = Model("./assets/Models/bed_double_A1.obj");
-    std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
+    funkyCube = Model("./assets/Models/funky_cube.obj");
+    //std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
 
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
@@ -171,22 +172,15 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         // make it look forward
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         model = applyQuaternionToMatrix(model, playerRot);
+        //model = glm::scale(model, glm::vec3(0.5f));
 
         // sending our matrixes to the shader
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-
-        // binding textures
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, player1Texture);
-
-        //float angle = 45.0f;
-        ourShader.use();
         ourShader.setMat4("model", model);
         bedModel.Draw(ourShader);
-        //renderObject(tank, &tankVAO);
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, planeTexture);
+
+        //funkyCube.Draw(ourShader);
 
         /*model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
