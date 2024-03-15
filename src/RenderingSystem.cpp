@@ -79,11 +79,16 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
 
     // geom shaders
-    ourShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
     //ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
     bedModel = Model("./assets/Models/bed_double_A1.obj");
     funkyCube = Model("./assets/Models/funky_cube.obj");
+    plane = Model("./assets/Models/planeHugeWithWalls.obj");
+    projectile = Model("./assets/Models/ball.obj");
+    tank = Model("./assets/Models/tank.obj");
+    powerup = Model("./assets/Models/bed_double_A1.obj");
+
     //std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
 
     textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
@@ -132,7 +137,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         }
 
         // activate shader
-        ourShader.use();
+        shader.use();
 
         // camera setup stuff/ 3d transformations
         glm::mat4 model = glm::mat4(1.0f);
@@ -175,95 +180,89 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         //model = glm::scale(model, glm::vec3(0.5f));
 
         // sending our matrixes to the shader
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
-        ourShader.setMat4("model", model);
-        bedModel.Draw(ourShader);
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+        shader.setMat4("model", model);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, player1Texture);
+        tank.Draw(shader);
 
         //funkyCube.Draw(ourShader);
 
-        /*model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f));
-        shader.setMat4("model", model);
-
-        renderObject(plane, &planeVAO);
-
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-
-        shader.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, redTexture);
+        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+        //model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
-        renderObject(building, &buildingVAO);*/
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, planeTexture);
+        plane.Draw(shader);
 
         //rendering all other entities starting at 2 (skipping player car and map)
-        //for (int i = 2; i < dataSys->entityList.size(); i++) {
+        for (int i = 2; i < dataSys->entityList.size(); i++) {
 
-        //    switch (dataSys->entityList[i].physType) {
+            switch (dataSys->entityList[i].physType) {
 
-        //    case (PhysicsType::CAR):
+            case (PhysicsType::CAR):
 
-        //        //is the car alive? -> render it
-        //        if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
-        //            if (i == 1) {
-        //                glActiveTexture(GL_TEXTURE0);
-        //                glBindTexture(GL_TEXTURE_2D, player2Texture);
-        //            }
-        //            else if (i == 2) {
-        //                glActiveTexture(GL_TEXTURE0);
-        //                glBindTexture(GL_TEXTURE_2D, player3Texture);
-        //            }
-        //            else if (i == 3) {
-        //                glActiveTexture(GL_TEXTURE0);
-        //                glBindTexture(GL_TEXTURE_2D, player4Texture);
-        //            }
-        //            else {
-        //                glActiveTexture(GL_TEXTURE0);
-        //                glBindTexture(GL_TEXTURE_2D, player5Texture);
-        //            }
+                //is the car alive? -> render it
+                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+                    if (i == 1) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player2Texture);
+                    }
+                    else if (i == 2) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player3Texture);
+                    }
+                    else if (i == 3) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player4Texture);
+                    }
+                    else {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, player5Texture);
+                    }
 
-        //            model = glm::mat4(1.0f);
-        //            model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-        //            // make it look forward
-        //            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-        //            model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
-        //            shader.setMat4("model", model);
-        //            renderObject(tank, &tankVAO);
-        //        }
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                    // make it look forward
+                    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+                    model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
+                    shader.setMat4("model", model);
+                    tank.Draw(shader);
+                }
 
-        //        break;
-        //    case (PhysicsType::PROJECTILE):
+                break;
+            case (PhysicsType::PROJECTILE):
 
-        //        glActiveTexture(GL_TEXTURE0);
-        //        glBindTexture(GL_TEXTURE_2D, redTexture);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, redTexture);
 
-        //        model = glm::mat4(1.0f);
-        //        model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-        //        shader.setMat4("model", model);
-        //        renderObject(ball, &ballVAO);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                shader.setMat4("model", model);
+                projectile.Draw(shader);
 
-        //        break;
-        //    case (PhysicsType::POWERUP):
+                break;
+            case (PhysicsType::POWERUP):
 
-        //        glActiveTexture(GL_TEXTURE0);
-        //        glBindTexture(GL_TEXTURE_2D, redTexture);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, redTexture);
 
-        //        model = glm::mat4(1.0f);
-        //        model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-        //        shader.setMat4("model", model);
-        //        renderObject(powerup, &powerupVAO);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                shader.setMat4("model", model);
+                powerup.Draw(shader);
 
-        //        break;
-        //    case (PhysicsType::STATIC):
+                break;
+            case (PhysicsType::STATIC):
 
-        //        break;
-        //    default:
+                break;
+            default:
 
-        //        break;
-        //    }
-        //}
+                break;
+            }
+        }
 
 
     }
@@ -320,54 +319,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
     glfwSwapBuffers(window);
     glfwPollEvents();
 
-}
-
-void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
-    glGenVertexArrays(1, VAO);
-    glGenBuffers(1, VBO);
-
-    glBindVertexArray(*VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-
-    // Calculate total size needed for vertex attributes
-    size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
-        model.textureCoordinates.size() * sizeof(glm::vec2) +
-        model.normals.size() * sizeof(glm::vec3);
-
-    // Allocate buffer memory
-    glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
-
-    // Copy vertex data
-    glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
-
-    // Copy texture coordinate data
-    glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
-        model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
-
-    // Copy normal data
-    glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
-        model.textureCoordinates.size() * sizeof(glm::vec2),
-        model.normals.size() * sizeof(glm::vec3), model.normals.data());
-
-    // Vertex positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
-    glEnableVertexAttribArray(1);
-
-    // Normals
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
-        model.textureCoordinates.size() * sizeof(glm::vec2)));
-    glEnableVertexAttribArray(2);
-}
-
-
-void renderObject(const OBJModel& model, unsigned int* VAO) {
-    glBindVertexArray(*VAO);
-    glDrawArrays(GL_TRIANGLES, 0, model.vertices.size());
 }
 
 

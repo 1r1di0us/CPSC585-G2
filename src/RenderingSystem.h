@@ -25,7 +25,7 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	Model bedModel, funkyCube;
+	Model bedModel, funkyCube, plane, projectile, tank, powerup;
 
 public:
 	// settings
@@ -34,19 +34,11 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	unsigned int VAO, VBO,
-		textVAO, textVBO,
-		tankVAO, tankVBO,
-		ballVAO, ballVBO,
-		buildingVAO, buildingVBO,
-		planeVAO, planeVBO,
-		powerupVAO, powerupVBO,
-		quadVAO, quadVBO;
+	unsigned int VAO, VBO, textVAO, textVBO;
 	Shader textShader;
 	Shader shader;
-	Shader ourShader; // testing it
+	Shader testShader; // testing it
 	std::map<char, Character> Characters_gaegu;
-	OBJModel tank, building, ball, plane, powerup;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
