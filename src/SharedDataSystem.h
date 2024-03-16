@@ -303,10 +303,19 @@ public:
 	* COLLISIONS
 	*/
 
+	//the objects to be deleted in a given physics frame (created to deal with collats)
+	std::vector<std::shared_ptr<Entity>> collatCache;
+
+	//adds an entity to the collat cache if it hasnt been already
+	void AddToCollatCache(std::shared_ptr<Entity> entityToAdd);
+
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
+
+	//clean up any objects that could be collided with at the same time
+	void CleanCollatCache();
 
 	//function to resolve all collisions
 	/*
