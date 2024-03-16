@@ -72,6 +72,14 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		}
 	}
 
+
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		if (parry[0] == 0) parry[0] = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
+		if (parry[0] >= 2) parry[0] = 0;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) { //toggle birds eye view
 		if (dataSys->useBirdsEyeView == 0) {
 			dataSys->useBirdsEyeView = 1;
@@ -182,6 +190,12 @@ void InputSystem::getGamePadInput() {
 				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
 					if (confirm[j + 1] >= 2) confirm[j + 1] = 0;
 				}
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS) {
+					if (parry[j + 1] == 0) parry[j + 1] = 1;
+				}
+				else if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE) {
+					if (parry[j + 1] >= 2) parry[j + 1] = 0;
+				}
 			}
 		}
 	}
@@ -211,6 +225,8 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	bool l = false;
 	bool r = false;
 	bool rev = false;
+	int s = 0;
+	int p = 0;
 	bool cl = false;
 	bool cr = false;
 	for (int i : checkvals) if (forward[i]) {
@@ -232,6 +248,14 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	for (int i : checkvals) if (reverse[i]) {
 		rev = true;
 		reverse[i] = false;
+	}
+	for (int i : checkvals) if (shoot[i] == 1) {
+		s = 1;
+		shoot[i] = 2;
+	}
+	for (int i : checkvals) if (parry[i] == 1) {
+		p = 1;
+		parry[i] = 2;
 	}
 	for (int i : checkvals) if (camLeft[i]) {
 		cl = true;
@@ -340,17 +364,18 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
 	}
 
-	int s = 0;
-	for (int i : checkvals) if (shoot[i] == 1) {
-		s = 1;
-		shoot[i] = 2;
-	}
-
 	if (s == 1) {
 		return true;
 	}
 	else {
 		return false;
+	}
+
+	if (p == 1) {
+		//parry
+	}
+	else {
+		//no parry
 	}
 }
 
