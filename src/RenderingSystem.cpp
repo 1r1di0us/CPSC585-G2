@@ -240,8 +240,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         shader.setMat4("model", model);
         renderObject(building, &buildingVAO);
 
-        //rendering all other entities starting at 2 (skipping player car and map)
-        for (int i = 2; i < dataSys->entityList.size(); i++) {
+        //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
+        for (int i = dataSys->STATIC_OBJECT_LIST.size(); i < dataSys->entityList.size(); i++) {
 
             switch (dataSys->entityList[i].physType) {
 
