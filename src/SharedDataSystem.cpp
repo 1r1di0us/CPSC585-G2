@@ -557,27 +557,8 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
 	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic after\n");
 
-	/*
-	* remove the projectile from all lists
-	*/
+	AddToCollatCache(projectileEntity);
 
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == projectileEntity->name) {
-			entityList.erase(entityList.begin() + i);
-		}
-	}
-
-	//car projectile dict
-	for (int i = 0; i < carProjectileRigidDynamicDict[carThatShotProjectile].size(); i++) {
-		if (carProjectileRigidDynamicDict[carThatShotProjectile][i] == (PxRigidDynamic*)projectile) {
-			carProjectileRigidDynamicDict[carThatShotProjectile].erase(carProjectileRigidDynamicDict[carThatShotProjectile].begin() + i);
-		}
-	}
-
-	//delete the projectile
-	gScene->removeActor(*projectile);
-	projectile->release();
 }
 
 void SharedDataSystem::CleanCollatCache() {
