@@ -32,11 +32,13 @@ private:
 	bool right[17];
 	int shoot[17];
 	bool reverse[17];
+	int parry[17];
 	int confirm[17];
 	bool camLeft[17];
 	bool camRight[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
+	//to make sure menu left and menu right only press for one frame
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
 
