@@ -7,10 +7,9 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 	//physx setup
 	initPhysX();
-	initGroundPlane();
+	CookStaticObject("./assets/Models/planeHugeWithWalls.obj", PxVec3(0, 0, 0));
 	initMaterialFrictionTable();
 	initVehicleSimContext();
-
 }
 
 //initializes physx
@@ -53,11 +52,10 @@ void PhysicsSystem::initPhysX() {
 	
 }
 
-//creates the ground
-void PhysicsSystem::initGroundPlane()
-{
-	/////////////////////////////////////////////////////////////////////////
-	OBJModel groundObstacles = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
+//cooks an object given a file path
+void PhysicsSystem::CookStaticObject(std::string filePath, PxVec3 location) {
+
+	OBJModel groundObstacles = LoadModelFromPath(filePath);
 
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.setToDefault();
@@ -81,34 +79,27 @@ void PhysicsSystem::initGroundPlane()
 	PxTriangleMeshGeometry meshGeom = PxTriangleMeshGeometry(trimesh, PxMeshScale(1));
 	PxShape* meshShape = gPhysics->createShape(meshGeom, *gMaterial, true);
 
-	//setting the collision mesh for the map to be a statics
-	PxFilterData mapFilter(COLLISION_FLAG_STATIC, COLLISION_FLAG_STATIC_AGAINST, 0, 0);
-	meshShape->setSimulationFilterData(mapFilter);
+	//setting the collision mesh for the cooked object to be static
+	PxFilterData staticFilter(COLLISION_FLAG_STATIC, COLLISION_FLAG_STATIC_AGAINST, 0, 0);
+	meshShape->setSimulationFilterData(staticFilter);
 
 	PxTransform meshTrans(PxVec3(0, 0, 0), PxQuat(PxIdentity));
 	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
 
-	//making the map entity and adding it to the entity list (for collisions n shit)
-	dataSys->MAP.collisionBox = (PxRigidDynamic*) meshStatic;
-	dataSys->MAP.name = "MAP";
-	dataSys->MAP.physType = PhysicsType::STATIC;
-	dataSys->MAP.CreateTransformFromPhysX(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+	//making the static entity
+	Entity staticEntity;
+	staticEntity.collisionBox = (PxRigidDynamic*)meshStatic;
+	staticEntity.name = "STATIC_" + std::to_string(dataSys->STATIC_OBJECT_LIST.size());
+	staticEntity.physType = PhysicsType::STATIC;
+	staticEntity.CreateTransformFromPhysX(PxTransform(location));
 
-	dataSys->entityList.emplace_back(dataSys->MAP);
+	//adding the entity to the needed lists
+	dataSys->STATIC_OBJECT_LIST.emplace_back(staticEntity);
+	dataSys->entityList.emplace_back(staticEntity);
 
 	meshStatic->attachShape(*meshShape);
 	gScene->addActor(*meshStatic);
-	/////////////////////////////////////////////////////////////////////////
-	gGroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
-	for (PxU32 i = 0; i < gGroundPlane->getNbShapes(); i++)
-	{
-		PxShape* shape = NULL;
-		gGroundPlane->getShapes(&shape, 1, i);
-		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-	}
-	gScene->addActor(*gGroundPlane);
+	
 }
 
 void PhysicsSystem::initMaterialFrictionTable() {

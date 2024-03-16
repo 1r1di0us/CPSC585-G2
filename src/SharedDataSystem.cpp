@@ -697,8 +697,11 @@ void SharedDataSystem::resetSharedDataSystem() {
 	//reset variables
 	spawnedPowerupCounter = 0;
 
-	//add the map to the entity list
-	entityList.emplace_back(MAP);
+	//add all the static objects to the entity list
+	for (int i = 0; i < STATIC_OBJECT_LIST.size(); i++) {
+
+		entityList.emplace_back(STATIC_OBJECT_LIST[i]);
+	}
 }
 
 void SharedDataSystem::InitSharedDataSystem() {

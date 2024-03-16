@@ -200,8 +200,8 @@ public:
 	//the number of bullets given per ammo powerup
 	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
-	//adding a map entity that persists through games
-	Entity MAP;
+	//a vector of static objects that persist through games
+	std::vector<Entity> STATIC_OBJECT_LIST;
 
 	//entity helper functions move from entity cpp?
 

@@ -51,7 +51,7 @@ public:
 
 	//physx basic setup
 	void initPhysX();
-	void initGroundPlane();
+	void CookStaticObject(std::string filePath, PxVec3 location);
 	void initMaterialFrictionTable();
 	void initVehicleSimContext();
 
