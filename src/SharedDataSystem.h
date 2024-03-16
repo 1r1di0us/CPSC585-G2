@@ -267,7 +267,7 @@ public:
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
 
 	//activates parry for a given car
-	void Parry(PxRigidDynamic* carThatParried);
+	bool Parry(PxRigidDynamic* carThatParried);
 
 	/*
 	* PROJECTILES

@@ -377,15 +377,20 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 	exit(69);
 }
 
-void SharedDataSystem::Parry(PxRigidDynamic* carThatParried) {
+bool SharedDataSystem::Parry(PxRigidDynamic* carThatParried) {
 
 	CarInfo* carInfo = GetCarInfoStructFromEntity(GetEntityFromRigidDynamic(carThatParried));
 
+	//can sucessfully parry
 	if (carInfo->parryCooldownTimeLeft < 0 && carInfo->isAlive) {
 
 		carInfo->parryActiveTimeLeft = PARRY_ACTIVE_DURATION;
-		carInfo->parryCooldownTimeLeft = 0;
+		carInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
+
+		return true;
 	}
+	
+	return false;
 }
 
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {

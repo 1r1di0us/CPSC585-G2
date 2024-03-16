@@ -202,7 +202,7 @@ void InputSystem::getGamePadInput() {
 	
 }
 
-bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
+int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	//update timer
 	if (brakeTimer < deltaTime.count()) {
 		brakeTimer = 0.0;
@@ -364,19 +364,18 @@ bool InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
 	}
 
+	//shoot
 	if (s == 1) {
-		return true;
-	}
-	else {
-		return false;
+		return 1;
 	}
 
+	//parry
 	if (p == 1) {
-		//parry
+		return 2;
 	}
-	else {
-		//no parry
-	}
+
+	//if no action is required
+	return 0;
 }
 
 void InputSystem::InputToMenu() {
