@@ -5,7 +5,9 @@
 #include <iostream>
 #include <chrono>
 #include <random>
+#include <map>
 
+//DELETE THIS
 enum State;
 
 class AiSystem {
@@ -19,9 +21,16 @@ public:
 	std::normal_distribution<double> distribution;
 
 	AiSystem(SharedDataSystem* dataSys);
-	bool update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc);
+	bool update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime);
+	bool hiding_behaviour(EngineDriveVehicle* aiCar, bool fire);
+	bool hunting_behaviour(EngineDriveVehicle* aiCar, bool fire);
+	void astar_path_finding(EngineDriveVehicle* aiCar);
 
+	//TO BE DELETED
+	bool update_old(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc);
 	bool sit_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	bool spin_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	bool moveto_behaviour(EngineDriveVehicle* aiCar, bool fire);
+
+
 };

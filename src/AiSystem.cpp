@@ -1,5 +1,6 @@
 #include "AiSystem.h"
 
+//DELETE THIS
 enum State { SIT, SPIN, MOVETO };  //no idea how to do what I want
 
 AiSystem::AiSystem(SharedDataSystem* dataSys) {
@@ -9,13 +10,20 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	moveLocation = PxVec3(0, 0, 0);
 }
 
-//TODO: add randomness and timing.
-//TODO: add shooting
-//TODO: give it an ai car and test it
-//TODO: ask matt why anyone would want to use quaternions to find the direction the guy is facing.
-//TODO: actually think of an ai
+bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
+	int ammo = 0;
+	bool fire = false;
+	if (ammo > 1) fire = hunting_behaviour(aiCar, fire);
+	else fire = hiding_behaviour(aiCar, fire);
+	if (moveLocation != PxVec3(0, 0, 0)) astar_path_finding(aiCar);
+}
 
-bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc) {
+void astar_path_finding(EngineDriveVehicle* aiCar) {
+
+}
+
+
+bool AiSystem::update_old(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc) {
 	moveLocation = movLoc;
 	bool fire = false;
 	//update timers

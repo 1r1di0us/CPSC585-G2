@@ -38,6 +38,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
+    <ClCompile Include="src\PathFinder.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\PowerupSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
@@ -68,6 +69,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\PathFinder.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\PowerupSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
