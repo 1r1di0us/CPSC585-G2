@@ -6,6 +6,7 @@
 #include <chrono>
 #include <random>
 #include <map>
+#include "PathFinder.h"
 
 //DELETE THIS
 enum State;
@@ -13,6 +14,8 @@ enum State;
 class AiSystem {
 public:
 	SharedDataSystem* dataSys;
+	NavMesh* navMesh;
+	PathFinder* pathFinder;
 	State state;
 	double timer;
 	double brakeTimer;
@@ -31,6 +34,4 @@ public:
 	bool sit_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	bool spin_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	bool moveto_behaviour(EngineDriveVehicle* aiCar, bool fire);
-
-
 };

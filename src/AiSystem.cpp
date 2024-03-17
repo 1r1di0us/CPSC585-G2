@@ -7,6 +7,8 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 	timer = 0.0;
 	state = MOVETO;
+	navMesh = new NavMesh();
+	pathFinder = new PathFinder(navMesh);
 	moveLocation = PxVec3(0, 0, 0);
 }
 
@@ -19,7 +21,7 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 }
 
 void astar_path_finding(EngineDriveVehicle* aiCar) {
-
+	//i don't know how to do it.
 }
 
 

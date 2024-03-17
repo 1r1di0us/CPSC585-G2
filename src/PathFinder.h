@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <iostream>
 
 class Node { //no idea why this class is defined here but ok
 public: // A "Node" is a square
@@ -43,14 +44,14 @@ private:
 	float cost(Node* src, Node* dest);
 };
 
-class Pathfinder {
+class PathFinder {
 
 public:
 
 	std::stack<glm::vec3>* path;
 	NavMesh* navMesh;
 
-	Pathfinder(NavMesh* navMesh);
+	PathFinder(NavMesh* navMesh);
 
 	bool search(Node* src, Node* dest);
 	glm::vec3 getNextWaypoint();
