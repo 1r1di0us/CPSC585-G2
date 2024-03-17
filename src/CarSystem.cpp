@@ -137,13 +137,13 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 6.5,
-			projectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 6.5),
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * dataSys->PROJECTILE_RADIUS * 6.5,
+			dataSys->PROJECTILE_RADIUS * 2,
+			shootingCar->getGlobalPose().p.z + forwardVector.z * dataSys->PROJECTILE_RADIUS * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
-	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *dataSys->gMaterial);
+	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(dataSys->PROJECTILE_RADIUS), *dataSys->gMaterial);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
@@ -162,7 +162,7 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	dataSys->gScene->addActor(*projectileBody);
 
 	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-	projectileBody->setLinearVelocity(shootForce * PxVec3(forwardVector.x, 0, forwardVector.z));
+	projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(forwardVector.x, 0, forwardVector.z));
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
@@ -192,4 +192,21 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	return true;
 
+}
+
+void CarSystem::UpdateAllCarCooldowns() {
+
+	//updates all the car cooldowns
+	for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+
+		//edits correct cooldown based on if the parry is active or not
+		if (dataSys->carInfoList[i].parryActiveTimeLeft > 0) {
+
+			dataSys->carInfoList[i].parryActiveTimeLeft -= dataSys->TIMESTEP;
+		}
+		else {
+
+			dataSys->carInfoList[i].parryCooldownTimeLeft -= dataSys->TIMESTEP;
+		}
+	}
 }
