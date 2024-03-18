@@ -100,7 +100,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/finishedMap.obj");
+    this->plane = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     this->bedModel = LoadModelFromPath("./assets/Models/bed_double_A.obj");

@@ -7,7 +7,7 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 	//physx setup
 	initPhysX();
-	CookStaticObject("./assets/Models/finishedMap.obj", PxVec3(0, 0, 0));
+	CookStaticObject("./assets/Models/planeHugeWithWalls.obj", PxVec3(0, 0, 0));
 	initMaterialFrictionTable();
 	initVehicleSimContext();
 }
