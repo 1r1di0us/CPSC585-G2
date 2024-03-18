@@ -166,8 +166,6 @@ void PhysicsSystem::stepPhysics() {
 
 	dataSys->ResolveCollisions();
 
-	dataSys->CleanCollatCache();
-
 	//update the transform components of each entity
 	for (Entity entity : dataSys->entityList) {
 		entity.updateTransform();
