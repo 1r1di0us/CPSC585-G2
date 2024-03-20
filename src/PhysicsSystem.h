@@ -51,7 +51,9 @@ public:
 
 	//physx basic setup
 	void initPhysX();
-	void CookStaticObject(std::string filePath, PxVec3 location);
+
+	//function to cook a static object and if wanted, make things not spawn inside it
+	void CookStaticObject(std::string filePath, PxVec3 location, bool dontSpawnInside = false);
 	void initMaterialFrictionTable();
 	void initVehicleSimContext();
 

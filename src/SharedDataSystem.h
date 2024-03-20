@@ -160,7 +160,8 @@ public:
 	*/
 
 	//debug mode
-	const bool DEBUG_MODE = false;
+	bool DEBUG_PRINTS = false;
+	bool DEBUG_BOXES = false;
 
 	//timestep value, easily modifiable
 	const PxReal TIMESTEP = 1.0f / 60.0f;
@@ -169,8 +170,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -11);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 24);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -70);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 70);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -187,6 +188,9 @@ public:
 
 	//the spawn height of powerups
 	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
+
+	//min spawn distance from static objects
+	const PxReal STATIC_SPAWN_OFFSET = 5.0f;
 
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
@@ -258,7 +262,7 @@ public:
 	std::vector<MapSquare> powerupMapSquareList;
 
 	//obstacle list to do checking against
-	std::vector<MapSquare> obstacleList;
+	std::vector<MapSquare> obstacleMapSquareList;
 
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
