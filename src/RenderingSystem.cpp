@@ -51,6 +51,13 @@ float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
+// Define the vertex data for the quad to overlay the screen
+GLfloat quadVertices[] = {
+    0.0f, 0.0f,          // Bottom-left corner
+    0.0f, 800.0f,  // Top-left corner
+    600.0f, 800.0f, // Top-right corner
+    600.0f, 0.0f    // Bottom-right corner
+};
 
 unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture;
 
@@ -129,19 +136,17 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     // setting the int has to do with something about the uniforms
     skyBoxShader.setInt("skybox", 0);
 
-    //ourShader = Shader("src/model_loading_vertex.txt", "src/model_loading_fragment.txt");
 
+    // loading in the models
     bedModel = Model("./assets/Models/bed_double_A1.obj");
     funkyCube = Model("./assets/Models/funky_cube.obj");
     plane = Model("./assets/Models/planeHugeWithWalls.obj");
     projectile = Model("./assets/Models/ball.obj");
     tank = Model("./assets/Models/tank.obj");
     powerup = Model("./assets/Models/bed_double_A1.obj");
-
-    //std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
-
-    //initVAO(skyboxVertices, sizeof(skyboxVertices), &skyVAO, &skyVBO);
-
+    tankHead = Model("./assets/Models/tankHead.obj");
+    tankBody = Model("./assets/Models/tankBody.obj");
+    
 
     // SkyVAO Initialization
     glGenVertexArrays(1, &skyVAO);
@@ -152,8 +157,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-
-
+    // text VAO VBO Initialization
     textShader = Shader("src/shaders/vertex_shader_text.txt", "src/shaders/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
     textShader.use();
@@ -240,36 +244,10 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
         }
 
-
-        glDepthFunc(GL_LEQUAL);
-        glDepthMask(GL_FALSE);
-        // I think I need to either give it a projection
-        skyBoxShader.use();
-
-
-
-        //glm::mat4 skyView = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
-        skyBoxShader.setMat4("projection", projection);
-        glm::mat4 skyView = glm::mat4(glm::mat3(view));
-        skyBoxShader.setMat4("view", skyView);
-        //model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
-        //skyBoxShader.setMat4("model", model);
-
-
-        // skybox cube
-        glBindVertexArray(skyVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS); // set depth function back to default
-        glDepthMask(GL_TRUE);
-
-
-
-
+        // rendering player car
         shader.use();
         // car translating
+
         model = glm::translate(model, playerPos);
         // make it look forward
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -282,11 +260,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         shader.setMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player1Texture);
-        tank.Draw(shader);
+        //tankHead.Draw(shader);
+        tankBody.Draw(shader);
+        //tank.Draw(shader);
 
+
+        // rendering plane
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
-        //model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, planeTexture);
@@ -362,8 +343,20 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         }
 
 
-
-
+        // skybox rendering, needs to be at the end of rendering
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);
+        skyBoxShader.use();
+        skyBoxShader.setMat4("projection", projection);
+        glm::mat4 skyView = glm::mat4(glm::mat3(view));
+        skyBoxShader.setMat4("view", skyView);
+        glBindVertexArray(skyVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+        glDepthMask(GL_TRUE);
     }
 
     // Setup UI if necessary

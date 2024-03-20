@@ -76,6 +76,8 @@
     <None Include="assets\Models\backpack.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
     <None Include="assets\Models\funky_cube.mtl" />
+    <None Include="assets\Models\tankHead.mtl" />
+    <None Include="assets\Models\tankBody.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Gaegu-Bold.ttf" />

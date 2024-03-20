@@ -87,6 +87,8 @@
     <None Include="assets\Models\building_E.mtl" />
     <None Include="assets\Models\funky_cube.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
+    <None Include="assets\Models\tankBody.mtl" />
+    <None Include="assets\Models\tankHead.mtl" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />

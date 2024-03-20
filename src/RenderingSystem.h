@@ -25,19 +25,18 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	Model bedModel, funkyCube, plane, projectile, tank, powerup;
+	Model bedModel, funkyCube, plane, projectile, tank, powerup, tankHead, tankBody;
+
+	// galaxy skybox
 	std::vector<std::string> faces
 	{
-		"./assets/skybox/right.jpg",
-		"./assets/skybox/left.jpg",
-		"./assets/skybox/top.jpg",
-		"./assets/skybox/bottom.jpg",
-		"./assets/skybox/front.jpg",
-		"./assets/skybox/back.jpg"
+		"./assets/skybox/px.jpg",
+		"./assets/skybox/nx.jpg",
+		"./assets/skybox/py.jpg",
+		"./assets/skybox/ny.jpg",
+		"./assets/skybox/pz.jpg",
+		"./assets/skybox/nz.jpg"
 	};
-	
-    
-
 
 
 public:
@@ -62,9 +61,9 @@ public:
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
 
+
 };
 
-void renderObject(const OBJModel& model, unsigned int* VAO);
-void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
 unsigned int loadCubemap(std::vector<std::string> faces);
+void renderDeathScreen(unsigned int* VAO);
 
