@@ -90,6 +90,7 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 
 	//go through the map square list and populate each one fully before moving on to the next one
 	while (pointsOfSameType.size() > 0) {
+
 		for (int i = 0; i < mapSquareList.size(); i++) {
 			//gets rid of out of bounds points
 			IsPointInBounds(pointsOfSameType.at(0));
@@ -691,6 +692,40 @@ void SharedDataSystem::InitMapSquares(std::vector<MapSquare>& listToPopulate, Px
 		listToPopulate.emplace_back(square);
 	}
 
+	//checks all boxes against all obstacles
+	//checks all the elements using fancy iterator logic
+	std::vector<MapSquare>::iterator iterator = listToPopulate.begin();
+	do {
+
+		iterator++;
+
+		//go through all obstacles
+		for (int i = 0; i < obstacleMapSquareList.size(); i++) {
+
+			//if the bottom left and top right are in any obstacle
+				//may lead to some deadzones around obstacles
+			if (IsPointInSquare((iterator - 1)->bottomLeft, obstacleMapSquareList[i])) {
+
+				if (IsPointInSquare((iterator - 1)->topRight, obstacleMapSquareList[i])) {
+
+					//remove the map square
+					iterator = listToPopulate.erase(iterator - 1);
+					break;
+				}
+			}
+		}
+	} while (iterator != listToPopulate.end());
+
+	//makes all debug boxes for the remaining map squares
+	for (int i = 0; i < listToPopulate.size(); i++) {
+
+		MAKE_BOX_DEBUG(listToPopulate[i].bottomLeft.x, listToPopulate[i].bottomLeft.y);
+		MAKE_BOX_DEBUG(listToPopulate[i].topRight.x, listToPopulate[i].topRight.y);
+
+		MAKE_BOX_DEBUG(listToPopulate[i].bottomLeft.x, listToPopulate[i].topRight.y);
+		MAKE_BOX_DEBUG(listToPopulate[i].topRight.x, listToPopulate[i].bottomLeft.y);
+	}
+
 }
 
 void SharedDataSystem::resetSharedDataSystem() {
@@ -715,55 +750,10 @@ void SharedDataSystem::resetSharedDataSystem() {
 void SharedDataSystem::InitSharedDataSystem() {
 
 	//generate the map squares for both cars and powerups
-	//InitMapSquares(this->carMapSquareList, CAR_MIN_SPAWN_DISTANCE);
+	InitMapSquares(this->carMapSquareList, CAR_MIN_SPAWN_DISTANCE);
 	InitMapSquares(this->powerupMapSquareList, POWERUP_MIN_SPAWN_DISTANCE);
 
-	
-	//go through both the map square and powerup list and check all boxes against all obstacles
-		//checks all the elements using fancy iterator logic
-	std::vector<MapSquare>::iterator iterator = powerupMapSquareList.begin();
-	do {
-
-		iterator++;
-
-		//go through all obstacles
-		for (int i = 0; i < obstacleMapSquareList.size(); i++) {
-
-			//if the bottom left and top right are in any obstacle
-				//may lead to some deadzones around obstacles
-			if (IsPointInSquare((iterator-1)->bottomLeft, obstacleMapSquareList[i])) {
-
-				if (IsPointInSquare((iterator - 1)->topRight, obstacleMapSquareList[i])) {
-
-					//remove the map square
-					iterator = powerupMapSquareList.erase(iterator - 1);
-					break;
-
-				}
-
-			}
-
-		}
-
-	} while (iterator != powerupMapSquareList.end());
-
-	//make all debug boxes that are still relevant
-	/*for (int i = 0; i < carMapSquareList.size(); i++) {
-
-		MAKE_BOX_DEBUG(carMapSquareList[i].bottomLeft.x, carMapSquareList[i].bottomLeft.y);
-		MAKE_BOX_DEBUG(carMapSquareList[i].topRight.x, carMapSquareList[i].topRight.y);
-
-		MAKE_BOX_DEBUG(carMapSquareList[i].bottomLeft.x, carMapSquareList[i].topRight.y);
-		MAKE_BOX_DEBUG(carMapSquareList[i].topRight.x, carMapSquareList[i].bottomLeft.y);
-	}
-	for (int i = 0; i < powerupMapSquareList.size(); i++) {
-
-		MAKE_BOX_DEBUG(powerupMapSquareList[i].bottomLeft.x, powerupMapSquareList[i].bottomLeft.y);
-		MAKE_BOX_DEBUG(powerupMapSquareList[i].topRight.x, powerupMapSquareList[i].topRight.y);
-
-		MAKE_BOX_DEBUG(powerupMapSquareList[i].bottomLeft.x, powerupMapSquareList[i].topRight.y);
-		MAKE_BOX_DEBUG(powerupMapSquareList[i].topRight.x, powerupMapSquareList[i].bottomLeft.y);
-	}*/
+	//make all obstacle debug boxes
 	for (int i = 0; i < obstacleMapSquareList.size(); i++) {
 
 		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].bottomLeft.y);
