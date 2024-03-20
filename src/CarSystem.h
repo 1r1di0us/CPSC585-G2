@@ -48,6 +48,7 @@ public:
 	//constructor
 	CarSystem(SharedDataSystem* dataSys);
 
+	//spawns a new car at given position and rotation
 	void SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation);
 
 	//respawn all dead cars
@@ -59,9 +60,11 @@ public:
 
 	//constants
 	const PxReal projectileMass = 10.0f;
-	const PxReal projectileRadius = 1.0f;
-	const float shootForce = 100;
 
+	//shoots a projectile from the given car
 	bool Shoot(PxRigidDynamic* shootingCar);
+
+	//updates all the car cooldowns
+	void UpdateAllCarCooldowns();
 
 };
