@@ -35,6 +35,9 @@ private:
 		"./assets/skybox/front.jpg",
 		"./assets/skybox/back.jpg"
 	};
+	
+    
+
 
 
 public:
@@ -58,6 +61,7 @@ public:
 	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
+
 };
 
 void renderObject(const OBJModel& model, unsigned int* VAO);

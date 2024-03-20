@@ -124,8 +124,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
 
     // geom shaders
-    shader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
-    skyBoxShader = Shader("src/skybox_vertex.txt", "src/skybox_fragment.txt");
+    shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
+    skyBoxShader = Shader("src/shaders/skybox_vertex.txt", "src/shaders/skybox_fragment.txt");
     // setting the int has to do with something about the uniforms
     skyBoxShader.setInt("skybox", 0);
 
@@ -140,10 +140,21 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     //std::cout << bedModel.meshes.at(0).vertices.size() << std::endl;
 
-    initVAO(skyboxVertices, sizeof(skyboxVertices), &skyVAO, &skyVBO);
+    //initVAO(skyboxVertices, sizeof(skyboxVertices), &skyVAO, &skyVBO);
 
 
-    textShader = Shader("src/vertex_shader_text.txt", "src/fragment_shader_text.txt");
+    // SkyVAO Initialization
+    glGenVertexArrays(1, &skyVAO);
+    glGenBuffers(1, &skyVBO);
+    glBindVertexArray(skyVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+
+    textShader = Shader("src/shaders/vertex_shader_text.txt", "src/shaders/fragment_shader_text.txt");
     glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
@@ -156,6 +167,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 }
 
 
+
+// to do: implement uniforms for obstacle rendering, or anything else that changes infrequently
 void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft) {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -227,6 +240,34 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
         }
 
+
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);
+        // I think I need to either give it a projection
+        skyBoxShader.use();
+
+
+
+        //glm::mat4 skyView = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
+        skyBoxShader.setMat4("projection", projection);
+        glm::mat4 skyView = glm::mat4(glm::mat3(view));
+        skyBoxShader.setMat4("view", skyView);
+        //model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+        //skyBoxShader.setMat4("model", model);
+
+
+        // skybox cube
+        glBindVertexArray(skyVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+        glDepthMask(GL_TRUE);
+
+
+
+
         shader.use();
         // car translating
         model = glm::translate(model, playerPos);
@@ -243,8 +284,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         glBindTexture(GL_TEXTURE_2D, player1Texture);
         tank.Draw(shader);
 
-        //funkyCube.Draw(ourShader);
-
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
         //model = glm::scale(model, glm::vec3(1.0f));
@@ -253,6 +292,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         glBindTexture(GL_TEXTURE_2D, planeTexture);
         plane.Draw(shader);
 
+
+        shader.use();
         //rendering all other entities starting at 2 (skipping player car and map)
         for (int i = 2; i < dataSys->entityList.size(); i++) {
 
@@ -321,6 +362,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         }
 
 
+
+
     }
 
     // Setup UI if necessary
@@ -370,21 +413,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
-    // I think I need to either give it a projection
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // Remove translation from the view matrix
-    skyBoxShader.use();
-    skyBoxShader.setMat4("projection", projection);
-    skyBoxShader.setMat4("view", view);
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_FALSE);
-    skyBoxShader.use();
-    // render skybox
-    glBindVertexArray(skyVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
+
 
 
     // swap buffers and poll IO events
@@ -420,6 +449,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    stbi_set_flip_vertically_on_load(false); // images flipped
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++)
@@ -438,6 +468,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
             stbi_image_free(data);
         }
     }
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

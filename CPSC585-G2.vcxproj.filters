@@ -63,8 +63,8 @@
     <ClInclude Include="src\PowerupSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\fragment_shader.txt" />
-    <None Include="src\vertex_shader.txt" />
+    <None Include="src\shaders\fragment_shader.txt" />
+    <None Include="src\shaders\vertex_shader.txt" />
     <None Include="src\assets\models\bed_double_A.mtl" />
     <None Include="assets\Models\bed_double_A1.mtl" />
     <None Include="assets\Models\box_A.mtl" />
@@ -84,13 +84,11 @@
     <Font Include="assets\arial.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\vertex_shader_text.txt" />
-    <Text Include="src\fragment_shader_text.txt" />
+    <Text Include="src\shaders\vertex_shader_text.txt" />
+    <Text Include="src\shaders\fragment_shader_text.txt" />
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
-    <Text Include="src\model_loading_vertex.txt" />
-    <Text Include="src\model_loading_fragment.txt" />
-    <Text Include="src\skybox_vertex.txt" />
-    <Text Include="src\skybox_fragment.txt" />
+    <Text Include="src\shaders\skybox_vertex.txt" />
+    <Text Include="src\shaders\skybox_fragment.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\Textures\wood.jpg" />
