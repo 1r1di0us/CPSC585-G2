@@ -4,12 +4,12 @@ NavMesh::NavMesh() {
 	this->nodes = new std::map<unsigned int, Node*>();
 
 	//make vertices
-	std::vector<std::vector<glm::vec3>> verts = std::vector<std::vector<glm::vec3>>();
+	std::vector<std::vector<PxVec3>> verts = std::vector<std::vector<PxVec3>>();
 	int i = 0;
 	for (float x = -75; x <= 75; x += 5.f) { //make vertices every 5 units and add them into the vertices pile
-		verts.emplace_back(std::vector<glm::vec3>());
+		verts.emplace_back(std::vector<PxVec3>());
 		for (float z = -75; z <= 75; z += 5.f) { // z is horizontal yes
-			verts[i].emplace_back(glm::vec3(x, 0.f, z));  //31 x 31 vertices
+			verts[i].emplace_back(PxVec3(x, 0.f, z));  //31 x 31 vertices
 		}
 		i++;
 	}
@@ -34,6 +34,7 @@ NavMesh::NavMesh() {
 			if (z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
 			if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
 			if (x > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+			//Knight's move connections?
 		}
 	}
 }
@@ -155,33 +156,34 @@ bool PathFinder::isDestination(Node * src, Node * dest) {
 	}
 }
 
-glm::vec3 PathFinder::getNextWaypoint() {
+PxVec3 PathFinder::getNextWaypoint() {
 	if (path->size() > 0) {
-		glm::vec3 vector = path->top();
+		PxVec3 vector = path->top();
 		path->pop();
 
 		return vector;
 	}
 	else {
+		return PxVec3(-100, -100, -100);
 		std::cout << "Path is Empty :(" << std::endl;
 	}
 
 }
 
 float PathFinder::calculateHCost(Node* src, Node* dest) {
-	glm::vec3 srcCenter = src->v0 + src->v1 + src->v2 / 3.f;
-	glm::vec3 destCenter = dest->v0 + dest->v1 + dest->v2 / 3.f;
+	PxVec3 srcCenter = src->v0 + src->v1 + src->v2 / 3.f;
+	PxVec3 destCenter = dest->v0 + dest->v1 + dest->v2 / 3.f;
 
 	// get euc dist
-	float dx = glm::abs(srcCenter.x - destCenter.x);
-	float dy = glm::abs(srcCenter.y - destCenter.y);
-	float dz = glm::abs(srcCenter.z - destCenter.z);
+	float dx = abs(srcCenter.x - destCenter.x);
+	float dy = abs(srcCenter.y - destCenter.y);
+	float dz = abs(srcCenter.z - destCenter.z);
 
-	return glm::sqrt(dx * dx + dy * dy + dz * dz);
+	return sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 void PathFinder::tracePath(Node* src, Node* dest, std::map<unsigned int, unsigned int> parents) {
-	std::vector<glm::vec3> bPath;
+	std::vector<PxVec3> bPath;
 
 	// Get rid of any pre-existing paths
 	while (!this->path->empty()) {

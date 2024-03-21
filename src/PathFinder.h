@@ -9,19 +9,19 @@
 class Node { //no idea why this class is defined here but ok
 public: // A "Node" is a square
 	unsigned int id;
-	glm::vec3 v0; //top left
-	glm::vec3 v1; //top right
-	glm::vec3 v2; //bottom right
-	glm::vec3 v3; //bottom left
-	glm::vec3 centroid;
+	PxVec3 v0; //top left
+	PxVec3 v1; //top right
+	PxVec3 v2; //bottom right
+	PxVec3 v3; //bottom left
+	PxVec3 centroid;
 
 	std::vector<std::pair<float, Node*>>* connections;
 
-	glm::vec3 getCentroid(Node* node) {
+	PxVec3 getCentroid(Node* node) {
 		return (node->v0 + node->v1 + node->v2 + node->v3) / 4.f;
 	}
 
-	Node(unsigned int id, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) {
+	Node(unsigned int id, PxVec3 v0, PxVec3 v1, PxVec3 v2, PxVec3 v3) {
 		this->id = id;
 		this->v0 = v0;
 		this->v1 = v1;
@@ -38,7 +38,7 @@ public:
 
 	NavMesh(); //constructor
 
-	Node* findEntity(glm::vec3 pos);
+	Node* findEntity(PxVec3 pos);
 
 private:
 	float cost(Node* src, Node* dest);
@@ -48,13 +48,13 @@ class PathFinder {
 
 public:
 
-	std::stack<glm::vec3>* path;
+	std::stack<PxVec3>* path;
 	NavMesh* navMesh;
 
 	PathFinder(NavMesh* navMesh);
 
 	bool search(Node* src, Node* dest);
-	glm::vec3 getNextWaypoint();
+	PxVec3 getNextWaypoint();
 
 private:
 	bool isDestination(Node* src, Node* dest);

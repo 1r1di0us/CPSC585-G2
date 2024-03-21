@@ -20,6 +20,7 @@ public:
 	double timer;
 	double brakeTimer;
 	PxVec3 moveLocation;
+	Node* moveNode;
 	std::default_random_engine rand;
 	std::normal_distribution<double> distribution;
 
@@ -28,6 +29,7 @@ public:
 	bool hiding_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	bool hunting_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	void astar_path_finding(EngineDriveVehicle* aiCar);
+	void move_car(EngineDriveVehicle* aiCar);
 
 	//TO BE DELETED
 	bool update_old(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc);
