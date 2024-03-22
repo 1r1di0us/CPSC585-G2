@@ -130,8 +130,8 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 		return false;
 	}
 
-	//gets the forward vector of the car
-	PxVec3 forwardVector = shootingCar->getGlobalPose().q.getBasisVector2();
+	//car info struct
+	CarInfo* carInfo = dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar));
 
 	//calculating the actual projectile radius, taking powerups into account
 	float actualProjectileRadius = dataSys->DEFAULT_PROJECTILE_RADIUS;
@@ -144,11 +144,10 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
-	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * actualProjectileRadius * 6.5,
+		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * actualProjectileRadius * 6.5,
 			actualProjectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * actualProjectileRadius * 6.5),
+			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * actualProjectileRadius * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
@@ -174,12 +173,12 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->projectileSpeedActiveTimeLeft > 0) {
 
 		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * dataSys->PROJECTILE_SPEED_POWERUP_STRENGTH * PxVec3(forwardVector.x, 0, forwardVector.z));
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * dataSys->PROJECTILE_SPEED_POWERUP_STRENGTH * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
 	}
 	else {
 
 		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(forwardVector.x, 0, forwardVector.z));
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
 	}
 
 	//adding the projectile to the dict for the correct car
