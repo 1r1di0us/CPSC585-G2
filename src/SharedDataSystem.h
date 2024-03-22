@@ -34,6 +34,7 @@ struct CarInfo{
 	float parryActiveTimeLeft = 0;
 	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
+	PxVec3 shootDir;
 };
 
 //powerup types

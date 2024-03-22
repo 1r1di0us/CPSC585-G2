@@ -44,6 +44,12 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 	else if (state == MOVETO) {
 		fire = moveto_behaviour(aiCar, fire);
 	}
+
+	//not sure if best place to put it
+	//update the shoot direction of each car
+	CarInfo* carInfo = dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(dataSys->GetRigidDynamicFromVehicle(aiCar)));
+	carInfo->shootDir = dataSys->GetRigidDynamicFromVehicle(aiCar)->getGlobalPose().q.getBasisVector2();
+
 	return fire;
 }
 
