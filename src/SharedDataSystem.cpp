@@ -1,6 +1,5 @@
 #include "SharedDataSystem.h"
 
-
 /*
 * PRIVATE FUNCTIONS
 */
@@ -82,8 +81,16 @@ PxVec2 SharedDataSystem::FindCenterOfFourPointsWithRandomOffset(PxReal minDistan
 
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
+	//clear the data from the previous iteration
+	for (int i = 0; i < mapSquareList.size(); i++) {
+
+		mapSquareList[i].numPoints = 0;
+		mapSquareList[i].pointsInIt.clear();
+	}
+
 	//go through the map square list and populate each one fully before moving on to the next one
 	while (pointsOfSameType.size() > 0) {
+
 		for (int i = 0; i < mapSquareList.size(); i++) {
 			//gets rid of out of bounds points
 			IsPointInBounds(pointsOfSameType.at(0));
@@ -91,8 +98,7 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 				pointsOfSameType.erase(pointsOfSameType.begin());
 				break;
 			}
-
-			//the if statement is what crashes
+			
 			if (IsPointInSquare(pointsOfSameType.at(0), mapSquareList[i])) {
 				mapSquareList[i].numPoints++;
 				mapSquareList[i].pointsInIt.emplace_back(pointsOfSameType.at(0));
@@ -107,9 +113,6 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 
 void SharedDataSystem::RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList) {
 
-	//make a random seed based on the current time
-	srand(time(0));
-
 	for (int i = mapSquareList.size() - 1; i > 0; --i) {
 		// Generate a random index between 0 and i (inclusive)
 		int randomIndex = rand() % (i + 1);
@@ -119,139 +122,96 @@ void SharedDataSystem::RandomizeMapSquareList(std::vector<MapSquare>& mapSquareL
 	}
 }
 
-PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
+bool SharedDataSystem::IsSpawnPointValid(PxVec2 potentialSpawnPoint) {
+
+	//go through all obstacles
+	for (int i = 0; i < obstacleMapSquareList.size(); i++) {
+
+		//if the point is inside the square made by the max dimensions of an obstacle
+		if (IsPointInSquare(potentialSpawnPoint, obstacleMapSquareList[i])) {
+			if (DEBUG_PRINTS) printf("CheckPotentialSpawnPoint spawnpoint is in obstacle\n");
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
 
 	PxVec2 spawnPoint;
-	std::vector<MapSquare> mapSquareList;
+	bool foundPoint;
+	MapSquare* bestSquare;
 
-	int xMapSquares = MAPLENGTHX / minDistance;
-	int zMapSquares = MAPLENGTHZ / minDistance;
+	//for the case where it gets stuck infinite looping because the spawn square is invalid and cant choose another one cause random is outside of this loop
+	int minAcceptablePoints = 0;
+	int maxAcceptableLoops = 10;
 
-	//divide the map into squares using the minDistance
-	for (int i = 0; i < xMapSquares; i++) {
-		for (int j = 0; j < zMapSquares; j++) {
-			MapSquare square;
-			square.id = i * zMapSquares + j;
-			square.bottomLeft = PxVec2(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
-			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
-			mapSquareList.emplace_back(square);
+	do {
 
-			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
-			MAKE_BOX_DEBUG(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
-		}
-	}
+		foundPoint = false;
 
-	//then make one more row of map squares to cover the last area of the map (in case it doesnt divide nicely)
-		//need to get the leftover bit and divide it as much as possible into good ish squares and have one bs square in the top right corner
+		//find the square with the least amount of points in it
+		//if the square has no points in it, find the center and return that
+		bestSquare = &mapSquareList[0];
 
-	//the remaining distance to be split
-	float remainingX = MAPLENGTHX - xMapSquares * minDistance;
-	float remainingZ = MAPLENGTHZ - zMapSquares * minDistance;
+		for (int i = 0; i < mapSquareList.size(); i++) {
+			if (mapSquareList[i].numPoints == minAcceptablePoints || mapSquareList[i].numPoints < bestSquare->numPoints) {
+				bestSquare = &mapSquareList[i];
+				if (bestSquare->numPoints == 0) {
 
-	//add semi nice squares in the z direction
-	if (remainingX > 0) {
+					//random offset
+					float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
 
-		//go from x = bottom left map x in increments of minDistance until hit either top right or just less than
-		//constant z size
-
-		//loops "up" in the z-direction
-		for (int i = BOTTOM_LEFT_MAP_COORD.y; i < TOP_RIGHT_MAP_COORD.y - minDistance; i += minDistance) {
-
-			MapSquare square;
-			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, i);
-			square.topRight = PxVec2(TOP_RIGHT_MAP_COORD.x, i + minDistance);
-			mapSquareList.emplace_back(square);
-
-			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, i);
-			MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, i + minDistance);
-		}
-	}
-
-	//add semi nice squares in the x direction
-	if (remainingZ > 0) {
-
-		//go from z = bottom left map z in increments of minDistance until hit either top right or just less than
-		//constant x size
-
-		//loops "right" in the x-direction
-		for (int i = BOTTOM_LEFT_MAP_COORD.x; i < TOP_RIGHT_MAP_COORD.x - minDistance; i += minDistance) {
-
-			MapSquare square;
-			square.id = mapSquareList.size() + 1;
-			square.bottomLeft = PxVec2(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
-			square.topRight = PxVec2(i + minDistance, TOP_RIGHT_MAP_COORD.y);
-			mapSquareList.emplace_back(square);
-
-			MAKE_BOX_DEBUG(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
-			MAKE_BOX_DEBUG(i + minDistance, TOP_RIGHT_MAP_COORD.y);
-		}
-
-	}
-
-	//add the corner fucked square
-	MapSquare square;
-	square.id = mapSquareList.size() + 1;
-	square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
-	square.topRight = TOP_RIGHT_MAP_COORD;
-	mapSquareList.emplace_back(square);
-
-	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
-	MAKE_BOX_DEBUG(TOP_RIGHT_MAP_COORD.x, TOP_RIGHT_MAP_COORD.y);
-
-	//place the points in their respecitve squares
-	PopulateMapSquareList(pointsOfSameType, mapSquareList);
-
-	//randomize the list to prevent spawning in the same place always
-	RandomizeMapSquareList(mapSquareList);
-
-	//find the square with the least amount of points in it
-	//if the square has no points in it, find the center and return that
-	MapSquare* bestSquare = &mapSquareList[0];
-
-	for (int i = 0; i < mapSquareList.size(); i++) {
-		if (mapSquareList[i].numPoints == 0 || mapSquareList[i].numPoints < bestSquare->numPoints) {
-			bestSquare = &mapSquareList[i];
-			if (bestSquare->numPoints == 0) {
-
-				//random offset
-				float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
-
-				//setting the coords
-				spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
-				spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
-				return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
+					//setting the coords
+					spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
+					spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
+					foundPoint = true;
+				}
 			}
 		}
-	}
 
-	boxesMade = true;
+		if (!foundPoint) {
 
-	printf("best square: %d\n", bestSquare->numPoints);
+			switch (bestSquare->numPoints) {
+			case 1:
+				//need to find 3 nearest points
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 2:
+				//need to find 2 nearest points
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 3:
+				//need to find nearest point
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
+				break;
+			case 4:
+				//make square, return middle
+				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
+				break;
+			default:
+				//make a random point in the square and return that
+				spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
+				spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
+				break;
+			}
 
-	switch (bestSquare->numPoints) {
-	case 1:
-		//need to find 3 nearest points
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 2:
-		//need to find 2 nearest points
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 3:
-		//need to find nearest point
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
-		break;
-	case 4:
-		//make square, return middle
-		spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
-		break;
-	default:
-		//make a random point in the square and return that
-		spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
-		spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
-		break;
-	}
+			//if spawn point not found after 10 attempts
+			if (maxAcceptableLoops-- == 0) {
+
+				//reset number of attempts
+				maxAcceptableLoops = 10;
+				//increase the number of points allowed in a square
+				minAcceptablePoints++;
+				//randomize the list again for good measure
+				RandomizeMapSquareList(mapSquareList);
+			}
+		}
+
+	//function to check the spawn point generated
+	} while (!IsSpawnPointValid(spawnPoint));
 
 	return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
 }
@@ -261,21 +221,22 @@ PxVec3 SharedDataSystem::GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType
 */
 
 void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
-	
-	if (!boxesMade) {
 
-		//define a projectile
+	if (DEBUG_BOXES) {
+
+		//define a box
 		physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(0.25f, 0.25f, 0.25f), *gMaterial);
 
-		PxRigidStatic* projectileBody = gPhysics->createRigidStatic(PxTransform(x, 5, z));
-		projectileBody->attachShape(*shape);
-		projectileBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
-		gScene->addActor(*projectileBody);
+		PxRigidStatic* boxBody = gPhysics->createRigidStatic(PxTransform(x, 5, z));
+		boxBody->setName("DEBUG BOX");
+		boxBody->attachShape(*shape);
+		boxBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+		gScene->addActor(*boxBody);
 	}
 }
 
 CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> entity) {
-	
+
 	for (int i = 0; i < carInfoList.size(); i++) {
 		if (carInfoList[i].entity->name == entity->name) {
 			return &carInfoList[i];
@@ -288,7 +249,7 @@ CarInfo* SharedDataSystem::GetCarInfoStructFromEntity(std::shared_ptr<Entity> en
 }
 
 EngineDriveVehicle* SharedDataSystem::GetVehicleFromRigidDynamic(PxRigidDynamic* carRigidDynamic) {
-	
+
 	for (int i = 0; i < carRigidDynamicList.size(); i++) {
 
 		if (carRigidDynamicList[i] == carRigidDynamic) {
@@ -344,7 +305,10 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 
 PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 
+	//has some code re-use for easy function usage
+
 	std::vector<PxVec2> locations;
+	PxVec3 respawnPoint;
 
 	//uses physics type to determine min spacing
 	switch (physType) {
@@ -357,7 +321,14 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 				locations.emplace_back(carInfoList[i].entity->collisionBox->getGlobalPose().p.x, carInfoList[i].entity->collisionBox->getGlobalPose().p.z);
 			}
 		}
-		return GenerateSpawnPoint(locations, CAR_MIN_SPAWN_DISTANCE, CAR_SPAWN_HEIGHT);
+
+		//place the points in their respecitve squares
+		PopulateMapSquareList(locations, carMapSquareList);
+
+		//randomize the list to prevent spawning in the same place always
+		RandomizeMapSquareList(carMapSquareList);
+
+		return GenerateValidSpawnPoint(carMapSquareList, locations, CAR_MIN_SPAWN_DISTANCE, CAR_SPAWN_HEIGHT);
 
 		break;
 	case PhysicsType::POWERUP:
@@ -365,7 +336,14 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 		for (int i = 0; i < allPowerupList.size(); i++) {
 			locations.emplace_back(PxVec2(allPowerupList[i].entity->collisionBox->getGlobalPose().p.x, allPowerupList[i].entity->collisionBox->getGlobalPose().p.z));
 		}
-		return GenerateSpawnPoint(locations, POWERUP_MIN_SPAWN_DISTANCE, POWERUP_SPAWN_HEIGHT);
+
+		//place the points in their respecitve squares
+		PopulateMapSquareList(locations, powerupMapSquareList);
+
+		//randomize the list to prevent spawning in the same place always
+		RandomizeMapSquareList(powerupMapSquareList);
+
+		return GenerateValidSpawnPoint(powerupMapSquareList, locations, POWERUP_MIN_SPAWN_DISTANCE, POWERUP_SPAWN_HEIGHT);
 
 		break;
 	default:
@@ -378,15 +356,53 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 	exit(69);
 }
 
+void SharedDataSystem::AddObstacleToObstacleList(PxRigidStatic* obstacle) {
+
+	//getting half the size of the object
+	PxVec3 halfSize = obstacle->getWorldBounds().getDimensions() / 2;
+	
+	//making the box that cant spawn in bigger to avoid clipping issues
+	halfSize.x += STATIC_SPAWN_OFFSET;
+	halfSize.z += STATIC_SPAWN_OFFSET;
+
+	//getting the center of the object
+	PxVec3 center = obstacle->getGlobalPose().p;
+
+	//creating the mapsquare for the obstacle
+	MapSquare obstacleMapSquare;
+	obstacleMapSquare.bottomLeft = PxVec2(center.x - halfSize.x, center.z - halfSize.z);
+	obstacleMapSquare.topRight = PxVec2(center.x + halfSize.x, center.z + halfSize.z);
+
+	//adding it to the list
+	obstacleMapSquareList.emplace_back(obstacleMapSquare);
+}
+
+bool SharedDataSystem::Parry(PxRigidDynamic* carThatParried) {
+
+	CarInfo* carInfo = GetCarInfoStructFromEntity(GetEntityFromRigidDynamic(carThatParried));
+
+	//can sucessfully parry
+	if (carInfo->parryCooldownTimeLeft < 0 && carInfo->isAlive) {
+
+		carInfo->parryActiveTimeLeft = PARRY_ACTIVE_DURATION;
+		carInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
+
+		return true;
+	}
+	
+	return false;
+}
+
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
 
 	//not sure if there is a better way to do this
 	//go through every list of shot projectiles and search for the passed one
 	//return the car
 	for (auto iterator = carProjectileRigidDynamicDict.begin(); iterator != carProjectileRigidDynamicDict.end(); ++iterator) {
-		
+
 		for (PxRigidDynamic* listProjectile : iterator->second) {
 			if (listProjectile == projectile) {
+				if (DEBUG_PRINTS) printf("GetCarThatShotProjectile hard debug\n");
 				return GetEntityFromRigidDynamic(iterator->first);
 			}
 		}
@@ -410,54 +426,103 @@ PowerupInfo* SharedDataSystem::GetPowerupInfoStructFromEntity(std::shared_ptr<En
 	exit(69);
 }
 
+void SharedDataSystem::AddToCollatCache(std::shared_ptr<Entity> entityToAdd) {
+
+	//adding the projectile to the collat cache
+	bool isInCache = false;
+	for (int i = 0; i < collatCache.size(); i++) {
+		if (collatCache[i]->name == entityToAdd->name) {
+			isInCache = true;
+			break;
+		}
+	}
+
+	//only add it to the cache if it isnt already in there
+	if (!isInCache) {
+		collatCache.emplace_back(entityToAdd);
+	}
+}
+
 void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projectile) {
 
-	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
+	if (DEBUG_PRINTS) printf("CarProjectileCollisionLogic before\n");
+
+	std::shared_ptr<Entity> shotCarEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
-	//increase score of car that shot
-	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
-	shootingCarInfo->score++;
+	if (DEBUG_PRINTS) printf("CarProjectileCollisionLogic after\n");
 
-	/*
-	* remove the projectile from all lists
-	*/
+	//get the shooting cars rigid dynamic
+	PxRigidDynamic* shootingCarRigidDynamic = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
 
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == projectileEntity->name) {
-			entityList.erase(entityList.begin() + i);
+	//car info struct of the shot car
+	CarInfo* shotCarInfo = GetCarInfoStructFromEntity(shotCarEntity);
+
+	//if the shot car has parried
+	if (shotCarInfo->parryActiveTimeLeft > 0) {
+
+		//change ownership of the projectile
+		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
+			if (carProjectileRigidDynamicDict[shootingCarRigidDynamic][i] == (PxRigidDynamic*)projectile) {
+				carProjectileRigidDynamicDict[(PxRigidDynamic*)car].emplace_back((PxRigidDynamic*)projectile);
+				carProjectileRigidDynamicDict[shootingCarRigidDynamic].erase(carProjectileRigidDynamicDict[shootingCarRigidDynamic].begin() + i);
+			}
 		}
+
+		//getting the new forward direction of the projectile
+		PxVec3 projectileBackwardVector = projectileEntity->collisionBox->getGlobalPose().q.getBasisVector2() * -1;
+
+		//send the projectile back the way it came
+			//doing the offset based on the same math as the shooting math
+		projectileEntity->collisionBox->setGlobalPose(
+			PxTransform(
+				PxVec3(
+					projectileEntity->collisionBox->getGlobalPose().p.x + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5,
+					projectileEntity->collisionBox->getGlobalPose().p.y,
+					projectileEntity->collisionBox->getGlobalPose().p.z + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5),
+				projectileEntity->collisionBox->getGlobalPose().q));
+
+		//stoled from car shoot ahahah
+		projectileEntity->collisionBox->setLinearVelocity(SHOOT_FORCE * PxVec3(projectileBackwardVector.x, 0, projectileBackwardVector.z));
+
+		//update cooldowns
+		shotCarInfo->parryActiveTimeLeft = 0;
+		shotCarInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
+
 	}
+	else {
 
-	//car projectile dict
-	for (int i = 0; i < carProjectileRigidDynamicDict[(PxRigidDynamic*)car].size(); i++) {
-		if (carProjectileRigidDynamicDict[(PxRigidDynamic*)car][i] == (PxRigidDynamic*)projectile) {
-			carProjectileRigidDynamicDict[(PxRigidDynamic*)car].erase(carProjectileRigidDynamicDict[(PxRigidDynamic*)car].begin() + i);
-		}
+		//increase score of car that shot
+		CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
+		shootingCarInfo->score++;
+
+		AddToCollatCache(projectileEntity);
+
+		//make a sound
+		SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+
+		//setting the data of the car that got hit to let it respawn
+		CarInfo* hitCar = GetCarInfoStructFromEntity(shotCarEntity);
+		hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
+		hitCar->isAlive = false;
+		//moving into the sky and disabling gravity to "delete it"
+		hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+		PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
+		PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
+		hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
 	}
-
-	//delete the projectile
-	gScene->removeActor(*projectile);
-	projectile->release();
-
-	//setting the data of the car that got hit to let it respawn
-	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
-	hitCar->isAlive = false;
-	//moving into the sky and disabling gravity to "delete it"
-	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
-	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 100;
-	PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
-	hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
 
 }
 
 void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
 
+	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic before\n");
+
 	//converting the actors to entities
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
+
+	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic after\n");
 
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
@@ -479,56 +544,71 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	}
 
-	/*
-	* kill the powerup (remove from all lists and scene)
-	*/
-
-	//all powerup list
-	for (int i = 0; i < allPowerupList.size(); i++) {
-		if (allPowerupList[i].entity->name == powerupEntity->name) {
-			allPowerupList.erase(allPowerupList.begin() + i);
-		}
-	}
-
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == powerupEntity->name) {
-			entityList.erase(entityList.begin() + i);
-		}
-	}
-
-	//scene
-	gScene->removeActor(*powerupEntity->collisionBox);
-	powerupEntity->collisionBox->release();
+	AddToCollatCache(powerupEntity);
 
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
+	if (DEBUG_PRINTS) printf("ProjectileStaticCollisionLogic before\n");
+
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 	PxRigidDynamic* carThatShotProjectile = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
 
-	/*
-	* remove the projectile from all lists
-	*/
+	if (DEBUG_PRINTS) printf("ProjectileStaticCollisionLogic after\n");
 
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == projectileEntity->name) {
-			entityList.erase(entityList.begin() + i);
+	AddToCollatCache(projectileEntity);
+
+}
+
+void SharedDataSystem::CleanCollatCache() {
+
+	std::shared_ptr<Entity> shootingCar;
+
+	while (collatCache.size() > 0) {
+
+		switch (collatCache.front()->physType) {
+		case PhysicsType::PROJECTILE:
+
+			shootingCar = GetCarThatShotProjectile(collatCache.front()->collisionBox);
+
+			//remove projectile from car projectile dict
+			for (int i = 0; i < carProjectileRigidDynamicDict[shootingCar->collisionBox].size(); i++) {
+				if (carProjectileRigidDynamicDict[shootingCar->collisionBox][i] == collatCache.front()->collisionBox) {
+					carProjectileRigidDynamicDict[shootingCar->collisionBox].erase(carProjectileRigidDynamicDict[shootingCar->collisionBox].begin() + i);
+				}
+			}
+
+			break;
+		case PhysicsType::POWERUP:
+
+			//all powerup list
+			for (int i = 0; i < allPowerupList.size(); i++) {
+				if (allPowerupList[i].entity->name == collatCache.front()->name) {
+					allPowerupList.erase(allPowerupList.begin() + i);
+				}
+			}
+
+			break;
+		default:
+			break;
 		}
-	}
 
-	//car projectile dict
-	for (int i = 0; i < carProjectileRigidDynamicDict[carThatShotProjectile].size(); i++) {
-		if (carProjectileRigidDynamicDict[carThatShotProjectile][i] == (PxRigidDynamic*)projectile) {
-			carProjectileRigidDynamicDict[carThatShotProjectile].erase(carProjectileRigidDynamicDict[carThatShotProjectile].begin() + i);
+		//delete the object
+		gScene->removeActor(*collatCache.front()->collisionBox);
+		collatCache.front()->collisionBox->release();
+
+		//remove from entity list
+		for (int i = 0; i < entityList.size(); i++) {
+			if (entityList[i].name == collatCache.front()->name) {
+				entityList.erase(entityList.begin() + i);
+			}
 		}
-	}
 
-	//delete the projectile
-	gScene->removeActor(*projectile);
-	projectile->release();
+		//remove it from the cache
+		collatCache.erase(collatCache.begin());
+
+	}
 }
 
 void SharedDataSystem::ResolveCollisions() {
@@ -536,67 +616,181 @@ void SharedDataSystem::ResolveCollisions() {
 	//if a collision has occured
 	if (gContactReportCallback->contactDetected) {
 
-		//code readability variables
-		PxActor* actor1 = gContactReportCallback->contactPair.actors[0];
-		PxActor* actor2 = gContactReportCallback->contactPair.actors[1];
+		//goes through all contact pairs
+		for (int i = 0; i < SharedDataSystem::contactPairs.size(); i++) {
 
-		//get the two entities that collided
-		std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
-		std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
+			//code readability variables
+			PxActor* actor1 = SharedDataSystem::contactPairs[i].actors[0];
+			PxActor* actor2 = SharedDataSystem::contactPairs[i].actors[1];
 
-		//determines the logic to use
-		switch (entity1->physType) {
-		case PhysicsType::CAR:
+			if (DEBUG_PRINTS) printf("ResolveCollisions before\n");
 
-			switch (entity2->physType) {
-			case PhysicsType::PROJECTILE:
-				CarProjectileCollisionLogic(actor1, actor2);
-				break;
-			case PhysicsType::POWERUP:
-				CarPowerupCollisionLogic(actor1, actor2);
-				break;
-			default:
-				break;
-			}
+			//get the two entities that collided
+			std::shared_ptr<Entity> entity1 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor1);
+			std::shared_ptr<Entity> entity2 = GetEntityFromRigidDynamic((PxRigidDynamic*)actor2);
 
-			break;
-		case PhysicsType::PROJECTILE:
+			if (DEBUG_PRINTS) printf("ResolveCollisions after\n");
 
-			switch (entity2->physType) {
+			//determines the logic to use
+			switch (entity1->physType) {
 			case PhysicsType::CAR:
-				CarProjectileCollisionLogic(actor2, actor1);
+
+				switch (entity2->physType) {
+				case PhysicsType::PROJECTILE:
+					CarProjectileCollisionLogic(actor1, actor2);
+					break;
+				case PhysicsType::POWERUP:
+					CarPowerupCollisionLogic(actor1, actor2);
+					break;
+				default:
+					break;
+				}
+
+				break;
+			case PhysicsType::PROJECTILE:
+
+				switch (entity2->physType) {
+				case PhysicsType::CAR:
+					CarProjectileCollisionLogic(actor2, actor1);
+					break;
+				case PhysicsType::STATIC:
+					ProjectileStaticCollisionLogic(actor1);
+					break;
+				default:
+					break;
+				}
+
 				break;
 			case PhysicsType::STATIC:
-				ProjectileStaticCollisionLogic(actor1);
+
+				if (entity2->physType == PhysicsType::PROJECTILE) {
+					ProjectileStaticCollisionLogic(actor2);
+				}
+
+				break;
+			case PhysicsType::POWERUP:
+
+				if (entity2->physType == PhysicsType::CAR) {
+					CarPowerupCollisionLogic(actor2, actor1);
+				}
+
 				break;
 			default:
+				printf("unknown physics type of colliding object\n");
 				break;
 			}
 
-			break;
-		case PhysicsType::STATIC:
-
-			if (entity2->physType == PhysicsType::PROJECTILE) {
-				ProjectileStaticCollisionLogic(actor2);
-			}
-
-			break;
-		case PhysicsType::POWERUP:
-
-			if (entity2->physType == PhysicsType::CAR) {
-				CarPowerupCollisionLogic(actor2, actor1);
-			}
-
-			break;
-		default:
-			printf("unknown physics type of colliding object\n");
-			break;
 		}
-	
+
 	}
 
-	//resolved the collision
+	//resolved the collisions
+	SharedDataSystem::contactPairs.clear();
 	gContactReportCallback->contactDetected = false;
+}
+
+void SharedDataSystem::InitMapSquares(std::vector<MapSquare>& listToPopulate, PxReal minDistance) {
+
+	int xMapSquares = MAPLENGTHX / minDistance;
+	int zMapSquares = MAPLENGTHZ / minDistance;
+
+	//divide the map into squares using the minDistance
+	for (int i = 0; i < xMapSquares; i++) {
+		for (int j = 0; j < zMapSquares; j++) {
+			MapSquare square;
+			square.id = i * zMapSquares + j;
+			square.bottomLeft = PxVec2(BOTTOM_LEFT_MAP_COORD.x + i * minDistance, BOTTOM_LEFT_MAP_COORD.y + j * minDistance);
+			square.topRight = PxVec2(BOTTOM_LEFT_MAP_COORD.x + (i + 1) * minDistance, BOTTOM_LEFT_MAP_COORD.y + (j + 1) * minDistance);
+			listToPopulate.emplace_back(square);
+
+		}
+	}
+
+	//then make one more row of map squares to cover the last area of the map (in case it doesnt divide nicely)
+		//need to get the leftover bit and divide it as much as possible into good ish squares and have one bs square in the top right corner
+
+	//the remaining distance to be split
+	float remainingX = MAPLENGTHX - xMapSquares * minDistance;
+	float remainingZ = MAPLENGTHZ - zMapSquares * minDistance;
+
+	//add semi nice squares in the z direction
+	if (remainingX > 0) {
+
+		//go from x = bottom left map x in increments of minDistance until hit either top right or just less than
+		//constant z size
+
+		//loops "up" in the z-direction
+		for (int i = BOTTOM_LEFT_MAP_COORD.y; i < TOP_RIGHT_MAP_COORD.y - minDistance; i += minDistance) {
+
+			MapSquare square;
+			square.id = listToPopulate.size() + 1;
+			square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, i);
+			square.topRight = PxVec2(TOP_RIGHT_MAP_COORD.x, i + minDistance);
+			listToPopulate.emplace_back(square);
+		}
+	}
+
+	//add semi nice squares in the x direction
+	if (remainingZ > 0) {
+
+		//go from z = bottom left map z in increments of minDistance until hit either top right or just less than
+		//constant x size
+
+		//loops "right" in the x-direction
+		for (int i = BOTTOM_LEFT_MAP_COORD.x; i < TOP_RIGHT_MAP_COORD.x - minDistance; i += minDistance) {
+
+			MapSquare square;
+			square.id = listToPopulate.size() + 1;
+			square.bottomLeft = PxVec2(i, TOP_RIGHT_MAP_COORD.y - remainingZ);
+			square.topRight = PxVec2(i + minDistance, TOP_RIGHT_MAP_COORD.y);
+			listToPopulate.emplace_back(square);
+		}
+
+	}
+
+	//add the corner fucked square
+	if (remainingX > 0 && remainingZ > 0) {
+		MapSquare square;
+		square.id = listToPopulate.size() + 1;
+		square.bottomLeft = PxVec2(TOP_RIGHT_MAP_COORD.x - remainingX, TOP_RIGHT_MAP_COORD.y - remainingZ);
+		square.topRight = TOP_RIGHT_MAP_COORD;
+		listToPopulate.emplace_back(square);
+	}
+
+	//checks all boxes against all obstacles
+	//checks all the elements using fancy iterator logic
+	std::vector<MapSquare>::iterator iterator = listToPopulate.begin();
+	do {
+
+		iterator++;
+
+		//go through all obstacles
+		for (int i = 0; i < obstacleMapSquareList.size(); i++) {
+
+			//if the bottom left and top right are in any obstacle
+				//may lead to some deadzones around obstacles
+			if (IsPointInSquare((iterator - 1)->bottomLeft, obstacleMapSquareList[i])) {
+
+				if (IsPointInSquare((iterator - 1)->topRight, obstacleMapSquareList[i])) {
+
+					//remove the map square
+					iterator = listToPopulate.erase(iterator - 1);
+					break;
+				}
+			}
+		}
+	} while (iterator != listToPopulate.end());
+
+	//makes all debug boxes for the remaining map squares
+	for (int i = 0; i < listToPopulate.size(); i++) {
+
+		MAKE_BOX_DEBUG(listToPopulate[i].bottomLeft.x, listToPopulate[i].bottomLeft.y);
+		MAKE_BOX_DEBUG(listToPopulate[i].topRight.x, listToPopulate[i].topRight.y);
+
+		MAKE_BOX_DEBUG(listToPopulate[i].bottomLeft.x, listToPopulate[i].topRight.y);
+		MAKE_BOX_DEBUG(listToPopulate[i].topRight.x, listToPopulate[i].bottomLeft.y);
+	}
+
 }
 
 void SharedDataSystem::resetSharedDataSystem() {
@@ -610,6 +804,29 @@ void SharedDataSystem::resetSharedDataSystem() {
 
 	//reset variables
 	spawnedPowerupCounter = 0;
+
+	//add all the static objects to the entity list
+	for (int i = 0; i < STATIC_OBJECT_LIST.size(); i++) {
+
+		entityList.emplace_back(STATIC_OBJECT_LIST[i]);
+	}
+}
+
+void SharedDataSystem::InitSharedDataSystem() {
+
+	//generate the map squares for both cars and powerups
+	InitMapSquares(this->carMapSquareList, CAR_MIN_SPAWN_DISTANCE);
+	InitMapSquares(this->powerupMapSquareList, POWERUP_MIN_SPAWN_DISTANCE);
+
+	//make all obstacle debug boxes
+	for (int i = 0; i < obstacleMapSquareList.size(); i++) {
+
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].bottomLeft.y);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].topRight.y);
+
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].topRight.y);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].bottomLeft.y);
+	}
 }
 
 void SharedDataSystem::menuEventHandler() {
@@ -625,4 +842,8 @@ glm::mat3 SharedDataSystem::getCamRotMat() {
 
 PxMat33 SharedDataSystem::getCamRotMatPx(float angle) {
 	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
+}
+
+PxMat33 SharedDataSystem::getSoundRotMat() {
+	return PxMat33({ cos((float)M_PI - cameraAngle), 0, sin((float)M_PI - cameraAngle) }, { 0, 1, 0 }, { -sin((float)M_PI - cameraAngle), 0, -cos((float)M_PI - cameraAngle) });
 }

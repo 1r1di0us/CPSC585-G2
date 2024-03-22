@@ -98,10 +98,10 @@
     <None Include="src\shaders\vertex_shader.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="assets\arial.ttf" />
-    <Font Include="assets\Gaegu-Bold.ttf" />
-    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\Fonts\arial.ttf" />
+    <Font Include="assets\Fonts\Candy Beans.otf" />
+    <Font Include="assets\Fonts\Gaegu-Bold.ttf" />
+    <Font Include="assets\Fonts\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\shaders\fragment_shader_text.txt" />
@@ -315,9 +315,9 @@ mkdir "$(TargetDir)assets"
 
 copy "$(SolutionDir)assets\" "$(TargetDir)assets\"
 
-mkdir "$(TargetDir)src\Textures"
+mkdir "$(TargetDir)assets\Textures"
 
-copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
+copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -363,9 +363,21 @@ mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
 
-mkdir "$(TargetDir)src\Textures"
+mkdir "$(TargetDir)assets\Fonts"
 
-copy "$(SolutionDir)src\Textures" "$(TargetDir)src\Textures"</Command>
+copy "$(SolutionDir)assets\Fonts" "$(TargetDir)assets\Fonts"
+
+mkdir "$(TargetDir)assets\Music"
+
+copy "$(SolutionDir)assets\Music" "$(TargetDir)assets\Music"
+
+mkdir "$(TargetDir)assets\Textures"
+
+copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"
+
+mkdir "$(TargetDir)assets\Textures\UI"
+
+copy "$(SolutionDir)assets\Textures\UI" "$(TargetDir)assets\Textures\UI"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

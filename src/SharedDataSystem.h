@@ -14,6 +14,7 @@
 #include <chrono>
 #include <queue>
 #include "math.h"
+#include <utility>
 
 using namespace physx;
 using namespace physx::vehicle2;
@@ -30,7 +31,8 @@ struct CarInfo{
 	//THANKS MURTAZA!
 	bool isAlive = true;
 	float respawnTimeLeft = 0;
-	float parryTimeLeft = 0;
+	float parryActiveTimeLeft = 0;
+	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
 };
 
@@ -70,7 +72,12 @@ struct CompareDistance {
 
 class SharedDataSystem {
 
+public:
+
+	static std::vector<PxContactPairHeader> contactPairs;
+
 private:
+
 	//custom collision callback system
 	class ContactReportCallback : public PxSimulationEventCallback {
 
@@ -84,12 +91,14 @@ private:
 			void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) {
 				//PX_UNUSED(pairHeader);
 				//PX_UNUSED(pairs);
-				PX_UNUSED(nbPairs);
+				//PX_UNUSED(nbPairs);
 
 				//call the resolver here to deal with more than one collision pair per physics sim frame?
 				contactPair = pairHeader;
-				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND))
+				if (pairHeader.pairs->events.isSet(PxPairFlag::eNOTIFY_TOUCH_FOUND)) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 			}
 			void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) {}
 			void onWake(physx::PxActor** actors, physx::PxU32 count) {}
@@ -100,8 +109,10 @@ private:
 				contactPair.actors[0] = pairs->triggerActor;
 				contactPair.actors[1] = pairs->otherActor;
 
-				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND)
+				if (pairs->status == PxPairFlag::eNOTIFY_TOUCH_FOUND) {
 					contactDetected = true;
+					contactPairs.emplace_back(contactPair);
+				}
 
 			}
 			void onAdvance(const physx::PxRigidBody* const* bodyBuffer,
@@ -137,18 +148,21 @@ private:
 	//randomizes the map square list
 	void RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList);
 
-	//creates the map square list
-	void CreateMapSquareList();
+	//function to check a potential spawn point against all obstacles
+	bool IsSpawnPointValid(PxVec2 potentialSpawnPoint);
 
 	//generates a point a min distance away from all points in given vec and within the map range
-	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
-
+	PxVec3 GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
 
 public:
 
 	/*
 	* CONSTANTS:
 	*/
+
+	//debug mode
+	bool DEBUG_PRINTS = false;
+	bool DEBUG_BOXES = false;
 
 	//timestep value, easily modifiable
 	const PxReal TIMESTEP = 1.0f / 60.0f;
@@ -157,8 +171,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-20.0f, -20.0f);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(20.0f, 20.0f);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -70);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 70);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -176,6 +190,9 @@ public:
 	//the spawn height of powerups
 	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
+	//min spawn distance from static objects
+	const PxReal STATIC_SPAWN_OFFSET = 5.0f;
+
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
 
@@ -186,9 +203,25 @@ public:
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
 
 	//the number of bullets given per ammo powerup
-	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 2;
+	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
-	//entity helper functions move from entity cpp?
+	//a vector of static objects that persist through games
+	std::vector<Entity> STATIC_OBJECT_LIST;
+	
+	//the cooldown time for the parry mechanic
+	const float PARRY_COOLDOWN_TIME_LEFT = 2.0f;
+
+	//how long can you parry for
+	const float PARRY_ACTIVE_DURATION = 1.0f;
+
+	//force at which to shoot the projectile
+	const float SHOOT_FORCE = 100;
+
+	//the projectile radius
+	const PxReal PROJECTILE_RADIUS = 1.0f;
+
+	//adding a map entity that persists through games
+	Entity MAP;
 
 	//the GOAT list of entities
 	std::vector<Entity> entityList;
@@ -212,9 +245,6 @@ public:
 	* DEBUGGING STUFF
 	*/
 
-	//will make debug boxes at all the squares used in respawning
-	bool boxesMade = false;
-
 	//makes a floating box for boundary demo purposes
 	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
 
@@ -237,18 +267,38 @@ public:
 	//gets the list of dead cars to do shit to
 	std::vector<CarInfo*> GetListOfDeadCars();
 
+	/*
+	* RESPAWN
+	*/
+
+	//map square lists to populate
+	std::vector<MapSquare> carMapSquareList;
+	std::vector<MapSquare> powerupMapSquareList;
+
+	//obstacle list to do checking against
+	std::vector<MapSquare> obstacleMapSquareList;
+
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
+
+	//adds the obstacle to its list of map squares to test against
+	void AddObstacleToObstacleList(PxRigidStatic* obstacle);
 
 	/*
 	* PROJECTILES
 	*/
+
+	//an int to make the projectile names unique (cant do it based on list size)
+	int spawnedProjectileCounter = 0;
 
 	//the dictionary for all projectiles for all cars
 	std::unordered_map<PxRigidDynamic*, std::vector<PxRigidDynamic*>> carProjectileRigidDynamicDict;
 
 	//finds the car that shot a given projectile
 	std::shared_ptr<Entity> GetCarThatShotProjectile(PxRigidDynamic* projectile);
+
+	//activates parry for a given car
+	bool Parry(PxRigidDynamic* carThatParried);
 
 	/*
 	* POWERUPS
@@ -271,11 +321,19 @@ public:
 	* COLLISIONS
 	*/
 
+	//the objects to be deleted in a given physics frame (created to deal with collats)
+	std::vector<std::shared_ptr<Entity>> collatCache;
+
+	//adds an entity to the collat cache if it hasnt been already
+	void AddToCollatCache(std::shared_ptr<Entity> entityToAdd);
+
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
-	//THIS MAY NOT WORK IN THE SWITCH DEPENDING ON HOW THE MAP EXISTS
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
+
+	//clean up any objects that could be collided with at the same time
+	void CleanCollatCache();
 
 	//function to resolve all collisions
 	/*
@@ -286,8 +344,18 @@ public:
 	*/
 	void ResolveCollisions();
 
+	//create the map square lists to use during respawn
+	void InitMapSquares(std::vector<MapSquare>& listToPopulate, PxReal minDistance);
+
 	// Delete all lists in SharedDataSystem.h
 	void resetSharedDataSystem();
+
+	/*
+	* GENERAL
+	*/
+
+	//fake constructor cause i couldnt get the real one to work
+	void InitSharedDataSystem();
 
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();
@@ -295,6 +363,7 @@ public:
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
 	PxMat33 getCamRotMatPx(float angle);
+	PxMat33 getSoundRotMat();
 
 	// Flags
 	bool inMenu = true;
@@ -317,9 +386,10 @@ public:
 	bool gameMusicPlaying = false;
 	bool resultsMusicPlaying = false;
 
-	//// Audio 
-	//AudioManager* audio_ptr = nullptr;
-	//glm::vec3 listener_position;
+	// Audio
+	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	float MusicVolume = -30.0;
+	float SfxVolume = -20.0;
 
 	// Camera
 	float cameraAngle = M_PI;

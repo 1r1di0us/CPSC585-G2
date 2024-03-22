@@ -59,7 +59,7 @@ GLfloat quadVertices[] = {
     600.0f, 0.0f    // Bottom-right corner
 };
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -113,23 +113,25 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // create and set textures
-    planeTexture = generateTexture("src/Textures/wood.jpg", true);
-    player1Texture = generateTexture("src/Textures/player1.jpg", true);
-    player2Texture = generateTexture("src/Textures/player2.jpg", true);
-    player3Texture = generateTexture("src/Textures/player3.jpg", true);
-    player4Texture = generateTexture("src/Textures/player4.jpg", true);
-    player5Texture = generateTexture("src/Textures/player5.jpg", true);
-    redTexture = generateTexture("src/Textures/red.jpg", true);
-    menuPlay = generateTexture("src/Textures/UI/menuPlay.jpg", true);
-    menuControls = generateTexture("src/Textures/UI/menuControls.jpg", true);
-    menuQuit = generateTexture("src/Textures/UI/menuQuit.jpg", true);
-    controlsMenu = generateTexture("src/Textures/UI/controlsMenu.jpg", true);
-    resultsP1 = generateTexture("src/Textures/UI/resultsP1.jpg", true);
-    resultsP2 = generateTexture("src/Textures/UI/resultsP2.jpg", true);
-    resultsP3 = generateTexture("src/Textures/UI/resultsP3.jpg", true);
-    resultsP4 = generateTexture("src/Textures/UI/resultsP4.jpg", true);
-    resultsP5 = generateTexture("src/Textures/UI/resultsP5.jpg", true);
-    resultsTie = generateTexture("src/Textures/UI/resultsTie.jpg", true);
+    planeTexture = generateTexture("assets/Textures/wood.jpg", true);
+    //stbi_set_flip_vertically_on_load(true); // to vertically flip the image
+    player1Texture = generateTexture("assets/Textures/player1.jpg", true);
+    player2Texture = generateTexture("assets/Textures/player2.jpg", true);
+    player3Texture = generateTexture("assets/Textures/player3.jpg", true);
+    player4Texture = generateTexture("assets/Textures/player4.jpg", true);
+    player5Texture = generateTexture("assets/Textures/player5.jpg", true);
+    redTexture = generateTexture("assets/Textures/red.jpg", true);
+    gunMetalTexture = generateTexture("assets/Textures/gunMetal.jpg", true);
+    menuPlay = generateTexture("assets/Textures/UI/menuPlay.jpg", true);
+    menuControls = generateTexture("assets/Textures/UI/menuControls.jpg", true);
+    menuQuit = generateTexture("assets/Textures/UI/menuQuit.jpg", true);
+    controlsMenu = generateTexture("assets/Textures/UI/controlsMenu.jpg", true);
+    resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
+    resultsP2 = generateTexture("assets/Textures/UI/resultsP2.jpg", true);
+    resultsP3 = generateTexture("assets/Textures/UI/resultsP3.jpg", true);
+    resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
+    resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
+    resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
 
     // geom shaders
     shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
@@ -164,7 +166,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     textShader.use();
     glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
-    Characters_gaegu = initFont("./assets/Candy Beans.otf");
+    Characters_gaegu = initFont("./assets/Fonts/Candy Beans.otf");
     initTextVAO(&textVAO, &textVBO);
 
     // loading skymap texture
@@ -203,10 +205,31 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         std::string score = "Score:";
         RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
+        glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
+        glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
+        glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
+        glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
+        glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
         for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+            glm::vec3 color;
+            if (i == 0) {
+                color = red;
+            }
+            else if (i == 1) {
+                color = blue;
+            }
+            else if (i == 2) {
+                color = green;
+            }
+            else if (i == 3) {
+                color = yellow;
+            }
+            else if (i == 4) {
+                color = pink;
+            }
             float yOffset = i * 30;
             std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
         }
 
         // activate shader
@@ -231,7 +254,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
             // Bird's eye view
-            glm::vec3 cameraPosition = glm::vec3(0.0f, 50.0f, 0.0f);
+            glm::vec3 cameraPosition = glm::vec3(0.0f, 200.0f, 0.0f);
             glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
             glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, -1.0f);
 
@@ -277,7 +300,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         // rendering plane
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+        //model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, planeTexture);
@@ -285,24 +310,37 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 
         shader.use();
-        //rendering all other entities starting at 2 (skipping player car and map)
-        for (int i = 2; i < dataSys->entityList.size(); i++) {
+        // what is the below used for ??
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+        // shader.setMat4("model", model);
+        // renderObject(building, &buildingVAO);
+
+        //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
+        for (int i = dataSys->STATIC_OBJECT_LIST.size(); i < dataSys->entityList.size(); i++) {
 
             switch (dataSys->entityList[i].physType) {
 
             case (PhysicsType::CAR):
 
+                //gets the car info struct of the car
+                CarInfo* carInfo;
+
                 //is the car alive? -> render it
                 if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
-                    if (i == 1) {
+
+                    carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+
+                    //different colors for different cars
+                    if (carInfo->entity->name == "car2") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player2Texture);
                     }
-                    else if (i == 2) {
+                    else if (carInfo->entity->name == "car3") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player3Texture);
                     }
-                    else if (i == 3) {
+                    else if (carInfo->entity->name == "car4") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player4Texture);
                     }
@@ -335,7 +373,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             case (PhysicsType::POWERUP):
 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, redTexture);
+                glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
 
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, dataSys->entityList[i].transform->getPos());

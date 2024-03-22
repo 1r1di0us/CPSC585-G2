@@ -51,6 +51,8 @@ void PowerupSystem::SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType) 
 	powerup.physType = PhysicsType::POWERUP;
 	powerup.collisionBox = powerupBody;
 
+	powerupBody->setName(powerup.name.c_str());
+
 	dataSys->entityList.emplace_back(powerup);
 
 	//making the powerup info to add to the list
@@ -71,10 +73,6 @@ void PowerupSystem::RespawnAllPowerups() {
 	if (dataSys->timeUntilRandomPowerup <= 0) {
 
 		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
-
-		// Seed the random number generator
-			//might be worth having the generator based on the real time used in game
-		std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 		// Get the total number of enum values
 		int numPowerupTypes = static_cast<int>(PowerupType::NUM_POWERUP_TYPES);

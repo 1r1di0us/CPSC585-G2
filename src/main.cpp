@@ -18,6 +18,9 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+//ZAIN THE GOAT!
+std::vector<PxContactPairHeader> SharedDataSystem::contactPairs;
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -45,18 +48,27 @@ std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 
-std::string menuMusic = "assets/Cianwood City Remix.wav";
-std::string gameMusic = "assets/Miror B Remix.wav";
-std::string resultsMusic = "assets/Mario Strikers Results.wav";
+std::string menuMusic = "assets/Music/Cianwood City Remix.wav";
+std::string gameMusic = "assets/Music/Miror B Remix.wav";
+std::string resultsMusic = "assets/Music/Mario Strikers Results.wav";
 
 int main() {
+
+    //seeding the random number gen to be used throughout the game
+    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
 
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
 
-    soundSys.Init();
-    soundSys.LoadSound("assets/PianoClusterThud.wav", false);
+    //fake constructor (real one didnt like me)
+    dataSys.InitSharedDataSystem();
+
+    soundSys.Init(&dataSys); //basically the constructor
+    soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
+    soundSys.AddToSoundDict("Thud", "assets/Music/PianoClusterThud.wav");
+    soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
+    soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
 
     //setting the round timer (will be moved to appropriate place when it is created)
     startTime = std::chrono::high_resolution_clock::now();
@@ -88,7 +100,7 @@ int main() {
 
             if (!dataSys.menuMusicPlaying) {
                 soundSys.LoadSound(menuMusic, false, true);
-                soundSys.PlaySound(menuMusic);
+                soundSys.PlaySound(menuMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                 dataSys.menuMusicPlaying = true;
             }
@@ -97,13 +109,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec3(0.0f, 0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(-19.0f, 0.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec3(19.0f, 0.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
 
                 dataSys.carsInitialized = true;
             }
@@ -117,7 +129,7 @@ int main() {
 
             if (!dataSys.resultsMusicPlaying) {
                 soundSys.LoadSound(resultsMusic, false, true);
-                soundSys.PlaySound(resultsMusic);
+                soundSys.PlaySound(resultsMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                 dataSys.resultsMusicPlaying = true;
             }
@@ -133,7 +145,7 @@ int main() {
 
             if (!dataSys.gameMusicPlaying) {
                  soundSys.LoadSound(gameMusic, false, true);
-                 soundSys.PlaySound(gameMusic);
+                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                  dataSys.gameMusicPlaying = true;
             }
@@ -174,38 +186,60 @@ int main() {
             //increases the frame counter
             FPSCOUNTER++;
 
-            if (inputSys.InputToMovement(deltaTime)) {
-                carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+            switch (inputSys.InputToMovement(deltaTime)) {
+            //shoot
+            case 1:
+                if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox)) {
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), PxVec3{ 0, 0, 0 }));
+                }
+                break;
+            //parry
+            case 2:
+                if (dataSys.Parry(dataSys.carInfoList[0].entity->collisionBox)) {
+                    //play audio cue + visual indicator
+                }
+                break;
+            default:
+                break;
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
-                carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
-                carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
-                carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
-                carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox);
-                soundSys.PlaySound("assets/PianoClusterThud.wav");
+                if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
+                    PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
+                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                }
             }
 
             //only updating the physics at max 60hz while everything else updates at max speed
             if (timeUntilPhysicsUpdate.count() <= 0.0f) {
                 physicsSys.stepPhysics();
                 timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
-                //carSys.RespawnAllCars();
+                carSys.RespawnAllCars();
+                carSys.UpdateAllCarCooldowns();
                 powerupSys.RespawnAllPowerups();
             }
+            soundSys.PlayAllSounds();
         }
 
         // render

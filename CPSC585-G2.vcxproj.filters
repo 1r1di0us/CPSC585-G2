@@ -80,10 +80,10 @@
     <None Include="assets\Models\tankBody.mtl" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="assets\Gaegu-Bold.ttf" />
-    <Font Include="..\..\..\Downloads\Fonts\Gaegu-Bold.ttf" />
-    <Font Include="assets\Nexa-Trial-Heavy.ttf" />
-    <Font Include="assets\arial.ttf" />
+    <Font Include="assets\Fonts\Gaegu-Bold.ttf" />
+    <Font Include="assets\Fonts\Nexa-Trial-Heavy.ttf" />
+    <Font Include="assets\Fonts\arial.ttf" />
+    <Font Include="assets\Fonts\Candy Beans.otf" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\shaders\vertex_shader_text.txt" />
@@ -96,6 +96,7 @@
     <Image Include="src\Textures\wood.jpg" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="assets\Models\bed_double_A1_diffuse.png" />
+    <Image Include="assets\Models\furniturebits_texture.png" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\tvblueorange.gif" />
     <Image Include="src\Textures\red.jpg" />
@@ -107,6 +108,8 @@
     <Image Include="src\Textures\player1.jpg" />
     <Image Include="src\Textures\KiddieCarpet.jpg" />
     <Image Include="assets\Models\funky_cube.png" />
+    <Image Include="src\Textures\cat.jpg" />
+    <Image Include="src\Textures\wood.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />

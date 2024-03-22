@@ -1,13 +1,13 @@
-# Blender MTL File: 'CityBits_Export.blend'
-# Material Count: 1
+# Blender 4.0.2 MTL File: 'Stock 74.blend'
+# www.blender.org
 
-newmtl citybits_texture
-Ns 359.999993
+newmtl Stock_74_Mag
+Ns 259.949249
 Ka 1.000000 1.000000 1.000000
-Kd 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
-d 1.000000
 illum 2
-map_Kd citybits_texture.png
+map_Kd C:/Users/David/AppData/Local/Temp/Rar$DIa37260.36613/Textures/Stock 74 Diffuse.png
+map_d C:/Users/David/AppData/Local/Temp/Rar$DIa37260.36613/Textures/Stock 74 A.png
+map_Bump -bm 1.000000 C:/Users/David/AppData/Local/Temp/Rar$DIa37260.36613/Textures/Stock 74 Normal.png
