@@ -38,6 +38,7 @@ struct CarInfo{
 	//powerup effects
 	float projectileSpeedActiveTimeLeft = 0;
 	float projectileSizeActiveTimeLeft = 0;
+	bool hasArmour = false;
 };
 
 //powerup types
@@ -45,10 +46,11 @@ enum PowerupType {
 	AMMO,
 	PROJECTILESPEED,
 	PROJECTILESIZE,
+	ARMOUR,
 	CARSPEED, 
 	
 	//used for generating random powerup type
-	NUM_POWERUP_TYPES = 3
+	NUM_POWERUP_TYPES = 4
 };
 
 //powerup info struct
@@ -193,7 +195,7 @@ public:
 	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
 	//the spawn rate of a random powerup
-	const float RANDOM_POWERUP_SPAWN_RATE = 7.0f;
+	const float RANDOM_POWERUP_SPAWN_RATE = 1.0f;
 
 	//the spawn rate of an ammo spawn powerup
 	const float AMMO_POWERUP_SPAWN_RATE = 5.0f;

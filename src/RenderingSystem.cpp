@@ -253,6 +253,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 //is the car alive? -> render it
                 if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
 
+                    //NOTE: does car have shields?
+
                     carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
 
                     //different colors for different cars
@@ -330,6 +332,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                     renderObject(ball, &ballVAO);
 
                     break;
+                case PowerupType::ARMOUR:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, player4Texture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
+
                 case PowerupType::CARSPEED:
 
                     break;

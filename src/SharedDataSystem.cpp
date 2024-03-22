@@ -493,6 +493,16 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		shotCarInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
 
 	}
+	//armour tanks the bullet
+	else if (shotCarInfo->hasArmour) {
+
+		shotCarInfo->hasArmour = false;
+
+		AddToCollatCache(projectileEntity);
+
+		//make a sound
+		//TODO
+	}
 	else {
 
 		//increase score of car that shot
@@ -533,8 +543,9 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
 		break;
-	case PowerupType::CARSPEED:
+	case PowerupType::ARMOUR:
 
+		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
 		break;
 	case PowerupType::PROJECTILESIZE:
 
@@ -543,6 +554,9 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	case PowerupType::PROJECTILESPEED:
 
 		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		break;
+	case PowerupType::CARSPEED:
+
 		break;
 	default:
 		printf("unknown powerup type\n");
