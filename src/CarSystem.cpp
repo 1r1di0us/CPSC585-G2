@@ -133,17 +133,26 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//gets the forward vector of the car
 	PxVec3 forwardVector = shootingCar->getGlobalPose().q.getBasisVector2();
 
+	//calculating the actual projectile radius, taking powerups into account
+	float actualProjectileRadius = dataSys->DEFAULT_PROJECTILE_RADIUS;
+
+	//projectile radius powerup
+	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->projectileSizeActiveTimeLeft > 0) {
+
+		actualProjectileRadius *= dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH;
+	}
+
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * dataSys->PROJECTILE_RADIUS * 6.5,
-			dataSys->PROJECTILE_RADIUS * 2,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * dataSys->PROJECTILE_RADIUS * 6.5),
+		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * actualProjectileRadius * 6.5,
+			actualProjectileRadius * 2,
+			shootingCar->getGlobalPose().p.z + forwardVector.z * actualProjectileRadius * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
-	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(dataSys->PROJECTILE_RADIUS), *dataSys->gMaterial);
+	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(actualProjectileRadius), *dataSys->gMaterial);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
@@ -221,5 +230,9 @@ void CarSystem::UpdateAllCarCooldowns() {
 		//the projectile speed powerup
 		if (dataSys->carInfoList[i].projectileSpeedActiveTimeLeft > 0)
 			dataSys->carInfoList[i].projectileSpeedActiveTimeLeft -= dataSys->TIMESTEP;
+		
+		//the projectile size powerup
+		if (dataSys->carInfoList[i].projectileSizeActiveTimeLeft > 0)
+			dataSys->carInfoList[i].projectileSizeActiveTimeLeft -= dataSys->TIMESTEP;
 	}
 }

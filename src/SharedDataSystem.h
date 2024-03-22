@@ -37,6 +37,7 @@ struct CarInfo{
 
 	//powerup effects
 	float projectileSpeedActiveTimeLeft = 0;
+	float projectileSizeActiveTimeLeft = 0;
 };
 
 //powerup types
@@ -47,7 +48,7 @@ enum PowerupType {
 	CARSPEED, 
 	
 	//used for generating random powerup type
-	NUM_POWERUP_TYPES = 2
+	NUM_POWERUP_TYPES = 3
 };
 
 //powerup info struct
@@ -213,10 +214,16 @@ public:
 	const float SHOOT_FORCE = 100;
 
 	//the projectile radius
-	PxReal PROJECTILE_RADIUS = 1.0f;
+	const PxReal DEFAULT_PROJECTILE_RADIUS = 1.0f;
+
+	//the length of the projectile size powerup
+	const float PROJECTILE_SIZE_POWERUP_DURATION = 2.0f;
+
+	//the magnitude of the projectile size multiplier
+	const float PROJECTILE_SIZE_POWERUP_STRENGTH = 2.0f;
 
 	//the length of the projectile speed powerup
-	const float PROJECTILE_SPEED_POWERUP_DURATION = 5.0f;
+	const float PROJECTILE_SPEED_POWERUP_DURATION = 2.0f;
 
 	//the magnitude of the projectile speed multiplier
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;

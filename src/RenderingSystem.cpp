@@ -285,6 +285,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 break;
             case (PhysicsType::PROJECTILE):
 
+                //NOTE: the projectiles that are double the size are too big for the model
+
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, redTexture);
 
@@ -319,10 +321,16 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                     renderObject(ball, &ballVAO);
 
                     break;
-                case PowerupType::CARSPEED:
+                case PowerupType::PROJECTILESIZE:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, player2Texture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
 
                     break;
-                case PowerupType::PROJECTILESIZE:
+                case PowerupType::CARSPEED:
 
                     break;
                 default:
