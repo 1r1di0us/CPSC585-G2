@@ -10,11 +10,11 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	navMesh = new NavMesh();
 	pathFinder = new PathFinder(navMesh);
 	moveLocation = PxVec3(0, 0, 0);
-	moveNode = navMesh->nodes[14][14];
+	moveNode = navMesh->nodes[0][0];
 }
 
 bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
-	int ammo = 3;
+	int ammo = dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(dataSys->GetRigidDynamicFromVehicle(aiCar)))->ammoCount;
 	bool fire = false;
 	if (ammo > 1) fire = hunting_behaviour(aiCar, fire);
 	else fire = hiding_behaviour(aiCar, fire);
@@ -89,6 +89,13 @@ void AiSystem::move_car(EngineDriveVehicle* aiCar) {
 	}
 }
 
+bool AiSystem::hunting_behaviour(EngineDriveVehicle* aiCar, bool fire) {
+	return fire;
+}
+
+bool AiSystem::hiding_behaviour(EngineDriveVehicle* aiCar, bool fire) {
+	return fire;
+}
 
 bool AiSystem::update_old(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc) {
 	moveLocation = movLoc;
