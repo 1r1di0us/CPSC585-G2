@@ -296,16 +296,44 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 break;
             case (PhysicsType::POWERUP):
 
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                shader.setMat4("model", model);
-                renderObject(powerup, &powerupVAO);
+
+                //changes based on powerup type
+                switch (dataSys->GetPowerupInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->powerupType) {
+                case PowerupType::AMMO:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+
+                    shader.setMat4("model", model);
+                    renderObject(powerup, &powerupVAO);
+
+                    break;
+                case PowerupType::PROJECTILESPEED:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
+
+                    break;
+                case PowerupType::CARSPEED:
+
+                    break;
+                case PowerupType::PROJECTILESIZE:
+
+                    break;
+                default:
+                    printf("not possible for this powerup type to be rendered");
+                    break;
+                }
 
                 break;
             case (PhysicsType::STATIC):
+
+                //idk if this needs a case as it will all be custom not in this loop?
 
                 break;
             default:

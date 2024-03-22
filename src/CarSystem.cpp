@@ -161,8 +161,17 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//adds the projectile to the scene
 	dataSys->gScene->addActor(*projectileBody);
 
-	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-	projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(forwardVector.x, 0, forwardVector.z));
+	//if the car shooting has the projectile speed powerup
+	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->projectileSpeedActiveTimeLeft > 0) {
+
+		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * dataSys->PROJECTILE_SPEED_POWERUP_STRENGTH * PxVec3(forwardVector.x, 0, forwardVector.z));
+	}
+	else {
+
+		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(forwardVector.x, 0, forwardVector.z));
+	}
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
@@ -208,5 +217,9 @@ void CarSystem::UpdateAllCarCooldowns() {
 
 			dataSys->carInfoList[i].parryCooldownTimeLeft -= dataSys->TIMESTEP;
 		}
+
+		//the projectile speed powerup
+		if (dataSys->carInfoList[i].projectileSpeedActiveTimeLeft > 0)
+			dataSys->carInfoList[i].projectileSpeedActiveTimeLeft -= dataSys->TIMESTEP;
 	}
 }

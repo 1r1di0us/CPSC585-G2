@@ -538,6 +538,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	case PowerupType::PROJECTILESPEED:
 
+		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
 		break;
 	default:
 		printf("unknown powerup type\n");
