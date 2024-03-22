@@ -377,6 +377,22 @@ PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 	exit(69);
 }
 
+bool SharedDataSystem::Parry(PxRigidDynamic* carThatParried) {
+
+	CarInfo* carInfo = GetCarInfoStructFromEntity(GetEntityFromRigidDynamic(carThatParried));
+
+	//can sucessfully parry
+	if (carInfo->parryCooldownTimeLeft < 0 && carInfo->isAlive) {
+
+		carInfo->parryActiveTimeLeft = PARRY_ACTIVE_DURATION;
+		carInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
+
+		return true;
+	}
+	
+	return false;
+}
+
 std::shared_ptr<Entity> SharedDataSystem::GetCarThatShotProjectile(PxRigidDynamic* projectile) {
 
 	//not sure if there is a better way to do this
@@ -431,29 +447,70 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 	if (DEBUG_MODE) printf("CarProjectileCollisionLogic before\n");
 
-	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
+	std::shared_ptr<Entity> shotCarEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
 	std::shared_ptr<Entity> projectileEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)projectile);
 
 	if (DEBUG_MODE) printf("CarProjectileCollisionLogic after\n");
 
-	//increase score of car that shot
-	CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
-	shootingCarInfo->score++;
+	//get the shooting cars rigid dynamic
+	PxRigidDynamic* shootingCarRigidDynamic = GetCarThatShotProjectile((PxRigidDynamic*)projectile)->collisionBox;
 
-	AddToCollatCache(projectileEntity);
+	//car info struct of the shot car
+	CarInfo* shotCarInfo = GetCarInfoStructFromEntity(shotCarEntity);
 
-	//make a sound
-	SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+	//if the shot car has parried
+	if (shotCarInfo->parryActiveTimeLeft > 0) {
 
-	//setting the data of the car that got hit to let it respawn
-	CarInfo* hitCar = GetCarInfoStructFromEntity(carEntity);
-	hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
-	hitCar->isAlive = false;
-	//moving into the sky and disabling gravity to "delete it"
-	hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
-	PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
-	PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
-	hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
+		//change ownership of the projectile
+		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
+			if (carProjectileRigidDynamicDict[shootingCarRigidDynamic][i] == (PxRigidDynamic*)projectile) {
+				carProjectileRigidDynamicDict[(PxRigidDynamic*)car].emplace_back((PxRigidDynamic*)projectile);
+				carProjectileRigidDynamicDict[shootingCarRigidDynamic].erase(carProjectileRigidDynamicDict[shootingCarRigidDynamic].begin() + i);
+			}
+		}
+
+		//getting the new forward direction of the projectile
+		PxVec3 projectileBackwardVector = projectileEntity->collisionBox->getGlobalPose().q.getBasisVector2() * -1;
+
+		//send the projectile back the way it came
+			//doing the offset based on the same math as the shooting math
+		projectileEntity->collisionBox->setGlobalPose(
+			PxTransform(
+				PxVec3(
+					projectileEntity->collisionBox->getGlobalPose().p.x + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5,
+					projectileEntity->collisionBox->getGlobalPose().p.y,
+					projectileEntity->collisionBox->getGlobalPose().p.z + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5),
+				projectileEntity->collisionBox->getGlobalPose().q));
+
+		//stoled from car shoot ahahah
+		projectileEntity->collisionBox->setLinearVelocity(SHOOT_FORCE * PxVec3(projectileBackwardVector.x, 0, projectileBackwardVector.z));
+
+		//update cooldowns
+		shotCarInfo->parryActiveTimeLeft = 0;
+		shotCarInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
+
+	}
+	else {
+
+		//increase score of car that shot
+		CarInfo* shootingCarInfo = GetCarInfoStructFromEntity(GetCarThatShotProjectile((PxRigidDynamic*)projectile));
+		shootingCarInfo->score++;
+
+		AddToCollatCache(projectileEntity);
+
+		//make a sound
+		SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+
+		//setting the data of the car that got hit to let it respawn
+		CarInfo* hitCar = GetCarInfoStructFromEntity(shotCarEntity);
+		hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
+		hitCar->isAlive = false;
+		//moving into the sky and disabling gravity to "delete it"
+		hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
+		PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
+		PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
+		hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
+	}
 
 }
 
@@ -500,27 +557,8 @@ void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
 
 	if (DEBUG_MODE) printf("ProjectileStaticCollisionLogic after\n");
 
-	/*
-	* remove the projectile from all lists
-	*/
+	AddToCollatCache(projectileEntity);
 
-	//entity list
-	for (int i = 0; i < entityList.size(); i++) {
-		if (entityList[i].name == projectileEntity->name) {
-			entityList.erase(entityList.begin() + i);
-		}
-	}
-
-	//car projectile dict
-	for (int i = 0; i < carProjectileRigidDynamicDict[carThatShotProjectile].size(); i++) {
-		if (carProjectileRigidDynamicDict[carThatShotProjectile][i] == (PxRigidDynamic*)projectile) {
-			carProjectileRigidDynamicDict[carThatShotProjectile].erase(carProjectileRigidDynamicDict[carThatShotProjectile].begin() + i);
-		}
-	}
-
-	//delete the projectile
-	gScene->removeActor(*projectile);
-	projectile->release();
 }
 
 void SharedDataSystem::CleanCollatCache() {
