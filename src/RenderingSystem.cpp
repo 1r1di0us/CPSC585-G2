@@ -289,7 +289,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         
         //tankHeadModel = glm::translate(modelRot, playerPos);
         //tankHeadModel *= modelRot; 
-        glm::mat4 tankrot = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+        glm::mat4 tankrot = glm::rotate(glm::mat4(1.0f), glm::radians(dataSys->cameraAngle), glm::vec3(0, 1.0f, 0));
         glm::mat4 transmat = glm::translate(glm::mat4(1.0f), playerPos);
 
         tankHeadModel = transmat * tankrot;
@@ -300,7 +300,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         // rendering plane
         model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
         model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f));
         shader.setMat4("model", model);
@@ -310,14 +309,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 
         shader.use();
-        // what is the below used for ??
-        // glActiveTexture(GL_TEXTURE0);
-        // glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-        // shader.setMat4("model", model);
-        // renderObject(building, &buildingVAO);
+        //what is the below used for ??
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+        //shader.setMat4("model", model);
+        //renderObject(building, &buildingVAO);
 
         //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
-        for (int i = dataSys->STATIC_OBJECT_LIST.size(); i < dataSys->entityList.size(); i++) {
+        for (int i = dataSys->STATIC_OBJECT_LIST.size() + 1; i < dataSys->entityList.size(); i++) {
 
             switch (dataSys->entityList[i].physType) {
 
@@ -336,7 +335,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player2Texture);
                     }
-                    else if (carInfo->entity->name == "car3") {
+                    if (carInfo->entity->name == "car3") {
                         glActiveTexture(GL_TEXTURE0);
                         glBindTexture(GL_TEXTURE_2D, player3Texture);
                     }
