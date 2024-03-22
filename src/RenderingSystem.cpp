@@ -76,6 +76,7 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
     return rotatedMatrix;
 }
 
+
 // constructor
 RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
@@ -246,13 +247,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         // rendering player car
         shader.use();
-        // car translating
-
         model = glm::translate(model, playerPos);
-        // make it look forward
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // make it look forward
         model = applyQuaternionToMatrix(model, playerRot);
-        //model = glm::scale(model, glm::vec3(0.5f));
 
         // sending our matrixes to the shader
         shader.setMat4("projection", projection);
@@ -260,9 +257,22 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         shader.setMat4("model", model);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player1Texture);
-        //tankHead.Draw(shader);
         tankBody.Draw(shader);
-        //tank.Draw(shader);
+        
+        // tank head
+        glm::mat4 tankHeadModel = glm::mat4(1.0f);
+        glm::mat3 camRot = dataSys->getCamRotMat();
+        //glm::mat4 modelRot = calculateRotationMatrix(camRot * glm::vec3(0, 0, -1)); // Assuming camera is looking down the negative z-axis
+        
+        //tankHeadModel = glm::translate(modelRot, playerPos);
+        //tankHeadModel *= modelRot; 
+        glm::mat4 tankrot = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+        glm::mat4 transmat = glm::translate(glm::mat4(1.0f), playerPos);
+
+        tankHeadModel = transmat * tankrot;
+        shader.setMat4("model", tankHeadModel);
+
+        tankHead.Draw(shader);
 
 
         // rendering plane
