@@ -304,6 +304,13 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir)); //triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 		float angle = atan2(dot, det);
 
+		//if (playerCar->mTransmissionCommandState.targetGear == 0) playerCar->mTransmissionCommandState.targetGear = 2;
+
+		/*if ((angle > 7 * M_PI / 8 || angle < -7 * M_PI / 8) && carSpeed < 1.f) {
+			playerCar->mTransmissionCommandState.targetGear = 0;
+			playerCar->mCommandState.steer = -angle;
+		}
+		else */
 		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
 			playerCar->mCommandState.steer = -angle;
 		}

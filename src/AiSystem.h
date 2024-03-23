@@ -18,11 +18,15 @@ public:
 	PathFinder* pathFinder;
 	State state;
 	double timer;
-	double brakeTimer;
+	double brakeTimer; //for shooting
+	double lockOnTime;
 	PxVec3 moveLocation;
 	Node* moveNode;
 	std::default_random_engine rand;
 	std::normal_distribution<double> distribution;
+	CarInfo* target = nullptr;
+	PxVec3 aimVec = PxVec3(0, 0, -1);
+	bool wantToFire = false;
 
 	AiSystem(SharedDataSystem* dataSys);
 	bool update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime);
