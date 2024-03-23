@@ -16,8 +16,8 @@ NavMesh::NavMesh() {
 
 	//make nodes and fill map with nodes
 	int id = 0;
-	for (int x = 0; x < 30; x++) {
-		for (int z = 0; z < 30; z++) {
+	for (double x = 0; x < 30; x++) {
+		for (double z = 0; z < 30; z++) {
 			this->nodes->insert({ id, new Node(id, verts[x][z], verts[x][z + 1], verts[x + 1][z + 1], verts[x + 1][z]) });
 			id++;
 		}
@@ -50,8 +50,16 @@ float NavMesh::cost(Node* src, Node* dest)
 	return glm::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
+Node* NavMesh::findEntity(PxVec3 pos) {
+	int x = (int)floor((pos.x + 75) / 5);
+	int z = (int)floor((pos.z + 75) / 5);
+	return nodes->at(x * 30 + z);
+}
+
 PathFinder::PathFinder(NavMesh* navMesh) {
 	this->navMesh = navMesh;
+	std::stack<PxVec3> initPath = std::stack<PxVec3>();
+	path = &initPath;
 }
 
 bool PathFinder::search(Node* src, Node* dest) {

@@ -20,8 +20,11 @@ public:
 	double timer;
 	double brakeTimer; //for shooting
 	double lockOnTime;
+	int degreeOfFreedom; //for pathfinding
 	PxVec3 moveLocation;
 	Node* moveNode;
+	std::vector<Node*> centerNodes; //for patrolling
+	std::vector<Node*> edgeNodes;
 	std::default_random_engine rand;
 	std::normal_distribution<double> distribution;
 	CarInfo* target = nullptr;

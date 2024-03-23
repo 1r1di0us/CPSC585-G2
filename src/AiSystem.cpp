@@ -12,7 +12,16 @@ AiSystem::AiSystem(SharedDataSystem* dataSys) {
 	navMesh = new NavMesh();
 	pathFinder = new PathFinder(navMesh);
 	moveLocation = PxVec3(0, 0, 0);
-	moveNode = navMesh->nodes[0][0];
+	moveNode = nullptr;
+	
+	centerNodes.emplace_back(navMesh->nodes->at(372)); //[12][12]
+	centerNodes.emplace_back(navMesh->nodes->at(522)); //[17][12]
+	centerNodes.emplace_back(navMesh->nodes->at(527)); //[17][17]
+	centerNodes.emplace_back(navMesh->nodes->at(377)); //[12][17]
+	centerNodes.emplace_back(navMesh->nodes->at(300)); //[10][0]
+	centerNodes.emplace_back(navMesh->nodes->at(570)); //[19][0]
+	centerNodes.emplace_back(navMesh->nodes->at(10)); //[0][10]
+	centerNodes.emplace_back(navMesh->nodes->at(19)); //[0][19]
 }
 
 bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime) {
@@ -42,9 +51,10 @@ bool AiSystem::update(EngineDriveVehicle* aiCar, std::chrono::duration<double> d
 void AiSystem::astar_path_finding(EngineDriveVehicle* aiCar) {
 	//no idea what I'm doing :)
 	PxVec3 carPos = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p;
-	int carX = (int)floor((carPos.x + 75) / 5);
-	int carZ = (int) floor((carPos.z + 75) / 5);
-	pathFinder->search(navMesh->nodes[carX][carZ], moveNode);
+	if (pathFinder->search(navMesh->findEntity(carPos), moveNode) == false) {
+		std::cout << "PATHFINDING FAILURE!" << std::endl;
+	}
+	degreeOfFreedom = ceil((int)pathFinder->path->size() / 2); // maximum degrees of freedom
 }
 
 void AiSystem::move_car(EngineDriveVehicle* aiCar) {
@@ -63,49 +73,61 @@ void AiSystem::move_car(EngineDriveVehicle* aiCar) {
 	//triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 	float angle = atan2(dot, det);
 
-	if (dist < 5) {
-		moveLocation = pathFinder->getNextWaypoint();
+	int freedom = 5;
+
+	if (pathFinder->path == nullptr || pathFinder->path->size() <= 1) {
+		moveNode = nullptr; //tell the ai to find a new path
+		aiCar->mCommandState.throttle = 1;
+		aiCar->mCommandState.nbBrakes = 0;
+		aiCar->mCommandState.brakes[0] = 0;
 	}
 	else {
-		if (angle <= 1 && angle >= -1) {
-			aiCar->mCommandState.steer = -angle;
-		}
-		else if (angle < -1) {
-			aiCar->mCommandState.steer = 1;
-			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 10.0) {
-					aiCar->mCommandState.throttle = 1;
-					aiCar->mCommandState.nbBrakes = 1;
-					aiCar->mCommandState.brakes[0] = 1;
-				}
-				else {
-					aiCar->mCommandState.throttle = 1;
-					aiCar->mCommandState.nbBrakes = 0.0f;
-					aiCar->mCommandState.brakes[0] = 0.0f;
-				}
-			}
-		}
-		else if (angle > 1) {
-			aiCar->mCommandState.steer = -1;
-			if (angle > M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 10.0) {
-					aiCar->mCommandState.throttle = 1;
-					aiCar->mCommandState.nbBrakes = 1;
-					aiCar->mCommandState.brakes[0] = 1;
-				}
-				else {
-					aiCar->mCommandState.throttle = 1;
-					aiCar->mCommandState.nbBrakes = 0.0f;
-					aiCar->mCommandState.brakes[0] = 0.0f;
-				}
-			}
-		}
+		freedom = abs(degreeOfFreedom - (int)pathFinder->path->size()) * 5;
 
-		if (brakeTimer > 0.0) {
-			if (carSpeed > 5.0) {
-				aiCar->mCommandState.throttle = 1;
-				aiCar->mCommandState.nbBrakes = 1;
-				aiCar->mCommandState.brakes[0] = 1;
+		if (dist < freedom) {
+			moveLocation = pathFinder->getNextWaypoint();
+		}
+		else {
+			if (angle <= 1 && angle >= -1) {
+				aiCar->mCommandState.steer = -angle;
+			}
+			else if (angle < -1) {
+				aiCar->mCommandState.steer = 1;
+				if (angle < -M_PI / 4 && brakeTimer == 0) {
+					if (carSpeed > 10.0) {
+						aiCar->mCommandState.throttle = 1;
+						aiCar->mCommandState.nbBrakes = 1;
+						aiCar->mCommandState.brakes[0] = 1;
+					}
+					else {
+						aiCar->mCommandState.throttle = 1;
+						aiCar->mCommandState.nbBrakes = 0;
+						aiCar->mCommandState.brakes[0] = 0;
+					}
+				}
+			}
+			else if (angle > 1) {
+				aiCar->mCommandState.steer = -1;
+				if (angle > M_PI / 4 && brakeTimer == 0) {
+					if (carSpeed > 10.0) {
+						aiCar->mCommandState.throttle = 1;
+						aiCar->mCommandState.nbBrakes = 1;
+						aiCar->mCommandState.brakes[0] = 1;
+					}
+					else {
+						aiCar->mCommandState.throttle = 1;
+						aiCar->mCommandState.nbBrakes = 0;
+						aiCar->mCommandState.brakes[0] = 0;
+					}
+				}
+			}
+
+			if (brakeTimer > 0.0) {
+				if (carSpeed > 5.0) {
+					aiCar->mCommandState.throttle = 1;
+					aiCar->mCommandState.nbBrakes = 1;
+					aiCar->mCommandState.brakes[0] = 1;
+				}
 			}
 		}
 	}
@@ -113,7 +135,12 @@ void AiSystem::move_car(EngineDriveVehicle* aiCar) {
 
 bool AiSystem::hunting_behaviour(EngineDriveVehicle* aiCar, bool fire) {
 	//patrol center
-
+	if (moveNode == nullptr) {
+		std::default_random_engine generator;
+		std::uniform_int_distribution<int> distribution(0, centerNodes.size());
+		moveNode = centerNodes[distribution(generator)];
+		astar_path_finding(aiCar);
+	}
 
 	//untarget enemies that are too far away
 	if (target != nullptr && target->entity != nullptr) {
