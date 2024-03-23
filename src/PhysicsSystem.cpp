@@ -11,6 +11,9 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 	
 	//like so:
 	//CookStaticObject("./assets/Models/funkyLeg1.obj", PxVec3(0, 20, 0), true);
+	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-12, 7.1, -35), true);
+	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20), true);
+	CookStaticObject("./assets/Models/toyBlocks.obj", PxVec3(-31, 0.5, 27), true);
 	
 	initMaterialFrictionTable();
 	initVehicleSimContext();

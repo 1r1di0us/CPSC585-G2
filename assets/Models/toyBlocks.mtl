@@ -1,7 +1,7 @@
-# Blender 4.0.2 MTL File: 'plane.blend'
+# Blender 4.0.2 MTL File: 'plane1.blend'
 # www.blender.org
 
-newmtl 10_Block
+newmtl 10_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -12,7 +12,7 @@ map_Kd C:/10_Albedo.png
 map_Ns C:/10_Roughness.png
 map_Bump -bm 1.000000 C:/10_Normal.jpg
 
-newmtl 1_Block
+newmtl 1_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -23,7 +23,7 @@ map_Kd C:/1_Albedo.png
 map_Ns C:/1_Roughness.png
 map_Bump -bm 1.000000 C:/1_Normal.jpg
 
-newmtl 2_Block
+newmtl 2_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -34,7 +34,7 @@ map_Kd C:/2_Albedo.png
 map_Ns C:/2_Roughness.png
 map_Bump -bm 1.000000 C:/2_Normal.jpg
 
-newmtl 3_Block
+newmtl 3_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -45,7 +45,7 @@ map_Kd C:/3_Albedo.png
 map_Ns C:/3_Roughness.png
 map_Bump -bm 1.000000 C:/3_Normal.jpg
 
-newmtl 4_Block
+newmtl 4_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -56,7 +56,7 @@ map_Kd C:/4_Albedo.png
 map_Ns C:/4_Roughness.png
 map_Bump -bm 1.000000 C:/4_Normal.jpg
 
-newmtl 5_Block
+newmtl 5_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -67,7 +67,7 @@ map_Kd C:/5_Albedo.png
 map_Ns C:/5_Roughness.png
 map_Bump -bm 1.000000 C:/5_Normal.jpg
 
-newmtl 6_Block
+newmtl 6_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -78,7 +78,7 @@ map_Kd C:/6_Albedo.png
 map_Ns C:/6_Roughness.png
 map_Bump -bm 1.000000 C:/6_Normal.jpg
 
-newmtl 7_Block
+newmtl 7_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -89,7 +89,7 @@ map_Kd C:/7_Albedo.png
 map_Ns C:/7_Roughness.png
 map_Bump -bm 1.000000 C:/7_Normal.jpg
 
-newmtl 8_Block
+newmtl 8_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -100,7 +100,7 @@ map_Kd C:/8_Albedo.png
 map_Ns C:/8_Roughness.png
 map_Bump -bm 1.000000 C:/8_Normal.jpg
 
-newmtl 9_Block
+newmtl 9_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -111,7 +111,7 @@ map_Kd C:/9_Albedo.png
 map_Ns C:/9_Roughness.png
 map_Bump -bm 1.000000 C:/9_Normal.jpg
 
-newmtl A_Block
+newmtl A_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -122,7 +122,7 @@ map_Kd C:/A_Albedo.png
 map_Ns C:/A_Roughness.png
 map_Bump -bm 1.000000 C:/A_Normal.jpg
 
-newmtl B_Block
+newmtl B_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -133,7 +133,7 @@ map_Kd C:/B_Albedo.png
 map_Ns C:/B_Roughness.png
 map_Bump -bm 1.000000 C:/B_Normal.jpg
 
-newmtl C_Block
+newmtl C_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -144,7 +144,7 @@ map_Kd C:/C_Albedo.png
 map_Ns C:/C_Roughness.png
 map_Bump -bm 1.000000 C:/C_Normal.jpg
 
-newmtl D_Block
+newmtl D_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -155,7 +155,7 @@ map_Kd C:/D_Albedo.png
 map_Ns C:/D_Roughness.png
 map_Bump -bm 1.000000 C:/D_Normal.jpg
 
-newmtl E_Block
+newmtl E_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -166,7 +166,7 @@ map_Kd C:/E_Albedo.png
 map_Ns C:/E_Roughness.png
 map_Bump -bm 1.000000 C:/E_Normal.jpg
 
-newmtl F_Block
+newmtl F_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -177,7 +177,7 @@ map_Kd C:/F_Albedo.png
 map_Ns C:/F_Roughness.png
 map_Bump -bm 1.000000 C:/F_Normal.jpg
 
-newmtl G_Block
+newmtl G_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -188,7 +188,7 @@ map_Kd C:/G_Albedo.png
 map_Ns C:/G_Roughness.png
 map_Bump -bm 1.000000 C:/G_Normal.jpg
 
-newmtl H_Block
+newmtl H_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -199,7 +199,7 @@ map_Kd C:/H_Albedo.png
 map_Ns C:/H_Roughness.png
 map_Bump -bm 1.000000 C:/H_Normal.jpg
 
-newmtl I_Block
+newmtl I_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -210,7 +210,7 @@ map_Kd C:/I_Albedo.png
 map_Ns C:/I_Roughness.png
 map_Bump -bm 1.000000 C:/I_Normal.jpg
 
-newmtl J_Block
+newmtl J_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -221,7 +221,7 @@ map_Kd C:/J_Albedo.png
 map_Ns C:/J_Roughness.png
 map_Bump -bm 1.000000 C:/J_Normal.jpg
 
-newmtl K_Block
+newmtl K_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -232,7 +232,7 @@ map_Kd C:/K_Albedo.png
 map_Ns C:/K_Roughness.png
 map_Bump -bm 1.000000 C:/K_Normal.jpg
 
-newmtl L_Block
+newmtl L_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -243,7 +243,7 @@ map_Kd C:/L_Albedo.png
 map_Ns C:/L_Roughness.png
 map_Bump -bm 1.000000 C:/L_Normal.jpg
 
-newmtl M_Block
+newmtl M_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -254,7 +254,7 @@ map_Kd C:/M_Albedo.png
 map_Ns C:/M_Roughness.png
 map_Bump -bm 1.000000 C:/M_Normal.jpg
 
-newmtl N_Block
+newmtl N_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -265,7 +265,7 @@ map_Kd C:/N_Albedo.png
 map_Ns C:/N_Roughness.png
 map_Bump -bm 1.000000 C:/N_Normal.jpg
 
-newmtl O_Block
+newmtl O_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -276,7 +276,7 @@ map_Kd C:/O_Albedo.png
 map_Ns C:/O_Roughness.png
 map_Bump -bm 1.000000 C:/O_Normal.jpg
 
-newmtl P_Block
+newmtl P_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -287,7 +287,7 @@ map_Kd C:/P_Albedo.png
 map_Ns C:/P_Roughness.png
 map_Bump -bm 1.000000 C:/P_Normal.jpg
 
-newmtl Q_Block
+newmtl Q_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -298,7 +298,7 @@ map_Kd C:/Q_Albedo.png
 map_Ns C:/Q_Roughness.png
 map_Bump -bm 1.000000 C:/Q_Normal.jpg
 
-newmtl R_Block
+newmtl R_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -309,7 +309,7 @@ map_Kd C:/R_Albedo.png
 map_Ns C:/R_Roughness.png
 map_Bump -bm 1.000000 C:/R_Normal.jpg
 
-newmtl S_Block
+newmtl S_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -320,7 +320,7 @@ map_Kd C:/S_Albedo.png
 map_Ns C:/S_Roughness.png
 map_Bump -bm 1.000000 C:/S_Normal.jpg
 
-newmtl T_Block
+newmtl T_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -331,7 +331,7 @@ map_Kd C:/T_Albedo.png
 map_Ns C:/T_Roughness.png
 map_Bump -bm 1.000000 C:/T_Normal.jpg
 
-newmtl U_Block
+newmtl U_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -342,17 +342,7 @@ map_Kd C:/U_Albedo.png
 map_Ns C:/U_Roughness.png
 map_Bump -bm 1.000000 C:/U_Normal.jpg
 
-newmtl Used_Plastic
-Ns 793.719055
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.572727 0.572727 0.572727
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-
-newmtl V_Block
+newmtl V_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -363,7 +353,7 @@ map_Kd C:/V_Albedo.png
 map_Ns C:/V_Roughness.png
 map_Bump -bm 1.000000 C:/V_Normal.jpg
 
-newmtl W_Block
+newmtl W_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -374,7 +364,7 @@ map_Kd C:/W_Albedo.png
 map_Ns C:/W_Roughness.png
 map_Bump -bm 1.000000 C:/W_normal.jpg
 
-newmtl X_Block
+newmtl X_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -385,7 +375,7 @@ map_Kd C:/X_Albedo.png
 map_Ns C:/X_Roughness.png
 map_Bump -bm 1.000000 C:/X_Normal.jpg
 
-newmtl Y_Block
+newmtl Y_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
@@ -396,7 +386,7 @@ map_Kd C:/Y_Albedo.png
 map_Ns C:/Y_Roughness.png
 map_Bump -bm 1.000000 C:/Y_normal.jpg
 
-newmtl Z_Block
+newmtl Z_Block.001
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
