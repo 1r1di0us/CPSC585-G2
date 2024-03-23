@@ -54,6 +54,9 @@ std::string resultsMusic = "assets/Music/Mario Strikers Results.wav";
 
 int main() {
 
+    //seeding the random number gen to be used throughout the game
+    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
+
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
@@ -183,10 +186,21 @@ int main() {
             //increases the frame counter
             FPSCOUNTER++;
 
-            if (inputSys.InputToMovement(deltaTime)) {
+            switch (inputSys.InputToMovement(deltaTime)) {
+            //shoot
+            case 1:
                 if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox)) {
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), PxVec3{ 0, 0, 0 }));
                 }
+                break;
+            //parry
+            case 2:
+                if (dataSys.Parry(dataSys.carInfoList[0].entity->collisionBox)) {
+                    //play audio cue + visual indicator
+                }
+                break;
+            default:
+                break;
             }
 
             if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
@@ -222,6 +236,7 @@ int main() {
                 physicsSys.stepPhysics();
                 timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
                 carSys.RespawnAllCars();
+                carSys.UpdateAllCarCooldowns();
                 powerupSys.RespawnAllPowerups();
             }
             soundSys.PlayAllSounds();

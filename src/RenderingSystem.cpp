@@ -100,7 +100,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/finishedMap.obj");
+    this->plane = LoadModelFromPath("./assets/Models/MapNoObstacles.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     this->bedModel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
@@ -213,6 +213,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         // sending our matrixes to the shader
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
+
+        //updating the shoot direction of the player car to be the direction of the camera
+        auto test = dataSys->getCamRotMat() * glm::vec3(0, 0, -1);
+        dataSys->carInfoList[0].shootDir.x = test.x;
+        dataSys->carInfoList[0].shootDir.z = test.z;
 
         // binding textures
         glActiveTexture(GL_TEXTURE0);

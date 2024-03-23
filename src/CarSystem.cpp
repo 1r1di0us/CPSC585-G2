@@ -117,33 +117,32 @@ void CarSystem::RespawnAllCars() {
 bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
-	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 1\n");
 		return false;
 	}
 
-	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 2\n");
 		return false;
 	}
 
-	//gets the forward vector of the car
-	PxVec3 forwardVector = shootingCar->getGlobalPose().q.getBasisVector2();
+	//car info struct
+	CarInfo* carInfo = dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar));
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
-	//TODO: THIS WILL BE REWORKED WHEN SPAWNING PROJECTILE BASED ON CAMERA DIRECTION AND TURRET SIZE
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + forwardVector.x * projectileRadius * 6.5,
-			projectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + forwardVector.z * projectileRadius * 6.5),
+		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * dataSys->PROJECTILE_RADIUS * 6.5,
+			dataSys->PROJECTILE_RADIUS * 2,
+			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * dataSys->PROJECTILE_RADIUS * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
-	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(projectileRadius), *dataSys->gMaterial);
+	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(dataSys->PROJECTILE_RADIUS), *dataSys->gMaterial);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
@@ -162,12 +161,12 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	dataSys->gScene->addActor(*projectileBody);
 
 	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-	projectileBody->setLinearVelocity(shootForce * PxVec3(forwardVector.x, 0, forwardVector.z));
+	projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 
-	if (dataSys->DEBUG_MODE) printf("before projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("before projectile entity creation\n");
 
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
@@ -176,20 +175,37 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
 	
-	if (dataSys->DEBUG_MODE) printf("after projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("after projectile entity creation\n");
 
 	//makes its name smart for easy debugging
 	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
-	if (dataSys->DEBUG_MODE) printf("before reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("before reduce ammo count\n");
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
 
-	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("after reduce ammo count\n");
 
 	return true;
 
+}
+
+void CarSystem::UpdateAllCarCooldowns() {
+
+	//updates all the car cooldowns
+	for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+
+		//edits correct cooldown based on if the parry is active or not
+		if (dataSys->carInfoList[i].parryActiveTimeLeft > 0) {
+
+			dataSys->carInfoList[i].parryActiveTimeLeft -= dataSys->TIMESTEP;
+		}
+		else {
+
+			dataSys->carInfoList[i].parryCooldownTimeLeft -= dataSys->TIMESTEP;
+		}
+	}
 }

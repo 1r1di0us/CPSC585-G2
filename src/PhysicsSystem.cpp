@@ -7,7 +7,11 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 	//physx setup
 	initPhysX();
-	CookStaticObject("./assets/Models/finishedMap.obj", PxVec3(0, 0, 0));
+	CookStaticObject("./assets/Models/MapNoObstacles.obj", PxVec3(0, 0, 0));
+	
+	//like so:
+	//CookStaticObject("./assets/Models/funkyLeg1.obj", PxVec3(0, 20, 0), true);
+	
 	initMaterialFrictionTable();
 	initVehicleSimContext();
 }
@@ -53,7 +57,7 @@ void PhysicsSystem::initPhysX() {
 }
 
 //cooks an object given a file path
-void PhysicsSystem::CookStaticObject(std::string filePath, PxVec3 location) {
+void PhysicsSystem::CookStaticObject(std::string filePath, PxVec3 location, bool dontSpawnInside) {
 
 	OBJModel groundObstacles = LoadModelFromPath(filePath);
 
@@ -83,7 +87,7 @@ void PhysicsSystem::CookStaticObject(std::string filePath, PxVec3 location) {
 	PxFilterData staticFilter(COLLISION_FLAG_STATIC, COLLISION_FLAG_STATIC_AGAINST, 0, 0);
 	meshShape->setSimulationFilterData(staticFilter);
 
-	PxTransform meshTrans(PxVec3(0, 0, 0), PxQuat(PxIdentity));
+	PxTransform meshTrans(location, PxQuat(PxIdentity));
 	PxRigidStatic* meshStatic = gPhysics->createRigidStatic(meshTrans);
 
 	//making the static entity
@@ -99,6 +103,12 @@ void PhysicsSystem::CookStaticObject(std::string filePath, PxVec3 location) {
 
 	meshStatic->attachShape(*meshShape);
 	gScene->addActor(*meshStatic);
+
+	if (dontSpawnInside) {
+
+		//adding the obstacle to the obstacle list to prevent spawning in
+		dataSys->AddObstacleToObstacleList(meshStatic);
+	}
 	
 }
 
