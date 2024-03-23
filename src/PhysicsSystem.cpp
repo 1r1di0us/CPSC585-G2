@@ -9,8 +9,7 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 	initPhysX();
 	CookStaticObject("./assets/Models/MapNoObstacles.obj", PxVec3(0, 0, 0));
 	
-	//like so:
-	//CookStaticObject("./assets/Models/funkyLeg1.obj", PxVec3(0, 20, 0), true);
+	//cooking the obstacles
 	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-12, 7.1, -35), true);
 	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20), true);
 	CookStaticObject("./assets/Models/toyBlocks.obj", PxVec3(-31, 0.5, 27), true);
