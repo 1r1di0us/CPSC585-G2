@@ -194,43 +194,49 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         // Convert timeLeft to seconds
         int timeLeftInSeconds = static_cast<int>(timeLeft.count());
 
-        // Convert timeLeftInSeconds to string
-        std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-        RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+        // text only if the player is alive
+        if (dataSys->carInfoList[0].isAlive) {
 
-        // Need to add ammo count when implemented
-        std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-        RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+            // Convert timeLeftInSeconds to string
+            std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+            RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
-        std::string score = "Score:";
-        RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+            // Need to add ammo count when implemented
+            std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
+            RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
-        glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
-        glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
-        glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
-        glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
-        glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
-        for (int i = 0; i < dataSys->carInfoList.size(); i++) {
-            glm::vec3 color;
-            if (i == 0) {
-                color = red;
+            std::string score = "Score:";
+            RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+            glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
+            glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
+            glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
+            glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
+            glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
+            for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+                glm::vec3 color;
+                if (i == 0) {
+                    color = red;
+                }
+                else if (i == 1) {
+                    color = blue;
+                }
+                else if (i == 2) {
+                    color = green;
+                }
+                else if (i == 3) {
+                    color = yellow;
+                }
+                else if (i == 4) {
+                    color = pink;
+                }
+                float yOffset = i * 30;
+                std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
+                RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
             }
-            else if (i == 1) {
-                color = blue;
-            }
-            else if (i == 2) {
-                color = green;
-            }
-            else if (i == 3) {
-                color = yellow;
-            }
-            else if (i == 4) {
-                color = pink;
-            }
-            float yOffset = i * 30;
-            std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-            RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
+
         }
+
 
         // activate shader
         shader.use();
@@ -291,111 +297,116 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         
         // tank head
         glm::mat4 tankHeadModel = glm::mat4(1.0f);
-        glm::mat3 camRot = dataSys->getCamRotMat();
-        //glm::mat4 modelRot = calculateRotationMatrix(camRot * glm::vec3(0, 0, -1)); // Assuming camera is looking down the negative z-axis
-        
-        //tankHeadModel = glm::translate(modelRot, playerPos);
-        //tankHeadModel *= modelRot; 
-        glm::mat4 tankrot = glm::rotate(glm::mat4(1.0f), glm::radians(dataSys->cameraAngle), glm::vec3(0, 1.0f, 0));
-        glm::mat4 transmat = glm::translate(glm::mat4(1.0f), playerPos);
-
-        tankHeadModel = transmat * tankrot;
+        glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
+        float angle = atan2(shootDir.x, shootDir.z);
+        tankHeadModel = glm::translate(tankHeadModel, playerPos);
+        tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
+        tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setMat4("model", tankHeadModel);
-
         tankHead.Draw(shader);
 
-
-        // rendering plane
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f));
-        shader.setMat4("model", model);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, planeTexture);
-        plane.Draw(shader);
+        // if player is alive, draw the scene
+        if (dataSys->carInfoList[0].isAlive) {
 
 
-        shader.use();
-        //what is the below used for ??
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-        //shader.setMat4("model", model);
-        //renderObject(building, &buildingVAO);
+            // rendering plane
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(1.0f));
+            shader.setMat4("model", model);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, planeTexture);
+            plane.Draw(shader);
+            shader.use();
 
-        //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
-        for (int i = dataSys->STATIC_OBJECT_LIST.size() + 1; i < dataSys->entityList.size(); i++) {
 
-            switch (dataSys->entityList[i].physType) {
+            //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0) (BW added +1, caused rendering issues)
+            for (int i = dataSys->STATIC_OBJECT_LIST.size() + 1; i < dataSys->entityList.size(); i++) {
 
-            case (PhysicsType::CAR):
+                switch (dataSys->entityList[i].physType) {
 
-                //gets the car info struct of the car
-                CarInfo* carInfo;
+                case (PhysicsType::CAR):
 
-                //is the car alive? -> render it
-                if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+                    //gets the car info struct of the car
+                    CarInfo* carInfo;
 
-                    carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+                    //is the car alive? -> render it
+                    if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
 
-                    //different colors for different cars
-                    if (carInfo->entity->name == "car2") {
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, player2Texture);
+                        carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+
+                        //different colors for different cars
+                        if (carInfo->entity->name == "car2") {
+                            glActiveTexture(GL_TEXTURE0);
+                            glBindTexture(GL_TEXTURE_2D, player2Texture);
+                        }
+                        if (carInfo->entity->name == "car3") {
+                            glActiveTexture(GL_TEXTURE0);
+                            glBindTexture(GL_TEXTURE_2D, player3Texture);
+                        }
+                        else if (carInfo->entity->name == "car4") {
+                            glActiveTexture(GL_TEXTURE0);
+                            glBindTexture(GL_TEXTURE_2D, player4Texture);
+                        }
+                        else {
+                            glActiveTexture(GL_TEXTURE0);
+                            glBindTexture(GL_TEXTURE_2D, player5Texture);
+                        }
+
+                        model = glm::mat4(1.0f);
+                        model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                        // make it look forward
+                        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+                        model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
+                        shader.setMat4("model", model);
+                        tankBody.Draw(shader);
+
+                        // make tank head static; no rotation
+                        model = glm::mat4(1.0f); // clear it 
+                        model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                        shader.setMat4("model", model);
+                        tankHead.Draw(shader);
                     }
-                    if (carInfo->entity->name == "car3") {
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, player3Texture);
-                    }
-                    else if (carInfo->entity->name == "car4") {
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, player4Texture);
-                    }
-                    else {
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, player5Texture);
-                    }
+
+                    break;
+                case (PhysicsType::PROJECTILE):
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, redTexture);
 
                     model = glm::mat4(1.0f);
                     model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                    // make it look forward
-                    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-                    model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
                     shader.setMat4("model", model);
-                    tank.Draw(shader);
+                    projectile.Draw(shader);
+
+                    break;
+                case (PhysicsType::POWERUP):
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+                    shader.setMat4("model", model);
+                    powerup.Draw(shader);
+
+                    break;
+                case (PhysicsType::STATIC):
+
+                    break;
+                default:
+
+                    break;
                 }
-
-                break;
-            case (PhysicsType::PROJECTILE):
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, redTexture);
-
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                shader.setMat4("model", model);
-                projectile.Draw(shader);
-
-                break;
-            case (PhysicsType::POWERUP):
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                shader.setMat4("model", model);
-                powerup.Draw(shader);
-
-                break;
-            case (PhysicsType::STATIC):
-
-                break;
-            default:
-
-                break;
             }
         }
-
+        // they must be dead, do not draw the scene/opponents
+        else {
+            // death text
+            textShader.use();
+            std::string deathText = "You got hit and are flying off into space!";
+            RenderText(textShader, textVAO, textVBO, deathText, 200.0f, 100.0f, 0.75f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu); // red
+        }
 
         // skybox rendering, needs to be at the end of rendering
         glDepthFunc(GL_LEQUAL);
