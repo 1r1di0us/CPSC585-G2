@@ -23,7 +23,6 @@ public:
 	void InputToResults();
 
 private:
-	double brakeTimer;
 	bool gpArr[16];
 	//make these arrays at some point
 	bool forward[17];
@@ -43,8 +42,8 @@ private:
 	bool menuRightPressed = false;
 
 	//mouse related things
-	bool initMouse = false;
-	double xpos, ypos, prevx, prevy, initx, inity;
-	int screenWidth;
-	bool mouseControl;
+	//bool initMouse = false;
+	//double xpos, ypos, prevx, prevy, initx, inity;
+	//int screenWidth;
+	//bool mouseControl;
 };

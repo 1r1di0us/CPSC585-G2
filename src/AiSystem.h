@@ -9,28 +9,24 @@
 #include <map>
 #include "PathFinder.h"
 
-//DELETE THIS
-enum State;
-
 class AiSystem {
 public:
 	SharedDataSystem* dataSys;
 	NavMesh* navMesh;
 	PathFinder* pathFinder;
-	State state;
-	double timer;
+	double startTimer;
 	double brakeTimer; //for shooting
+	double coolDownTimer;
 	double lockOnTime;
 	PxVec3 moveLocation;
 	Node* moveNode;
 	int nodeIterator = 0;
 	std::vector<Node*> centerNodes; //for patrolling
 	std::vector<Node*> edgeNodes;
-	std::default_random_engine rand;
-	std::normal_distribution<double> distribution;
 	CarInfo* target = nullptr;
-	PxVec3 aimVec = PxVec3(0, 0, -1);
+	CarInfo* aiCarInfo = nullptr;
 	bool wantToFire = false;
+	bool lockedOn = false;
 
 	AiSystem(SharedDataSystem* dataSys);
 	bool update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime);
@@ -38,10 +34,6 @@ public:
 	bool hunting_behaviour(EngineDriveVehicle* aiCar, bool fire);
 	void astar_path_finding(EngineDriveVehicle* aiCar);
 	void move_car(EngineDriveVehicle* aiCar);
+	void aim_car(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime);
 
-	//TO BE DELETED
-	bool update_old(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc);
-	bool sit_behaviour(EngineDriveVehicle* aiCar, bool fire);
-	bool spin_behaviour(EngineDriveVehicle* aiCar, bool fire);
-	bool moveto_behaviour(EngineDriveVehicle* aiCar, bool fire);
 };

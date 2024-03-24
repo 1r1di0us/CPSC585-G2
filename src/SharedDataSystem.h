@@ -335,7 +335,7 @@ public:
 
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
-	PxMat33 getCamRotMatPx(float angle);
+	PxMat33 getRotMatPx(float angle);
 	PxMat33 getSoundRotMat();
 
 	// Flags

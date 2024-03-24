@@ -3,7 +3,6 @@
 InputSystem::InputSystem(SharedDataSystem* dataSys) {
 
 	this->dataSys = dataSys;
-	brakeTimer = 0.0;
 
 	for (int i = 0; i < 16; i++) InputSystem::gpArr[i] = 0; //This is how you initialize an array. I can hardly believe it.
 	for (int i = 0; i < 17; i++) {
@@ -44,12 +43,12 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		camLeft[0] = true;
-		mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
+		//mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		camRight[0] = true;
-		mouseControl = false;
+		//mouseControl = false;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -97,17 +96,17 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		}
 	}
 
-	prevx = xpos;
-	prevy = ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-	if (initMouse) {
-		initMouse = false;
-		initx = xpos;
-		inity = ypos;
-	}
-	if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
-		mouseControl = true;
-	}
+	//prevx = xpos;
+	//prevy = ypos;
+	//glfwGetCursorPos(window, &xpos, &ypos);
+	//if (initMouse) {
+	//	initMouse = false;
+	//	initx = xpos;
+	//	inity = ypos;
+	//}
+	//if (xpos != prevx || ypos != prevy) { //if you move mouse you get mouse control, overrides pan control
+	//	mouseControl = true;
+	//}
 }
 
 void InputSystem::checkIfGamepadsPresent() {
@@ -147,11 +146,11 @@ void InputSystem::getGamePadInput() {
 				//y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 				if (x < -sens) {
 					camLeft[j + 1] = true;
-					mouseControl = false;
+					//mouseControl = false;
 				}
 				else if (x > sens) {
 					camRight[j + 1] = true;
-					mouseControl = false;
+					//mouseControl = false;
 				}
 				//else {
 				//	std::cout << "mid ";
@@ -203,13 +202,6 @@ void InputSystem::getGamePadInput() {
 }
 
 int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
-	//update timer
-	if (brakeTimer < deltaTime.count()) {
-		brakeTimer = 0.0;
-	}
-	else {
-		brakeTimer -= deltaTime.count();
-	}
 
 	EngineDriveVehicle* playerCar = dataSys->GetVehicleFromRigidDynamic(dataSys->carInfoList[0].entity->collisionBox);
 	
@@ -267,41 +259,30 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 
 	if (f && !b) {
-		
-		playerCar->mCommandState.throttle = gasPedal;
-		playerCar->mCommandState.nbBrakes = 0;
-		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(-1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(-1, 0, 0)).getNormalized();
 	}
 	else if (b && !f) {
-		playerCar->mCommandState.throttle = gasPedal;
-		playerCar->mCommandState.nbBrakes = 0;
-		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + dataSys->getCamRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(1, 0, 0)).getNormalized();
+		intentDir = (intentDir + dataSys->getRotMatPx(M_PI - dataSys->cameraAngle) * PxVec3(1, 0, 0)).getNormalized();
 	}
 
 	if (l && !r) {
-		playerCar->mCommandState.throttle = gasPedal;
-		playerCar->mCommandState.nbBrakes = 0;
-		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, 1)).getNormalized();
+		intentDir = (intentDir + dataSys->getRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, 1)).getNormalized();
 	}
 	else if (r && !l) {
-		playerCar->mCommandState.throttle = gasPedal;
-		playerCar->mCommandState.nbBrakes = 0;
-		playerCar->mCommandState.brakes[0] = 0;
-		intentDir = (intentDir + dataSys->getCamRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, -1)).getNormalized();
+		intentDir = (intentDir + dataSys->getRotMatPx(dataSys->cameraAngle) * PxVec3(0, 0, -1)).getNormalized();
 	}
 
-	if (!r && !l && !f && !b) {
+	if (!r && !l && !f && !b) { //when no move == stop
 		playerCar->mCommandState.throttle = 0;
 		playerCar->mCommandState.nbBrakes = 1;
 		playerCar->mCommandState.brakes[0] = 1;
 	}
 
 	if (intentDir != PxVec3(0, 0, 0)) {
+		//get the angle between the intentDir and the carDir
 		float dot = carDir.dot(intentDir);
-		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir)); //triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
+		float det = PxVec3(0, 1, 0).dot(carDir.cross(intentDir));
+		//triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 		float angle = atan2(dot, det);
 
 		//if (playerCar->mTransmissionCommandState.targetGear == 0) playerCar->mTransmissionCommandState.targetGear = 2;
@@ -311,34 +292,36 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 			playerCar->mCommandState.steer = -angle;
 		}
 		else */
-		if (angle <= M_PI / 8 && angle >= -M_PI / 8) {
+		if (angle <= 1 && angle >= -1) {
 			playerCar->mCommandState.steer = -angle;
+			playerCar->mCommandState.throttle = 1;
+			playerCar->mCommandState.nbBrakes = 0;
+			playerCar->mCommandState.brakes[0] = 0;
 		}
-		else if (angle < -M_PI/8) {
+		else if (angle < -1) {
 			playerCar->mCommandState.steer = 1;
-			if (angle < -M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 19.0) {
-					brakeTimer = 0.35;
-				}
-			}
-		}
-		else if (angle > M_PI/8) {
-			playerCar->mCommandState.steer = -1;
-			if (angle > M_PI / 4 && brakeTimer == 0.0) {
-				if (carSpeed > 19.0) {
-					brakeTimer = 0.35;
-				}
-			}
-		}
-		
-		if (brakeTimer > 0.0) {
-			if (carSpeed < 1.0) {
-				brakeTimer = 0.0;
-			}
-			else {
+			if (carSpeed > 15.0) {
 				playerCar->mCommandState.throttle = 0;
 				playerCar->mCommandState.nbBrakes = 1;
 				playerCar->mCommandState.brakes[0] = 1;
+			}
+			else {
+				playerCar->mCommandState.throttle = 1;
+				playerCar->mCommandState.nbBrakes = 0;
+				playerCar->mCommandState.brakes[0] = 0;
+			}
+		}
+		else if (angle > 1) {
+			playerCar->mCommandState.steer = -1;
+			if (carSpeed > 15.0) {
+				playerCar->mCommandState.throttle = 0;
+				playerCar->mCommandState.nbBrakes = 1;
+				playerCar->mCommandState.brakes[0] = 1;
+			}
+			else {
+				playerCar->mCommandState.throttle = 1;
+				playerCar->mCommandState.nbBrakes = 0;
+				playerCar->mCommandState.brakes[0] = 0;
 			}
 		}
 	}
@@ -364,12 +347,12 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 
 
-	if (mouseControl) {
-		dataSys->cameraAngle = fmod(M_PI * ((initx-xpos) / 1600), 2 * M_PI);
-	}
-	else {
-		dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
-	}
+	//if (mouseControl) {
+	//	dataSys->cameraAngle = fmod(M_PI * ((initx-xpos) / 1600), 2 * M_PI);
+	//}
+	//else {
+	//	dataSys->cameraAngle = fmod(dataSys->cameraAngle, 2 * M_PI);
+	//}
 
 	//shoot
 	if (s == 1) {
@@ -432,7 +415,7 @@ void InputSystem::InputToMenu() {
 	}
 
 	else if (conf && dataSys->menuOptionIndex == 0 && !dataSys->inControlsMenu){
-		initMouse = true;
+		//initMouse = true;
 		dataSys->inMenu = false;
 	}
 	else if (conf && dataSys->menuOptionIndex == 1 && !dataSys->inControlsMenu) {
