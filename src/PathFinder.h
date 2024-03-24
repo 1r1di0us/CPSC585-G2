@@ -48,7 +48,7 @@ class PathFinder {
 
 public:
 
-	std::stack<PxVec3>* path;
+	std::stack<PxVec3> path;
 	NavMesh* navMesh;
 
 	PathFinder(NavMesh* navMesh);

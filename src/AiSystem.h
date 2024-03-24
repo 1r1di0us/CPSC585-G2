@@ -4,6 +4,7 @@
 #include <math.h>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 #include <random>
 #include <map>
 #include "PathFinder.h"
@@ -20,9 +21,9 @@ public:
 	double timer;
 	double brakeTimer; //for shooting
 	double lockOnTime;
-	int degreeOfFreedom; //for pathfinding
 	PxVec3 moveLocation;
 	Node* moveNode;
+	int nodeIterator = 0;
 	std::vector<Node*> centerNodes; //for patrolling
 	std::vector<Node*> edgeNodes;
 	std::default_random_engine rand;

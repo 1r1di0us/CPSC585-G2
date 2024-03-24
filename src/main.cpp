@@ -207,21 +207,21 @@ int main() {
                 }
             }
 
-            if (aiSys2.update_old(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
+            if (aiSys2.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys3.update_old(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
+            if (aiSys3.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys4.update_old(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
+            if (aiSys4.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));

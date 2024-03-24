@@ -63,6 +63,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	gVehicle->mEngineDriveState.gearboxState.targetGear = gVehicle->mEngineDriveParams.gearBoxParams.neutralGear + 1;
 
 	//Set the vehicle to use the automatic gearbox.
+	//gVehicle->mTransmissionCommandState.targetGear = gVehicle->mTransmissionCommandState.eAUTOMATIC_GEAR;
+	//set the vehicle to be in 1st gear
 	gVehicle->mTransmissionCommandState.targetGear = 2;
 
 	//adding car to needed lists

@@ -58,8 +58,7 @@ Node* NavMesh::findEntity(PxVec3 pos) {
 
 PathFinder::PathFinder(NavMesh* navMesh) {
 	this->navMesh = navMesh;
-	std::stack<PxVec3> initPath = std::stack<PxVec3>();
-	path = &initPath;
+	path = std::stack<PxVec3>();
 }
 
 bool PathFinder::search(Node* src, Node* dest) {
@@ -147,12 +146,11 @@ bool PathFinder::search(Node* src, Node* dest) {
 				parents.insert_or_assign(temp.second->id, p.second->id);
 			}
 		}
-
-		// If we loop through and never find the destination
-		std::cout << "THE DESTINATION CELL IS NOT FOUND" << std::endl;
-		return false;
-
+		
 	}
+	// If we loop through and never find the destination
+	std::cout << "THE DESTINATION CELL IS NOT FOUND" << std::endl;
+	return false;
 }
 
 bool PathFinder::isDestination(Node * src, Node * dest) {
@@ -165,9 +163,9 @@ bool PathFinder::isDestination(Node * src, Node * dest) {
 }
 
 PxVec3 PathFinder::getNextWaypoint() {
-	if (path->size() > 0) {
-		PxVec3 vector = path->top();
-		path->pop();
+	if (path.size() > 0) {
+		PxVec3 vector = path.top();
+		path.pop();
 
 		return vector;
 	}
@@ -194,17 +192,17 @@ void PathFinder::tracePath(Node* src, Node* dest, std::map<unsigned int, unsigne
 	std::vector<PxVec3> bPath;
 
 	// Get rid of any pre-existing paths
-	while (!this->path->empty()) {
-		this->path->pop();
+	while (!this->path.empty()) {
+		this->path.pop();
 	}
 
 	// traverse
 	unsigned int temp = dest->id;
 	while (temp != parents.find(temp)->second) {
 		bPath.push_back(this->navMesh->nodes->find(temp)->second->centroid);
-		path->push(this->navMesh->nodes->find(temp)->second->centroid);
+		path.push(this->navMesh->nodes->find(temp)->second->centroid);
 		temp = parents.find(temp)->second;
 	}
 	bPath.push_back(this->navMesh->nodes->find(temp)->second->centroid);
-	path->push(this->navMesh->nodes->find(temp)->second->centroid);
+	path.push(this->navMesh->nodes->find(temp)->second->centroid);
 }
