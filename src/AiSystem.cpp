@@ -8,7 +8,7 @@ AiSystem::AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar) {
 	this->aiCar = aiCar;
 	state = STATE::hunting;
 	// state = 0; // hunting = 0 hiding = 1
-	startTimer = 1.5;
+	startTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
 	brakeTimer = 0;
 	coolDownTimer = 0;
 	reverseTimer = 0;
@@ -61,7 +61,7 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 		coolDownTimer -= deltaTime.count();
 	}
 	if (reverseTimer < deltaTime.count() && reverseTimer > 0) { //positive reverse timer is the time until we decide to reverse
-		reverseTimer = -2.5; //negative reverse timer is the time we actually reverse
+		reverseTimer = -1.0; //negative reverse timer is the time we actually reverse
 		aiCar->mTransmissionCommandState.targetGear = 0;
 	}
 	else if (reverseTimer > deltaTime.count()) {
@@ -116,13 +116,15 @@ void AiSystem::move_car() {
 
 	if (pathFinder->path.size() < 1) {
 		moveNode = nullptr; //tell the ai to find a new path
-		aiCar->mCommandState.throttle = 0; //stand still while we do
+		aiCar->mCommandState.throttle = 1; //stand still while we do
 		aiCar->mCommandState.nbBrakes = 0;
 		aiCar->mCommandState.brakes[0] = 0;
 	}
 	else {
-		int freedom = 10;//abs(degreeOfFreedom - (int)pathFinder->path.size()) * 5 + 5;
-
+		int freedom = 10; //abs(degreeOfFreedom - (int)pathFinder->path.size()) * 5 + 5;
+		if (movingToPowerup) {
+			freedom = 5;
+		}
 		if (dist < freedom) {
 			moveLocation = pathFinder->getNextWaypoint();
 		}
@@ -177,8 +179,8 @@ void AiSystem::move_car() {
 		aiCar->mCommandState.brakes[0] = 0;
 	}
 
-	if (aiCar->mCommandState.throttle == 1 && carSpeed < 1 && reverseTimer != 0) {
-		reverseTimer = 2.5;
+	if (aiCar->mCommandState.throttle == 1 && carSpeed < 1 && carSpeed > -1 && reverseTimer == 0) {
+		reverseTimer = 2.0;
 	}
 	else if (aiCar->mCommandState.throttle == 1 && reverseTimer > 0 && carSpeed > 1) {
 		reverseTimer = 0;
@@ -215,7 +217,7 @@ void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 		aiCarInfo->shootDir = dataSys->getRotMatPx(-angle) * aiCarInfo->shootDir;
 	}
 	
-	if (abs(angle) < 0.1) { //start bad
+	if (abs(angle) < 0.05) { //start bad
 		lockedOn = true;
 	}
 }
@@ -224,7 +226,7 @@ bool AiSystem::hunting_behaviour(bool fire) {
 	if (aiCarInfo->ammoCount <= 1) { //transition out of this
 		state = STATE::hiding;
 		moveNode = nullptr;
-		transitioning == true;
+		transitioning = true;
 		return fire;
 	}
 
@@ -238,7 +240,7 @@ bool AiSystem::hunting_behaviour(bool fire) {
 	if (moveNode == nullptr || moveLocation == PxVec3(-100, -100, -100)) { //if we need to pathfind
 		// iterate through a randomized list of preset nodes
 		nodeIterator++;
-		if (nodeIterator == centerNodes.size()) { //once we have gone through all the preset nodes, randomize the list again and start over
+		if (nodeIterator >= centerNodes.size()) { //once we have gone through all the preset nodes, randomize the list again and start over
 			nodeIterator = 0;
 			std::random_device rand;
 			std::mt19937 gen(rand());
@@ -272,9 +274,7 @@ bool AiSystem::hunting_behaviour(bool fire) {
 					//get direction to target
 					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
-					std::default_random_engine generator;
-					std::normal_distribution<float> distribution(0, 0.5); //mean of 0, standard deviation of 0.5 (pi/8 ~0.4)
-					float rand = distribution(generator);
+					double rand = -0.1 + (static_cast<double>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
 					aimDir = dataSys->getRotMatPx(rand) * aimDir;
 				}
 			}
@@ -283,11 +283,10 @@ bool AiSystem::hunting_behaviour(bool fire) {
 
 	if (target == nullptr) {
 		aimDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2(); //no valid targets
-		std::cout << "NO VALID TARGETS" << std::endl;
 	}
 	else {
 		enemyDist = (target->entity->collisionBox->getGlobalPose().p - carPos).magnitude();
-		if (enemyDist > 0 && enemyDist < 20) { // watch out this overrides startTimer
+		if (startTimer == 0 && enemyDist > 0 && enemyDist < 20) { // watch out this overrides startTimer
 			//enemy very close
 			if (lockOnTime > 0.1 && !wantToFire && coolDownTimer == 0) { //we are locked on but don't want to fire yet
 				brakeTimer = 0.5; // speedy fire
@@ -299,10 +298,9 @@ bool AiSystem::hunting_behaviour(bool fire) {
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
-				std::cout << "FIRE IN THE HOLE!!!" << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
-				coolDownTimer = 1.0;
+				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
 			}
 		}
 		else if (startTimer == 0) {
@@ -316,10 +314,9 @@ bool AiSystem::hunting_behaviour(bool fire) {
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
-				std::cout << "FIRE IN THE HOLE!!!" << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
-				coolDownTimer = 1.0;
+				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
 			}
 		}
 	}
@@ -332,12 +329,13 @@ bool AiSystem::hiding_behaviour(bool fire) {
 	if (aiCarInfo->ammoCount > 1) { //first, check if we need to transition to hunting
 		state = STATE::hunting;
 		moveNode = nullptr;
-		transitioning == true;
+		transitioning = true;
 		wantToFire = false;
+		edgePatrol = 0;
 		return fire;
 	}
 
-	if (transitioning) {
+	if (transitioning) { //just transitioned into hiding
 		transitioning = false;
 		float dist = 150;
 		for (int i = 0; i < edgeNodes.size(); i++) { //find closest preset edgeNode
@@ -354,6 +352,7 @@ bool AiSystem::hiding_behaviour(bool fire) {
 		movingToPowerup = false;
 	}
 
+	//SUPER LAGGY
 	//if target is too close
 	/*if ((target->entity.get()->collisionBox->getGlobalPose().p - carPos).magnitude() < 30) {
 		if (aiCarInfo->ammoCount == 1) {
@@ -363,17 +362,19 @@ bool AiSystem::hiding_behaviour(bool fire) {
 		int prevNode;
 		if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
 		else nextNode = nodeIterator + 1;
-		if (nodeIterator == 0) prevNode = edgeNodes.size();
+		if (nodeIterator == 0) prevNode = edgeNodes.size() - 1;
 		else prevNode = nodeIterator - 1;
 		if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
 			(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {
 			//if we are facing and/or closer to the next Node, set that as the moveNode
 			moveNode = edgeNodes[nextNode];
 			nodeIterator = nextNode;
+			edgePatrol = 1;
 		}
 		else { //otherwise move to the previous node
 			moveNode = edgeNodes[prevNode];
 			nodeIterator = prevNode;
+			edgePatrol = -1;
 		}
 		astar_path_finding();
 	}*/
@@ -384,7 +385,7 @@ bool AiSystem::hiding_behaviour(bool fire) {
 			float dist = (dataSys->allPowerupList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude();
 			if (dist < powerupDist && dist < 40) {
 				powerupDist = dist;
-				moveNode == navMesh->findEntity(dataSys->allPowerupList[i].entity->collisionBox->getGlobalPose().p);
+				moveNode = navMesh->findEntity(dataSys->allPowerupList[i].entity->collisionBox->getGlobalPose().p);
 				targetPowerup = dataSys->allPowerupList[i].entity->collisionBox;
 				movingToPowerup = true;
 			}
@@ -392,21 +393,31 @@ bool AiSystem::hiding_behaviour(bool fire) {
 
 		if (moveNode == nullptr) { //we didn't find a powerup to get
 			//patrol edges
-			int nextNode;
-			int prevNode;
-			if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
-			else nextNode = nodeIterator + 1;
-			if (nodeIterator == 0) prevNode = edgeNodes.size();
-			else prevNode = nodeIterator - 1;
-			if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
-				(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {
-				//if we are facing and/or closer to the next Node, set that as the moveNode
-				moveNode = edgeNodes[nextNode];
-				nodeIterator = nextNode;
+			if (edgePatrol != 0) { //move in the same direction
+				nodeIterator += edgePatrol;
+				if (nodeIterator == (int)edgeNodes.size()) nodeIterator = 0;
+				else if (nodeIterator == -1) nodeIterator = (int)edgeNodes.size() - 1;
+				moveNode = edgeNodes[nodeIterator];
 			}
-			else { //otherwise move to the previous node
-				moveNode = edgeNodes[prevNode];
-				nodeIterator = prevNode;
+			else {
+				int nextNode;
+				int prevNode;
+				if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
+				else nextNode = nodeIterator + 1;
+				if (nodeIterator == 0) prevNode = (int)edgeNodes.size();
+				else prevNode = nodeIterator - 1;
+				if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
+					(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {
+					//if we are facing and/or closer to the next Node, set that as the moveNode
+					moveNode = edgeNodes[nextNode];
+					nodeIterator = nextNode;
+					edgePatrol = 1;
+				}
+				else { //otherwise move to the previous node
+					moveNode = edgeNodes[prevNode];
+					nodeIterator = prevNode;
+					edgePatrol = -1;
+				}
 			}
 		}
 		astar_path_finding(); //we always find a node either way
@@ -424,9 +435,8 @@ bool AiSystem::hiding_behaviour(bool fire) {
 					//get direction to target
 					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
-					std::default_random_engine generator;
-					std::normal_distribution<float> distribution(0, 0.5); //mean of 0, standard deviation of 0.5 (pi/8 ~0.4)
-					float rand = distribution(generator);
+					std::normal_distribution<float> distribution(0, 0.05); //mean of 0, standard deviation of 0.5 (pi/8 ~0.4)
+					float rand = -0.1 + (static_cast<float>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
 					aimDir = dataSys->getRotMatPx(rand) * aimDir;
 				}
 			}
@@ -441,10 +451,9 @@ bool AiSystem::hiding_behaviour(bool fire) {
 		if (startTimer == 0) {
 			if (wantToFire && lockOnTime >= 0.25) { //no slowing down this time
 				fire = true; //FIRE IN THE HOLE!!!
-				std::cout << "FIRE IN THE HOLE!!!" << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
-				coolDownTimer = 1.0;
+				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
 			}
 		}
 	}

@@ -33,12 +33,12 @@ public:
 	CarInfo* aiCarInfo = nullptr;
 	physx::PxRigidDynamic* targetPowerup = nullptr;
 	PxVec3 aimDir = PxVec3(0, 0, -1);
+	PxVec3 carPos;
 	bool wantToFire = false;
 	bool lockedOn = false;
 	bool movingToPowerup = false;
 	bool transitioning = false; //lets us know when we are transitioning from one state to another
-
-	PxVec3 carPos;
+	int edgePatrol = 0;
 
 	AiSystem();
 	AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar);
