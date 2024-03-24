@@ -1,4 +1,4 @@
-# Blender 4.0.2 MTL File: 'plane1.blend'
+# Blender 4.0.2 MTL File: 'blocks.blend'
 # www.blender.org
 
 newmtl 10_Block.001
@@ -396,33 +396,3 @@ illum 2
 map_Kd C:/Z_Albedo.png
 map_Ns C:/Z_Roughness.png
 map_Bump -bm 1.000000 C:/Z_Normal.jpg
-
-newmtl cloth
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Kd 1.000000 0.800000 0.500000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-
-newmtl hair
-Ns 360.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
-
-newmtl plastic
-Ns 722.500000
-Ka 1.000000 1.000000 1.000000
-Kd 0.000000 0.000000 0.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
