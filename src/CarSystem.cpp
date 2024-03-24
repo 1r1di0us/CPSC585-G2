@@ -85,6 +85,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	CarInfo carInfo;
 	carInfo.entity = std::make_shared<Entity>(dataSys->entityList.back());
 	dataSys->carInfoList.emplace_back(carInfo);
+	
+	carInfo.shootDir = car.collisionBox->getGlobalPose().q.getBasisVector2();
 
 }
 
