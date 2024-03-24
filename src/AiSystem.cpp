@@ -156,16 +156,19 @@ void AiSystem::aim_car(EngineDriveVehicle* aiCar, std::chrono::duration<double> 
 		}
 	}
 
+	//resetting the shoot direction
+	aiCarInfo->shootDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+
 	//get angle between shootDir and aimDir
 	float dot = aiCarInfo->shootDir.dot(aimDir);
 	float det = PxVec3(0, 1, 0).dot(aiCarInfo->shootDir.cross(aimDir));
 	//triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 	float angle = atan2(dot, det);
 	//move shootDir slowly
-	if (angle > 0.75 * deltaTime.count()) {
+	if (angle > (0.75 * deltaTime.count())) {
 		aiCarInfo->shootDir = dataSys->getRotMatPx((float)(-0.75 * deltaTime.count())) * aiCarInfo->shootDir;
 	}
-	else if (angle < -0.75 * deltaTime.count()) {
+	else if (angle < (-0.75 * deltaTime.count())) {
 		aiCarInfo->shootDir = dataSys->getRotMatPx((float)(0.75 * deltaTime.count())) * aiCarInfo->shootDir;
 	}
 	else {
