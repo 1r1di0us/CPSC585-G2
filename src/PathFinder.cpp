@@ -26,14 +26,16 @@ NavMesh::NavMesh() {
 	//make all the connections
 	for (int x = 0; x < 30; x++) {
 		for (int z = 0; z < 30; z++) {
-			if (x > 0 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
+			//orthogonal connections
 			if (z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
-			if (x < 29 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
 			if (x < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
-			if (x < 29 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
 			if (z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
-			if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
 			if (x > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+			//diagonal connections
+			if (x > 0 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
+			if (x < 29 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
+			if (x < 29 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
+			if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
 			//Knight's move connections?
 		}
 	}

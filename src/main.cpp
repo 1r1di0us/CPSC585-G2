@@ -33,14 +33,14 @@ PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
 SoundSystem soundSys;
-AiSystem aiSys1(&dataSys);
-AiSystem aiSys2(&dataSys);
-AiSystem aiSys3(&dataSys);
-AiSystem aiSys4(&dataSys);
 Camera camera;
+AiSystem aiSys1;
+AiSystem aiSys2;
+AiSystem aiSys3;
+AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 50.0f;
+const double TIMELIMIT = 500.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -113,6 +113,10 @@ int main() {
                 carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
+                aiSys1 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox)); //call the constructors
+                aiSys2 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox));
+                aiSys3 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox));
+                aiSys4 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox));
 
                 dataSys.carsInitialized = true;
             }
@@ -200,33 +204,33 @@ int main() {
                 break;
             }
 
-            if (aiSys1.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime)) {
+            if (aiSys1.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys2.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime)) {
+            /*if (aiSys2.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys3.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime)) {
+            if (aiSys3.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys4.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime)) {
+            if (aiSys4.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
-            }
+            }*/
 
             //only updating the physics at max 60hz while everything else updates at max speed
             if (timeUntilPhysicsUpdate.count() <= 0.0f) {
