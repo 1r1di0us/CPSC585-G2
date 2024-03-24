@@ -196,6 +196,9 @@ void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 		}
 	}
 
+	//resetting the shoot direction
+	aiCarInfo->shootDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+
 	//get angle between shootDir and aimDir
 	float dot = aiCarInfo->shootDir.dot(aimDir);
 	float det = PxVec3(0, 1, 0).dot(aiCarInfo->shootDir.cross(aimDir));

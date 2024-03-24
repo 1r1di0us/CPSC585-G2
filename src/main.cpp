@@ -58,8 +58,8 @@ std::string resultsMusic = "assets/Music/Mario Strikers Results.wav";
 int main() {
 
     //y axis rotation in radians
-    int angle = PxPiDivFour;
-    PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
+    float angle = PxTwoPi;
+    PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
 
     soundSys.Init(&dataSys); //basically the constructor
     soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
