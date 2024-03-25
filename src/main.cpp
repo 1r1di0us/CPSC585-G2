@@ -58,9 +58,15 @@ int gameMusicChannelId;
 
 int main() {
 
+    //seeding the random number gen to be used throughout the game
+    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
+
     //y axis rotation in radians
     int angle = PxPiDivFour;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
+
+    //fake constructor (real one didnt like me)
+    dataSys.InitSharedDataSystem();
 
     soundSys.Init(&dataSys); //basically the constructor
     soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);

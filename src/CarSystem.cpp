@@ -117,16 +117,16 @@ void CarSystem::RespawnAllCars() {
 bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
-	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 1\n");
 		return false;
 	}
 
-	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 2\n");
 		return false;
 	}
 
@@ -184,7 +184,7 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 
-	if (dataSys->DEBUG_MODE) printf("before projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("before projectile entity creation\n");
 
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
@@ -193,19 +193,19 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
 	
-	if (dataSys->DEBUG_MODE) printf("after projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("after projectile entity creation\n");
 
 	//makes its name smart for easy debugging
 	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
-	if (dataSys->DEBUG_MODE) printf("before reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("before reduce ammo count\n");
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
 
-	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("after reduce ammo count\n");
 
 	return true;
 

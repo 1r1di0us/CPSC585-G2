@@ -102,7 +102,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/planeHugeWithWalls.obj");
+    this->plane = LoadModelFromPath("./assets/Models/MapNoObstacles.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     this->bedModel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
@@ -247,8 +247,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         shader.setMat4("model", model);
         renderObject(building, &buildingVAO);
 
-        //rendering all other entities starting at 2 (skipping player car and map)
-        for (int i = 2; i < dataSys->entityList.size(); i++) {
+        //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
+        for (int i = dataSys->STATIC_OBJECT_LIST.size(); i < dataSys->entityList.size(); i++) {
 
             switch (dataSys->entityList[i].physType) {
 
