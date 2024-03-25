@@ -84,7 +84,7 @@ public:
 	GLFWwindow* getWindow() const;
     
     // Generate particles at a given position
-	void generateParticles(glm::vec3 position, int count);
+	void generateParticles(glm::vec3 position, int count, unsigned int tex, float velocity, float lowerLifetime, float upperLifetime);
 
 	// Update particle positions and properties
 	void particleUpdate(float deltaTime);
@@ -96,16 +96,20 @@ public:
 		glm::vec3 position;
 		glm::vec3 velocity;
 		glm::vec4 color;
+		unsigned int texture;
 		float size;
 		float lifetime;
 	};
 
 	std::vector<Particle> particles;
 	unsigned int particleVAO, particleVBO;
-	unsigned int particleTexture; // Texture for particles
 	Shader particleShader;
 	void initParticlesVAO();
 
+	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture,
+		menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
+		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
+		planeTexture, gunMetalTexture, parryTexture, ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, particleExplosionTexture, particleSmokeTexture;
 };
 
 void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);

@@ -206,6 +206,7 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
+	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->shotBullet = true;
 
 	if (dataSys->DEBUG_PRINTS) printf("after reduce ammo count\n");
 

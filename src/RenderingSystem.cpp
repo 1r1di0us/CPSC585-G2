@@ -52,13 +52,6 @@ float skyboxVertices[] = {
 };
 
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture,
-redTexture,
-menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
-resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
-planeTexture, gunMetalTexture, parryTexture,
-ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, explosionTexture;
-
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
 	// Extract the upper-left 3x3 rotation submatrix from the original matrix
@@ -124,7 +117,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
 	gunMetalTexture = generateTexture("assets/Textures/gunMetal.jpg", true);
-	parryTexture = generateTexture("assets/Textures/whiteparry.jpg", true);
+	parryTexture = generateTexture("assets/Textures/blueparry.jpg", true);
 
 	//menu
 	menuPlay = generateTexture("assets/Textures/UI/menuPlay.jpg", true);
@@ -204,7 +197,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     // Initialize particles VAO
     initParticlesVAO();
     // Load particle texture
-    particleTexture = generateTexture("assets/Textures/fire.jpg", true);
+	particleExplosionTexture = generateTexture("assets/Textures/fire.jpg", true);
+	particleSmokeTexture = generateTexture("assets/Textures/whiteParry.jpg", true);
     //particleShader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
 }
 
@@ -395,12 +389,25 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		if (dataSys->carInfoList[0].parryActiveTimeLeft > 0) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, parryTexture);
+			if (!dataSys->carInfoList[0].parryParticles) {
+				generateParticles(playerPos, 15, parryTexture, 30, 1, 3);
+				dataSys->carInfoList[0].parryParticles = true;
+			}
 		}
 		else {
+			dataSys->carInfoList[0].parryParticles = false;
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, player1Texture);
 		}
 		tankBody.Draw(shader);
+
+		if (dataSys->carInfoList[0].shotBullet) {
+			glm::vec3 smokePosition = dataSys->carInfoList[0].entity->transform->pos;
+			smokePosition.z += 2;
+			smokePosition.y += 2;
+			generateParticles(smokePosition, 15, particleSmokeTexture, 3, 25, 40);
+			dataSys->carInfoList[0].shotBullet = false;
+		}
 
 		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);
 		//glm::vec3 frontLeft = glm::vec3(1.245f, 0.321f, 2.563f);
@@ -564,13 +571,22 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						shader.setMat4("model", tankHeadModel);
 						//tankWheel.Draw(shader);
 						//tankWheel.Draw(shader);
+
+						// Render smoke
+						if (carInfo->shotBullet) {
+							glm::vec3 smokePosition = carInfo->entity->transform->pos;
+							smokePosition.z += 2;
+							smokePosition.y += 2;
+							generateParticles(smokePosition, 15, particleSmokeTexture, 3, 25, 40);
+							carInfo->shotBullet = false;
+						}
 					}
                     else if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
                         if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded) {
                             CarInfo* carInfoStruct = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
                             glm::vec3 carPos = carInfoStruct->entity->transform->pos;
                             carPos.y -= 150.0f;
-                            generateParticles(carPos, 25);
+                            generateParticles(carPos, 25, particleExplosionTexture, 3, 25, 50);
                             dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded = true;
                         }
                     }
@@ -821,15 +837,15 @@ GLFWwindow* RenderingSystem::getWindow() const {
 	return window;
 }
 
-void RenderingSystem::generateParticles(glm::vec3 position, int count) {
+void RenderingSystem::generateParticles(glm::vec3 position, int count, unsigned int tex, float velocity, float lowerLifetime, float upperLifetime) {
     for (int i = 0; i < count; ++i) {
         Particle particle;
         particle.position = position;
-        particle.velocity = glm::sphericalRand(3.0f); // Random velocity
+        particle.velocity = glm::sphericalRand(velocity); // Random velocity
         particle.color = glm::vec4(1.0f); // White color
         particle.size = glm::linearRand(0.1f, 0.4f); // Random size
-        particle.lifetime = glm::linearRand(25.0f, 50.0f); // Random lifetime
-		printf("%f", particle.lifetime);
+        particle.lifetime = glm::linearRand(lowerLifetime, upperLifetime); // Random lifetime
+		particle.texture = tex;
         particles.push_back(particle);
     }
 }
@@ -856,7 +872,7 @@ void RenderingSystem::particleRender(std::chrono::duration<double> deltaTime, gl
         // Activate particle shader and set camera matrix
         // Bind particle texture
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, particleTexture);
+        glBindTexture(GL_TEXTURE_2D, particle.texture);
 
         //// Render particles
         //glBindVertexArray(particleVAO);
