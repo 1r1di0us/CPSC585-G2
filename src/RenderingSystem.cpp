@@ -569,7 +569,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					// render obstacles
 
 					model = glm::mat4(1.0f);
-					model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+					model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 					model = glm::translate(model, dataSys->entityList[i].transform->getPos());
 					shader.use();
 					shader.setMat4("model", model);
