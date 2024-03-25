@@ -95,7 +95,7 @@ void AiSystem::astar_path_finding() {
 	//no idea what I'm doing :)
 	Node* carNode = navMesh->findEntity(carPos);
 	if (pathFinder->search(carNode, moveNode) == false) {
-		std::cout << "PATHFINDING FAILURE!" << std::endl;
+		//std::cout << "PATHFINDING FAILURE!" << std::endl;
 	}
 	else {
 		moveLocation = pathFinder->getNextWaypoint();

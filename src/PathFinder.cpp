@@ -157,7 +157,7 @@ bool PathFinder::search(Node* src, Node* dest) {
 	}
 
 	if (isDestination(src, dest)) {
-		std::cout << "ALREADY AT DESTINATION!" << std::endl;
+		//std::cout << "ALREADY AT DESTINATION!" << std::endl;
 		return true;
 	}
 
@@ -233,7 +233,7 @@ bool PathFinder::search(Node* src, Node* dest) {
 		
 	}
 	// If we loop through and never find the destination
-	std::cout << "THE DESTINATION CELL IS NOT FOUND: " << dest->centroid.x << ", " << dest->centroid.z << std::endl;
+	//std::cout << "THE DESTINATION CELL IS NOT FOUND: " << dest->centroid.x << ", " << dest->centroid.z << std::endl;
 	return false;
 }
 
