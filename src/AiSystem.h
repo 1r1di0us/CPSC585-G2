@@ -43,8 +43,8 @@ public:
 	AiSystem();
 	AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar);
 	bool update(std::chrono::duration<double> deltaTime);
-	bool hiding_behaviour(bool fire);
-	bool hunting_behaviour(bool fire);
+	bool hunting_behaviour(bool fire, std::chrono::duration<double> deltaTime);
+	bool hiding_behaviour(bool fire, std::chrono::duration<double> deltaTime);
 	void astar_path_finding();
 	void move_car();
 	void aim_car(std::chrono::duration<double> deltaTime);

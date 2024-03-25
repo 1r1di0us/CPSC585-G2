@@ -77,8 +77,8 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 
 	bool fire = false;
 
-	if (state == STATE::hunting) fire = hunting_behaviour(fire); //hunting first because why not
-	if (state == STATE::hiding) fire = hiding_behaviour(fire);
+	if (state == STATE::hunting) fire = hunting_behaviour(fire, deltaTime); //hunting first because why not
+	if (state == STATE::hiding) fire = hiding_behaviour(fire, deltaTime);
 
 	move_car();
 	aim_car(deltaTime);
@@ -217,12 +217,12 @@ void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 		aiCarInfo->shootDir = dataSys->getRotMatPx(-angle) * aiCarInfo->shootDir;
 	}
 	
-	if (abs(angle) < 0.05) { //start bad
+	if (abs(angle) < 0.005) { //start bad
 		lockedOn = true;
 	}
 }
 
-bool AiSystem::hunting_behaviour(bool fire) {
+bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaTime) {
 	if (aiCarInfo->ammoCount <= 1) { //transition out of this
 		state = STATE::hiding;
 		moveNode = nullptr;
@@ -272,10 +272,11 @@ bool AiSystem::hunting_behaviour(bool fire) {
 					enemyDist = (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude();
 					target = &dataSys->carInfoList[i];
 					//get direction to target
-					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
+					//(targetpos + (target direction * target speed) - current position) normalized
+					aimDir = (target->entity->collisionBox->getGlobalPose().p + (target->entity->collisionBox->getGlobalPose().q.getBasisVector2() * target->entity->collisionBox->getLinearVelocity().magnitude() * deltaTime.count()) -aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
-					double rand = -0.1 + (static_cast<double>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
-					aimDir = dataSys->getRotMatPx(rand) * aimDir;
+					//double rand = -0.1 + (static_cast<double>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
+					//aimDir = dataSys->getRotMatPx(rand) * aimDir;
 				}
 			}
 		}
@@ -324,7 +325,7 @@ bool AiSystem::hunting_behaviour(bool fire) {
 	return fire;
 }
 
-bool AiSystem::hiding_behaviour(bool fire) {
+bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTime) {
 
 	if (aiCarInfo->ammoCount > 1) { //first, check if we need to transition to hunting
 		state = STATE::hunting;
@@ -344,6 +345,16 @@ bool AiSystem::hiding_behaviour(bool fire) {
 				nodeIterator = i;
 			}
 		}
+	}
+
+	if (target != nullptr && target->entity != nullptr) {
+		if (!target->isAlive) { //don't target things that are dead
+			target = nullptr;
+		}
+		else if ((target->entity->collisionBox->getGlobalPose().p - carPos).magnitude() > 75.0) {
+			target = nullptr; //don't target things that are too far away
+		}
+		//need to check if they are behind walls
 	}
 
 	//If the powerup has been stolen, targetPowerup should automatically be a null ptr.
@@ -433,11 +444,11 @@ bool AiSystem::hiding_behaviour(bool fire) {
 					enemyDist = (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).magnitude();
 					target = &dataSys->carInfoList[i];
 					//get direction to target
-					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
+					//(targetpos + (target direction * target speed) - current position) normalized
+					aimDir = (target->entity->collisionBox->getGlobalPose().p + (target->entity->collisionBox->getGlobalPose().q.getBasisVector2() * target->entity->collisionBox->getLinearVelocity().magnitude() * deltaTime.count()) - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
-					std::normal_distribution<float> distribution(0, 0.05); //mean of 0, standard deviation of 0.5 (pi/8 ~0.4)
-					float rand = -0.1 + (static_cast<float>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
-					aimDir = dataSys->getRotMatPx(rand) * aimDir;
+					//float rand = -0.1 + (static_cast<float>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
+					//aimDir = dataSys->getRotMatPx(rand) * aimDir;
 				}
 			}
 		}
