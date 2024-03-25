@@ -21,6 +21,7 @@ public:
 	int InputToMovement(std::chrono::duration<double> deltaTime);
 	void InputToMenu();
 	void InputToResults();
+	void InputToGameMenu();
 
 private:
 	bool gpArr[16];
@@ -35,11 +36,14 @@ private:
 	int confirm[17];
 	bool camLeft[17];
 	bool camRight[17];
+	int pause[17];
 	const float sens = 0.5f; //controller joystick and trigger sensitivity
 	const float gasPedal = 1;
 	//to make sure menu left and menu right only press for one frame
 	bool menuLeftPressed = false;
 	bool menuRightPressed = false;
+	bool menuUpPressed = false;
+	bool menuDownPressed = false;
 
 	//mouse related things
 	//bool initMouse = false;

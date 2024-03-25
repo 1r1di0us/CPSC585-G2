@@ -13,6 +13,8 @@ std::string PowerupSystem::PowerupTypeToString(PowerupType powerupType) {
 		return "PROJECTILESPEED";
 	case PowerupType::PROJECTILESIZE:
 		return "PROJECTILESIZE";
+	case PowerupType::ARMOUR:
+		return "ARMOUR";
 	case PowerupType::CARSPEED:
 		return "CARSPEED";
 	default:
@@ -73,10 +75,6 @@ void PowerupSystem::RespawnAllPowerups() {
 	if (dataSys->timeUntilRandomPowerup <= 0) {
 
 		PxVec3 spawnVec = dataSys->DetermineRespawnLocation(PhysicsType::POWERUP);
-
-		// Seed the random number generator
-			//might be worth having the generator based on the real time used in game
-		std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
 		// Get the total number of enum values
 		int numPowerupTypes = static_cast<int>(PowerupType::NUM_POWERUP_TYPES);

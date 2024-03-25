@@ -44,22 +44,32 @@ const double TIMELIMIT = 500.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
+std::chrono::high_resolution_clock::time_point lastTime;
 std::chrono::duration<double> totalTimePassed;
-std::chrono::duration<double> totalTimeLeft;
+std::chrono::duration<double> totalTimeLeft = std::chrono::duration<double>(TIMELIMIT);
 std::chrono::high_resolution_clock::time_point previousIterationTime;
 std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
+std::chrono::high_resolution_clock::time_point paused;
 
 std::string menuMusic = "assets/Music/Cianwood City Remix.wav";
 std::string gameMusic = "assets/Music/Miror B Remix.wav";
 std::string resultsMusic = "assets/Music/Mario Strikers Results.wav";
 
+int gameMusicChannelId;
+
 int main() {
+
+    //seeding the random number gen to be used throughout the game
+    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
 
     //y axis rotation in radians
     float angle = PxTwoPi;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
+
+    //fake constructor (real one didnt like me)
+    dataSys.InitSharedDataSystem();
 
     soundSys.Init(&dataSys); //basically the constructor
     soundSys.LoadSound("assets/Music/PianoClusterThud.wav", false);
@@ -67,9 +77,8 @@ int main() {
     soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
     soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
 
-    //setting the round timer (will be moved to appropriate place when it is created)
-    startTime = std::chrono::high_resolution_clock::now();
-    previousIterationTime = startTime;
+    lastTime = std::chrono::high_resolution_clock::now();
+    previousIterationTime = lastTime;
 
     GLFWwindow* window;
     window = renderingSystem.getWindow();
@@ -86,8 +95,9 @@ int main() {
         inputSys.getKeyboardInput(window);
         if (dataSys.inMenu) {
             inputSys.InputToMenu();
-            startTime = std::chrono::high_resolution_clock::now();
-            previousIterationTime = startTime;
+            lastTime = std::chrono::high_resolution_clock::now();
+            totalTimeLeft = std::chrono::duration<double>(TIMELIMIT);
+            previousIterationTime = lastTime;
             
             if (dataSys.resultsMusicPlaying) {
                 soundSys.UnLoadSound(resultsMusic);
@@ -137,23 +147,36 @@ int main() {
 
             inputSys.InputToResults();
         }
+        else if (dataSys.inGameMenu) {
+            inputSys.InputToGameMenu();
+            if (!dataSys.gameMusicPaused) {
+                soundSys.PauseChannel(gameMusicChannelId, true); // Pause the game music
+                dataSys.gameMusicPaused = true;
+            }
+            lastTime = std::chrono::high_resolution_clock::now();
+        }
         else {
             if (dataSys.menuMusicPlaying) {
                 soundSys.UnLoadSound(menuMusic);
-
                 dataSys.menuMusicPlaying = false;
             }
 
             if (!dataSys.gameMusicPlaying) {
                  soundSys.LoadSound(gameMusic, false, true);
-                 soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
+                 gameMusicChannelId = soundSys.PlaySound(gameMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
 
                  dataSys.gameMusicPlaying = true;
             }
+
+            if (dataSys.gameMusicPaused) {
+                soundSys.PauseChannel(gameMusicChannelId, false); // Pause the game music
+                dataSys.gameMusicPaused = false;
+            }
             //updating how much time has passed
             currentTime = std::chrono::high_resolution_clock::now();
-            totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
-            totalTimeLeft = std::chrono::duration<double>(TIMELIMIT) - totalTimePassed;
+            totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime);
+            totalTimeLeft = totalTimeLeft - totalTimePassed;
+            lastTime = currentTime;
 
             //calculating the total time passed since the last physics update
             deltaTime = currentTime - previousIterationTime;

@@ -121,32 +121,41 @@ void CarSystem::RespawnAllCars() {
 bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//if the car is dead, it cant shoot
-	if (dataSys->DEBUG_MODE) printf("before shoot 1\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 1\n");
 	if (!dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->isAlive) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 1\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 1\n");
 		return false;
 	}
 
-	if (dataSys->DEBUG_MODE) printf("before shoot 2\n");
+	if (dataSys->DEBUG_PRINTS) printf("before shoot 2\n");
 	//if the car has no ammo it can't shoot
 	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount <= 0) {
-		if (dataSys->DEBUG_MODE) printf("after shoot 2\n");
+		if (dataSys->DEBUG_PRINTS) printf("after shoot 2\n");
 		return false;
 	}
 
 	//car info struct
 	CarInfo* carInfo = dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar));
 
+	//calculating the actual projectile radius, taking powerups into account
+	float actualProjectileRadius = dataSys->DEFAULT_PROJECTILE_RADIUS;
+
+	//projectile radius powerup
+	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->projectileSizeActiveTimeLeft > 0) {
+
+		actualProjectileRadius *= dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH;
+	}
+
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * dataSys->PROJECTILE_RADIUS * 6.5,
-			dataSys->PROJECTILE_RADIUS * 2,
-			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * dataSys->PROJECTILE_RADIUS * 6.5),
+		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * actualProjectileRadius * 6.5,
+			actualProjectileRadius * 2,
+			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * actualProjectileRadius * 6.5),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
-	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(dataSys->PROJECTILE_RADIUS), *dataSys->gMaterial);
+	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(actualProjectileRadius), *dataSys->gMaterial);
 
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
@@ -164,13 +173,22 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//adds the projectile to the scene
 	dataSys->gScene->addActor(*projectileBody);
 
-	//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
-	projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
+	//if the car shooting has the projectile speed powerup
+	if (dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->projectileSpeedActiveTimeLeft > 0) {
+
+		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * dataSys->PROJECTILE_SPEED_POWERUP_STRENGTH * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
+	}
+	else {
+
+		//sets the linear velocity of the projectile (ignores y direction of car cause it wiggles)
+		projectileBody->setLinearVelocity(dataSys->SHOOT_FORCE * PxVec3(carInfo->shootDir.x, 0, carInfo->shootDir.z));
+	}
 
 	//adding the projectile to the dict for the correct car
 	dataSys->carProjectileRigidDynamicDict[shootingCar].emplace_back(projectileBody);
 
-	if (dataSys->DEBUG_MODE) printf("before projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("before projectile entity creation\n");
 
 	//creating the projectile entity with name based on car that shot it
 	Entity projectile;
@@ -179,19 +197,19 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	projectile.physType = PhysicsType::PROJECTILE;
 	projectile.collisionBox = projectileBody;
 	
-	if (dataSys->DEBUG_MODE) printf("after projectile entity creation\n");
+	if (dataSys->DEBUG_PRINTS) printf("after projectile entity creation\n");
 
 	//makes its name smart for easy debugging
 	projectileBody->setName(projectile.name.c_str());
 
 	dataSys->entityList.emplace_back(projectile);
 
-	if (dataSys->DEBUG_MODE) printf("before reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("before reduce ammo count\n");
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
 
-	if (dataSys->DEBUG_MODE) printf("after reduce ammo count\n");
+	if (dataSys->DEBUG_PRINTS) printf("after reduce ammo count\n");
 
 	return true;
 
@@ -211,5 +229,13 @@ void CarSystem::UpdateAllCarCooldowns() {
 
 			dataSys->carInfoList[i].parryCooldownTimeLeft -= dataSys->TIMESTEP;
 		}
+
+		//the projectile speed powerup
+		if (dataSys->carInfoList[i].projectileSpeedActiveTimeLeft > 0)
+			dataSys->carInfoList[i].projectileSpeedActiveTimeLeft -= dataSys->TIMESTEP;
+		
+		//the projectile size powerup
+		if (dataSys->carInfoList[i].projectileSizeActiveTimeLeft > 0)
+			dataSys->carInfoList[i].projectileSizeActiveTimeLeft -= dataSys->TIMESTEP;
 	}
 }

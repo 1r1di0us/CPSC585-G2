@@ -7,7 +7,7 @@ void renderOBJ(const OBJModel& model);
 
 std::map<char, Character> Characters_gaegu;
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -70,6 +70,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     menuControls = generateTexture("assets/Textures/UI/menuControls.jpg", true);
     menuQuit = generateTexture("assets/Textures/UI/menuQuit.jpg", true);
     controlsMenu = generateTexture("assets/Textures/UI/controlsMenu.jpg", true);
+    pauseMenuContinue = generateTexture("assets/Textures/UI/pauseMenuContinue.jpg", true);
+    pauseMenuQuit = generateTexture("assets/Textures/UI/pauseMenuQuit.jpg", true);
     resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
     resultsP2 = generateTexture("assets/Textures/UI/resultsP2.jpg", true);
     resultsP3 = generateTexture("assets/Textures/UI/resultsP3.jpg", true);
@@ -100,7 +102,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
     this->tank = LoadModelFromPath("./assets/Models/tank.obj");
     this->ball = LoadModelFromPath("./assets/Models/ball.obj");
-    this->plane = LoadModelFromPath("./assets/Models/mapNoObstacles.obj");
+    this->plane = LoadModelFromPath("./assets/Models/MapNoObstacles.obj");
     this->powerup = LoadModelFromPath("./assets/Models/building_E.obj");
 
     this->bedModel = LoadModelFromPath("./assets/Models/bed_double_A.obj");
@@ -245,8 +247,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         shader.setMat4("model", model);
         renderObject(building, &buildingVAO);
 
-        //rendering all other entities starting at 2 (skipping player car and map)
-        for (int i = 2; i < dataSys->entityList.size(); i++) {
+        //rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0)
+        for (int i = dataSys->STATIC_OBJECT_LIST.size(); i < dataSys->entityList.size(); i++) {
 
             switch (dataSys->entityList[i].physType) {
 
@@ -257,6 +259,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
                 //is the car alive? -> render it
                 if (dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+
+                    //NOTE: does car have shields?
 
                     carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
 
@@ -290,6 +294,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 break;
             case (PhysicsType::PROJECTILE):
 
+                //NOTE: the projectiles that are double the size are too big for the model
+
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, redTexture);
 
@@ -301,16 +307,58 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 break;
             case (PhysicsType::POWERUP):
 
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                shader.setMat4("model", model);
-                renderObject(powerup, &powerupVAO);
+
+                //changes based on powerup type
+                switch (dataSys->GetPowerupInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->powerupType) {
+                case PowerupType::AMMO:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+
+                    shader.setMat4("model", model);
+                    renderObject(powerup, &powerupVAO);
+
+                    break;
+                case PowerupType::PROJECTILESPEED:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
+
+                    break;
+                case PowerupType::PROJECTILESIZE:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, player2Texture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
+
+                    break;
+                case PowerupType::ARMOUR:
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, player4Texture);
+
+                    shader.setMat4("model", model);
+                    renderObject(ball, &ballVAO);
+
+                case PowerupType::CARSPEED:
+
+                    break;
+                default:
+                    printf("not possible for this powerup type to be rendered");
+                    break;
+                }
 
                 break;
             case (PhysicsType::STATIC):
+
+                //idk if this needs a case as it will all be custom not in this loop?
 
                 break;
             default:
@@ -325,10 +373,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
     }
 
     // Setup UI if necessary
-    if (dataSys->inMenu || dataSys->inResults) {
+    if (dataSys->inMenu || dataSys->inResults || dataSys->inGameMenu) {
         GLuint fboId = 0;
         glGenFramebuffers(1, &fboId);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
+
         if (dataSys->inMenu) {
             if (dataSys->inControlsMenu) {
                 glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, controlsMenu, 0);
@@ -365,6 +414,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 }
             }
             
+        }
+        else if (dataSys->inGameMenu) {
+            if (dataSys->ingameOptionIndex == 0) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pauseMenuContinue, 0);
+            }
+            else if (dataSys->ingameOptionIndex == 1) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pauseMenuQuit, 0);
+            }
         }
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // if not already bound
         glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT,

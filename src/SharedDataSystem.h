@@ -35,6 +35,11 @@ struct CarInfo{
 	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
 	PxVec3 shootDir;
+
+	//powerup effects
+	float projectileSpeedActiveTimeLeft = 0;
+	float projectileSizeActiveTimeLeft = 0;
+	bool hasArmour = false;
 };
 
 //powerup types
@@ -42,11 +47,11 @@ enum PowerupType {
 	AMMO,
 	PROJECTILESPEED,
 	PROJECTILESIZE,
+	ARMOUR,
 	CARSPEED, 
 	
 	//used for generating random powerup type
-		//set to 1 for now cause only ammo powerup exists
-	NUM_POWERUP_TYPES = 1
+	NUM_POWERUP_TYPES = 4
 };
 
 //powerup info struct
@@ -78,6 +83,7 @@ public:
 	static std::vector<PxContactPairHeader> contactPairs;
 
 private:
+
 	//custom collision callback system
 	class ContactReportCallback : public PxSimulationEventCallback {
 
@@ -148,21 +154,21 @@ private:
 	//randomizes the map square list
 	void RandomizeMapSquareList(std::vector<MapSquare>& mapSquareList);
 
-	//creates the map square list
-	void CreateMapSquareList();
+	//function to check a potential spawn point against all obstacles
+	bool IsSpawnPointValid(PxVec2 potentialSpawnPoint);
 
 	//generates a point a min distance away from all points in given vec and within the map range
-	PxVec3 GenerateSpawnPoint(std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
-
+	PxVec3 GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight);
 
 public:
-
-	//debug mode
-	const bool DEBUG_MODE = false;
 
 	/*
 	* CONSTANTS:
 	*/
+
+	//debug mode
+	bool DEBUG_PRINTS = false;
+	bool DEBUG_BOXES = false;
 
 	//timestep value, easily modifiable
 	const PxReal TIMESTEP = 1.0f / 60.0f;
@@ -171,8 +177,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -11);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 24);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-67, -67);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(67, 67);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -190,11 +196,15 @@ public:
 	//the spawn height of powerups
 	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
+	//min spawn distance from static objects
+		//might have to be minimum the size of the car to make sure that car spawning is safe
+	const PxReal STATIC_SPAWN_OFFSET = 3.0f;
+
 	//the spawn rate of a random powerup
-	const float RANDOM_POWERUP_SPAWN_RATE = 50.0f;
+	const float RANDOM_POWERUP_SPAWN_RATE = 7.0f;
 
 	//the spawn rate of an ammo spawn powerup
-	const float AMMO_POWERUP_SPAWN_RATE = 10.0f;
+	const float AMMO_POWERUP_SPAWN_RATE = 5.0f;
 
 	//the max number of ammo spawn powerups
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
@@ -202,6 +212,9 @@ public:
 	//the number of bullets given per ammo powerup
 	const int NUMBER_AMMO_GIVEN_PER_POWERUP = 3;
 
+	//a vector of static objects that persist through games
+	std::vector<Entity> STATIC_OBJECT_LIST;
+	
 	//the cooldown time for the parry mechanic
 	const float PARRY_COOLDOWN_TIME_LEFT = 2.0f;
 
@@ -212,7 +225,19 @@ public:
 	const float SHOOT_FORCE = 100;
 
 	//the projectile radius
-	const PxReal PROJECTILE_RADIUS = 1.0f;
+	const PxReal DEFAULT_PROJECTILE_RADIUS = 1.0f;
+
+	//the length of the projectile size powerup
+	const float PROJECTILE_SIZE_POWERUP_DURATION = 2.0f;
+
+	//the magnitude of the projectile size multiplier
+	const float PROJECTILE_SIZE_POWERUP_STRENGTH = 2.0f;
+
+	//the length of the projectile speed powerup
+	const float PROJECTILE_SPEED_POWERUP_DURATION = 2.0f;
+
+	//the magnitude of the projectile speed multiplier
+	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
 
 	//adding a map entity that persists through games
 	Entity MAP;
@@ -239,11 +264,8 @@ public:
 	* DEBUGGING STUFF
 	*/
 
-	//will make debug boxes at all the squares used in respawning
-	bool boxesMade = false;
-
 	//makes a floating box for boundary demo purposes
-	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
+	void MAKE_BOX_DEBUG(PxReal x, PxReal z, PxReal y = 5);
 
 	/*
 	* CAR FUNCTIONS
@@ -264,11 +286,22 @@ public:
 	//gets the list of dead cars to do shit to
 	std::vector<CarInfo*> GetListOfDeadCars();
 
+	/*
+	* RESPAWN
+	*/
+
+	//map square lists to populate
+	std::vector<MapSquare> carMapSquareList;
+	std::vector<MapSquare> powerupMapSquareList;
+
+	//obstacle list to do checking against
+	std::vector<MapSquare> obstacleMapSquareList;
+
 	//returns a location where an entity can be respawned
 	PxVec3 DetermineRespawnLocation(PhysicsType physType);
 
-	//activates parry for a given car
-	bool Parry(PxRigidDynamic* carThatParried);
+	//adds the obstacle to its list of map squares to test against
+	void AddObstacleToObstacleList(PxRigidStatic* obstacle);
 
 	/*
 	* PROJECTILES
@@ -282,6 +315,9 @@ public:
 
 	//finds the car that shot a given projectile
 	std::shared_ptr<Entity> GetCarThatShotProjectile(PxRigidDynamic* projectile);
+
+	//activates parry for a given car
+	bool Parry(PxRigidDynamic* carThatParried);
 
 	/*
 	* POWERUPS
@@ -327,8 +363,18 @@ public:
 	*/
 	void ResolveCollisions();
 
+	//create the map square lists to use during respawn
+	void InitMapSquares(std::vector<MapSquare>& listToPopulate, PxReal minDistance);
+
 	// Delete all lists in SharedDataSystem.h
 	void resetSharedDataSystem();
+
+	/*
+	* GENERAL
+	*/
+
+	//fake constructor cause i couldnt get the real one to work
+	void InitSharedDataSystem();
 
 	// Stuff moved in from GameState.cpp
 	void menuEventHandler();
@@ -345,11 +391,11 @@ public:
 	bool quit = false;
 	bool inResults = false;
 	int menuOptionIndex = 0;
-	int nbMenuOptions = 3; // Currently options are play and quit
+	int nbMenuOptions = 3; // Currently options are play, controls and quit
 
 	bool inGameMenu = false;
 	int ingameOptionIndex = 0;
-	int nbIngameOptions = 2; // Options will be main menu and quit
+	int nbIngameOptions = 2; // Options are continue and quit
 
 	// Reset these on game end
 	int winningPlayer = 0;
@@ -357,6 +403,7 @@ public:
 	bool carsInitialized = false;
 	bool menuMusicPlaying = false;
 	bool gameMusicPlaying = false;
+	bool gameMusicPaused = false;
 	bool resultsMusicPlaying = false;
 
 	// Audio
