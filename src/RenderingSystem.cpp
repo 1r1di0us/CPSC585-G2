@@ -52,7 +52,7 @@ float skyboxVertices[] = {
 };
 
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture, rainbow;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -127,6 +127,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
 	resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
 	resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
+	rainbow = generateTexture("assets/Textures/whiteparry.jpg", true);
 
 	// geom shaders
 	shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
@@ -350,9 +351,18 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		dataSys->carInfoList[0].shootDir.x = test.x;
 		dataSys->carInfoList[0].shootDir.z = test.z;
 
-		// binding textures
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, player1Texture);
+
+		// binding textures
+		if (dataSys->carInfoList[0].parryActiveTimeLeft > 0) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, rainbow);
+		}
+		else {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, player1Texture);
+		}
 		tankBody.Draw(shader);
 
 		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);

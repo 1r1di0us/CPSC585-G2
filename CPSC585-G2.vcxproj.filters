@@ -109,6 +109,7 @@
     <Image Include="assets\Models\funky_cube.png" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="src\Textures\wood.jpg" />
+    <Image Include="assets\Textures\whiteparry.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="physx\debug\LowLevelAABB_static_64.lib" />
