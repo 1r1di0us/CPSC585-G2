@@ -1,0 +1,200 @@
+# Blender 4.0.2 MTL File: 'None'
+# www.blender.org
+
+newmtl 10_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/10_Albedo.png
+map_Ns C:/10_Roughness.png
+map_Bump -bm 1.000000 C:/10_Normal.jpg
+
+newmtl 6_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/6_Albedo.png
+map_Ns C:/6_Roughness.png
+map_Bump -bm 1.000000 C:/6_Normal.jpg
+
+newmtl 7_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/7_Albedo.png
+map_Ns C:/7_Roughness.png
+map_Bump -bm 1.000000 C:/7_Normal.jpg
+
+newmtl 8_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/8_Albedo.png
+map_Ns C:/8_Roughness.png
+map_Bump -bm 1.000000 C:/8_Normal.jpg
+
+newmtl 9_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/9_Albedo.png
+map_Ns C:/9_Roughness.png
+map_Bump -bm 1.000000 C:/9_Normal.jpg
+
+newmtl F_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/F_Albedo.png
+map_Ns C:/F_Roughness.png
+map_Bump -bm 1.000000 C:/F_Normal.jpg
+
+newmtl G_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/G_Albedo.png
+map_Ns C:/G_Roughness.png
+map_Bump -bm 1.000000 C:/G_Normal.jpg
+
+newmtl H_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/H_Albedo.png
+map_Ns C:/H_Roughness.png
+map_Bump -bm 1.000000 C:/H_Normal.jpg
+
+newmtl I_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/I_Albedo.png
+map_Ns C:/I_Roughness.png
+map_Bump -bm 1.000000 C:/I_Normal.jpg
+
+newmtl J_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/J_Albedo.png
+map_Ns C:/J_Roughness.png
+map_Bump -bm 1.000000 C:/J_Normal.jpg
+
+newmtl O_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/O_Albedo.png
+map_Ns C:/O_Roughness.png
+map_Bump -bm 1.000000 C:/O_Normal.jpg
+
+newmtl P_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/P_Albedo.png
+map_Ns C:/P_Roughness.png
+map_Bump -bm 1.000000 C:/P_Normal.jpg
+
+newmtl Q_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Q_Albedo.png
+map_Ns C:/Q_Roughness.png
+map_Bump -bm 1.000000 C:/Q_Normal.jpg
+
+newmtl R_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/R_Albedo.png
+map_Ns C:/R_Roughness.png
+map_Bump -bm 1.000000 C:/R_Normal.jpg
+
+newmtl S_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/S_Albedo.png
+map_Ns C:/S_Roughness.png
+map_Bump -bm 1.000000 C:/S_Normal.jpg
+
+newmtl T_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Albedo.png
+map_Ns C:/T_Roughness.png
+map_Bump -bm 1.000000 C:/T_Normal.jpg
+
+newmtl Y_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Y_Albedo.png
+map_Ns C:/Y_Roughness.png
+map_Bump -bm 1.000000 C:/Y_normal.jpg
+
+newmtl Z_Block.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Z_Albedo.png
+map_Ns C:/Z_Roughness.png
+map_Bump -bm 1.000000 C:/Z_Normal.jpg
