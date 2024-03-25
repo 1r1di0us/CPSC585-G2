@@ -345,13 +345,9 @@ copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"</Command>
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)src"
 
-copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\fragment_shader.txt"
+mkdir "$(TargetDir)src\shaders"
 
-copy "$(SolutionDir)src\fragment_shader_text.txt" "$(TargetDir)src\fragment_shader_text.txt"
-
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\vertex_shader.txt"
-
-copy "$(SolutionDir)src\vertex_shader_text.txt" "$(TargetDir)src\vertex_shader_text.txt"
+copy "$(SolutionDir)src\shaders" "$(TargetDir)src\shaders"
 
 mkdir "$(TargetDir)assets"
 
@@ -372,6 +368,10 @@ copy "$(SolutionDir)assets\Models\Powerups" "$(TargetDir)assets\Models\Powerups"
 mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
+
+mkdir "$(TargetDir)assets\skybox"
+
+copy "$(SolutionDir)assets\skybox" "$(TargetDir)assets\skybox"
 
 mkdir "$(TargetDir)assets\Fonts"
 
