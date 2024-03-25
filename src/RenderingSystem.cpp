@@ -145,6 +145,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     tankWheels = Model("./assets/Models/tankWheels.obj");
     tankWheelFL = Model("./assets/Models/tankFrontLeftWheels.obj");
     tankWheelFR = Model("./assets/Models/tankFrontRightWheels.obj");
+    tankWheelBR = Model("./assets/Models/tankBackRightWheels.obj");
+    tankWheelBL = Model("./assets/Models/tankBackLeftWheels.obj");
 
     // SkyVAO Initialization
     glGenVertexArrays(1, &skyVAO);
@@ -368,6 +370,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         shader.setMat4("model", model);
                         tankBody.Draw(shader);
                         tankWheels.Draw(shader);
+                        tankWheelBL.Draw(shader);
+                        tankWheelBR.Draw(shader);
 
                         // tank head
                         glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -378,6 +382,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
                         shader.setMat4("model", tankHeadModel);
                         tankHead.Draw(shader);
+
+                        // front wheels
+                        glm::mat4 tankWheelRight = glm::mat4(1.0f);
+                        glm::mat4 tankWheelLeft = glm::mat4(1.0f);
+                        glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
                     }
 
                     break;
