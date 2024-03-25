@@ -145,7 +145,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	tankWheel = Model("./assets/Models/tankWheel.obj");
 	bunny = Model("./assets/Models/toyBunny.obj");
 	train = Model("./assets/Models/toyTrain.obj");
-	toyBlock = Model("./assets/Models/toyBlocksHalf2.obj");
+	toyBlock2 = Model("./assets/Models/toyBlocksHalf2.obj");
+	toyBlock1 = Model("./assets/Models/toyBlocksHalf1.obj");
 
 	// SkyVAO Initialization
 	glGenVertexArrays(1, &skyVAO);
@@ -273,7 +274,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			textShader.use();
 			std::string deathText1 = "You got hit!";
 			std::string deathText2 = "Fly off into space now!";
-			RenderText(textShader, textVAO, textVBO, deathText1, 150.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText1, 200.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
 			RenderText(textShader, textVAO, textVBO, deathText2, 100.0f, 100.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
 			// render the 2d screen if they are dead?
 		}
@@ -565,8 +566,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					else if (dataSys->entityList[i].name == "STATIC_2") {
 						bunny.Draw(shader);
 					}
-					else if (dataSys->entityList[i].name == "STATIC_3" || dataSys->entityList[i].name == "STATIC_4") {
-						toyBlock.Draw(shader);
+					else if (dataSys->entityList[i].name == "STATIC_3") {
+						toyBlock1.Draw(shader);
+					}
+					else if ( dataSys->entityList[i].name == "STATIC_4") {
+						toyBlock2.Draw(shader);
 					}
 
 					break;
