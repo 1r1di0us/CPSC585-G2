@@ -156,7 +156,7 @@ void PhysicsSystem::stepAllVehicleMovementPhysics() {
 			//update the forward direction of the wheels
 			PxShape* wheelShape = NULL;
 			dataSys->gVehicleList[i]->mPhysXState.physxActor.rigidBody->getShapes(&wheelShape, 1, 1);
-			dataSys->carInfoList[i].carWheelInfo.wheelForwardDir = wheelShape->getLocalPose().q.getBasisVector2();
+			dataSys->carInfoList[i].wheelForwardDir = wheelShape->getLocalPose().q.getBasisVector2();
 
 			//Forward integrate the vehicle by a single TIMESTEP.
 			//Apply substepping at low forward speed to improve simulation fidelity.

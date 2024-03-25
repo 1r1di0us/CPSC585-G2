@@ -318,9 +318,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		tankHead.Draw(shader);
 
 		// front wheels
-		glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.x,
-			dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.y,
-			dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.z));
+		glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].wheelForwardDir.x, dataSys->carInfoList[0].wheelForwardDir.y, dataSys->carInfoList[0].wheelForwardDir.z));
 
 		angle = atan2(wheelDir.x, wheelDir.z);
 		glm::mat4 wheelModel = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -394,7 +392,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						// front wheels
 						glm::mat4 tankWheelRight = glm::mat4(1.0f);
 						glm::mat4 tankWheelLeft = glm::mat4(1.0f);
-						glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->carWheelInfo.wheelForwardDir.x, carInfo->carWheelInfo.wheelForwardDir.y, carInfo->carWheelInfo.wheelForwardDir.z));
+						glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->wheelForwardDir.y, carInfo->wheelForwardDir.z));
 						angle = atan2(wheelDir.x, wheelDir.z);
 						glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), dataSys->entityList[i].transform->getPos());
 						//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated

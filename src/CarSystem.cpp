@@ -7,10 +7,6 @@ CarSystem::CarSystem(SharedDataSystem* dataSys) {
 
 void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 
-	//making vars n shit
-	Entity car;
-	CarInfo carInfo;
-
 	//every car has same name TODO: might change if need to sort by name
 	const char* name = "car";
 
@@ -53,20 +49,6 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
 			shape->setGeometry(myChassis);
 		}
-		//front right
-		else if (i == 2) {
-			carInfo.carWheelInfo.frontRightPos = shape->getLocalPose().p;
-		}//front left
-		else if (i == 3) {
-			carInfo.carWheelInfo.frontLeftPos = shape->getLocalPose().p;
-		}//back right
-		else if (i == 4) {
-			carInfo.carWheelInfo.backRightPos = shape->getLocalPose().p;
-		}//back left
-		else if (i == 5) {
-			carInfo.carWheelInfo.backLeftPos = shape->getLocalPose().p;
-		}
-		
 
 		shape->setSimulationFilterData(vehicleFilter);
 
@@ -88,6 +70,7 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	dataSys->carProjectileRigidDynamicDict[(PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody] = std::vector<PxRigidDynamic*>();
 
 	//creating the car entity to add to the entity list
+	Entity car;
 	car.name = "car" + std::to_string(dataSys->gVehicleList.size());
 	car.CreateTransformFromPhysX(gVehicle->mPhysXState.physxActor.rigidBody->getGlobalPose());
 	car.physType = PhysicsType::CAR;
@@ -96,9 +79,10 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	dataSys->entityList.emplace_back(car);
 
 	//creating the car info struct
+	CarInfo carInfo;
 	carInfo.entity = std::make_shared<Entity>(dataSys->entityList.back());
 	carInfo.shootDir = car.collisionBox->getGlobalPose().q.getBasisVector2();
-	carInfo.carWheelInfo.wheelForwardDir = carInfo.shootDir;
+	carInfo.wheelForwardDir = carInfo.shootDir;
 
 	dataSys->carInfoList.emplace_back(carInfo);
 
