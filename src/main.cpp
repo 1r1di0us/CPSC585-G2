@@ -73,6 +73,8 @@ int main() {
     soundSys.AddToSoundDict("Thud", "assets/Music/PianoClusterThud.wav");
     soundSys.LoadSound("assets/Music/PianoClusterBwud.wav", false);
     soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
+    soundSys.LoadSound("assets/Music/ParrySound.wav", false);
+    soundSys.AddToSoundDict("Parry", "assets/Music/ParrySound.wav");
 
     lastTime = std::chrono::high_resolution_clock::now();
     previousIterationTime = lastTime;
