@@ -284,8 +284,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			textShader.use();
 			std::string deathText1 = "You got hit!";
 			std::string deathText2 = "Fly off into space now!";
-			RenderText(textShader, textVAO, textVBO, deathText1, 200.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 100.0f, 100.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText1, 270.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 170.0f, 100.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
 			// render the 2d screen if they are dead?
 		}
 
