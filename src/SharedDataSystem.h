@@ -31,8 +31,10 @@ struct CarInfo{
 	//THANKS MURTAZA!
 	bool isAlive = true;
 	bool exploded = false;
+	bool shotBullet = false;
 	float respawnTimeLeft = 0;
 	float parryActiveTimeLeft = 0;
+	bool parryParticles = false;
 	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
 	PxVec3 shootDir;
@@ -218,7 +220,7 @@ public:
 	std::vector<Entity> STATIC_OBJECT_LIST;
 	
 	//the cooldown time for the parry mechanic
-	const float PARRY_COOLDOWN_TIME_LEFT = 2.0f;
+	const float PARRY_COOLDOWN_TIME_LEFT = 5.0f;
 
 	//how long can you parry for
 	const float PARRY_ACTIVE_DURATION = 1.0f;
@@ -230,13 +232,13 @@ public:
 	const PxReal DEFAULT_PROJECTILE_RADIUS = 1.0f;
 
 	//the length of the projectile size powerup
-	const float PROJECTILE_SIZE_POWERUP_DURATION = 2.0f;
+	const float PROJECTILE_SIZE_POWERUP_DURATION = 4.0f;
 
 	//the magnitude of the projectile size multiplier
 	const float PROJECTILE_SIZE_POWERUP_STRENGTH = 2.0f;
 
 	//the length of the projectile speed powerup
-	const float PROJECTILE_SPEED_POWERUP_DURATION = 2.0f;
+	const float PROJECTILE_SPEED_POWERUP_DURATION = 4.0f;
 
 	//the magnitude of the projectile speed multiplier
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
