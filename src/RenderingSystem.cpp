@@ -276,7 +276,13 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 			// Original view
-			glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+			glm::vec3 offsetFromPlayer;
+			if (dataSys->carInfoList[0].isAlive) {
+				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+			}
+			else {
+				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
+			}
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
