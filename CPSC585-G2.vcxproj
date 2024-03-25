@@ -118,7 +118,6 @@
     <Image Include="assets\Models\normal.png" />
     <Image Include="assets\Models\roughness.jpg" />
     <Image Include="assets\Models\specular.jpg" />
-    <Image Include="assets\Textures\whiteparry.jpg" />
     <Image Include="src\Textures\Blue.jpg" />
     <Image Include="src\Textures\cat.jpg" />
     <Image Include="src\Textures\KiddieCarpet.jpg" />
