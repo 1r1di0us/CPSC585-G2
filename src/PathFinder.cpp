@@ -39,16 +39,83 @@ NavMesh::NavMesh(SharedDataSystem* dataSys) {
 			}
 			if (!isInObstacle) {
 				//orthogonal connections
-				if (z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
-				if (x < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
-				if (z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
-				if (x > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+				if (z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z - 1))->v0.x, this->nodes->at(x * 30 + (z - 1))->v0.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z - 1))->v1.x, this->nodes->at(x * 30 + (z - 1))->v1.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
+				}
+				if (x < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + z)->v1.x, this->nodes->at((x + 1) * 30 + z)->v1.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + z)->v2.x, this->nodes->at((x + 1) * 30 + z)->v2.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
+				}
+				if (z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z + 1))->v2.x, this->nodes->at(x * 30 + (z + 1))->v2.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z + 1))->v3.x, this->nodes->at(x * 30 + (z + 1))->v3.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
+				}
+				if (x > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + z)->v3.x, this->nodes->at((x - 1) * 30 + z)->v3.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + z)->v0.x, this->nodes->at((x - 1) * 30 + z)->v0.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+				}
 				//diagonal connections
-				if (x > 0 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
-				if (x < 29 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
-				if (x < 29 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
-				if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
-				//Knight's move connections?
+				if (x > 0 && z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + (z - 1))->v0.x, this->nodes->at((x - 1) * 30 + (z - 1))->v0.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
+				}
+				if (x < 29 && z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + (z - 1))->v1.x, this->nodes->at((x + 1) * 30 + (z - 1))->v1.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
+				}
+				if (x < 29 && z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + (z + 1))->v2.x, this->nodes->at((x + 1) * 30 + (z + 1))->v2.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
+				}
+				if (x > 0 && z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + (z + 1))->v3.x, this->nodes->at((x - 1) * 30 + (z + 1))->v3.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
+				}
 			}
 		}
 	}
