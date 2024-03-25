@@ -1,0 +1,58 @@
+# Blender 4.0.2 MTL File: 'emptyPlane.blend'
+# www.blender.org
+
+newmtl 90s_Arcade_Carpet
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd 90s arcade carpet 1-basecolor.jpg
+map_Ns 90s arcade carpet 1-roughness.jpg
+map_refl 90s arcade carpet 1-metallic.jpg
+map_Bump -bm 1.000000 90s arcade carpet 1-normal.jpg
+
+newmtl Wood.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd woodcreator_1_basecolor.jpg
+map_Ns woodcreator_1_roughness.jpg
+map_refl woodcreator_1_metallic.jpg
+
+newmtl Wood.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd woodcreator_1_basecolor.jpg
+map_Ns woodcreator_1_roughness.jpg
+map_refl woodcreator_1_metallic.jpg
+
+newmtl Wood_Floor
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Wood_basecolor.jpg
+map_Ns Wood_roughness.jpg
+map_Bump -bm 1.000000 Wood_normal.jpg
+
+newmtl Wood_Floor.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Wood_basecolor.jpg
+map_Ns Wood_roughness.jpg
+map_Bump -bm 1.000000 Wood_normal.jpg

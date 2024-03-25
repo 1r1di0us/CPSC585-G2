@@ -1,3 +1,4 @@
+#pragma once
 #include "SharedDataSystem.h"
 
 /*
@@ -454,6 +455,9 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	//if the shot car has parried
 	if (shotCarInfo->parryActiveTimeLeft > 0) {
 
+		//playing a parry sound
+		SoundsToPlay.push_back(std::make_pair(std::string("Parry"), shotCarEntity->collisionBox->getGlobalPose().p));
+
 		//change ownership of the projectile
 		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
 			if (carProjectileRigidDynamicDict[shootingCarRigidDynamic][i] == (PxRigidDynamic*)projectile) {
@@ -468,14 +472,51 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//getting the actual radius of the projectile (to not worry about powerups)
 		float projectileRadius = projectile->getWorldBounds().getExtents().x;
 
+		//THANKS JESSE!
+		float dot = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().dot(projectileBackwardVector);
+		float det = PxVec3(0, 1, 0).dot(shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().cross(projectileBackwardVector));
+		float shootAngle = atan2(dot, det);
+
+		//offset to be determined based on shoot angle
+		float offsetMultiplier;
+
+		//45 deg range with left and right in center
+		if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
+			(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
+			(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
+			offsetMultiplier = 3.5;
+		}
+		//front
+		else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
+			offsetMultiplier = 6.2;
+		}
+		//back
+		else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
+			offsetMultiplier = 4;
+		}
+		//other
+		else {
+			offsetMultiplier = 4.5;
+		}
+
+		//changing projectile spawn
+		PxVec3 shootingPosition = shotCarEntity->collisionBox->getGlobalPose().p;
+
+		//fuck this code
+		PxVec3 tankHeadOffset = PxVec3(0);
+		tankHeadOffset.x = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+		tankHeadOffset.z = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+		tankHeadOffset *= 1.3;
+		shootingPosition += tankHeadOffset;
+
 		//send the projectile back the way it came
 			//doing the offset based on the same math as the shooting math
 		projectileEntity->collisionBox->setGlobalPose(
 			PxTransform(
 				PxVec3(
-					projectileEntity->collisionBox->getGlobalPose().p.x + projectileBackwardVector.x * projectileRadius * 6.5,
-					projectileEntity->collisionBox->getGlobalPose().p.y,
-					projectileEntity->collisionBox->getGlobalPose().p.z + projectileBackwardVector.x * projectileRadius * 6.5),
+					shootingPosition.x + projectileBackwardVector.x * projectileRadius * offsetMultiplier,
+					shootingPosition.y,
+					shootingPosition.z + projectileBackwardVector.x * projectileRadius * offsetMultiplier),
 				projectileEntity->collisionBox->getGlobalPose().q));
 
 		//stoled from car shoot ahahah
@@ -493,8 +534,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		AddToCollatCache(projectileEntity);
 
-		//make a sound
-		//TODO
+		SoundsToPlay.push_back(std::make_pair(std::string("Armour"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
 	}
 	else {
 
@@ -503,19 +543,28 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		shootingCarInfo->score++;
 
 		AddToCollatCache(projectileEntity);
-
-		//make a sound
-		SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
-
+		
 		//setting the data of the car that got hit to let it respawn
 		CarInfo* hitCar = GetCarInfoStructFromEntity(shotCarEntity);
 		hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
 		hitCar->isAlive = false;
+		hitCar->exploded = false;
 		//moving into the sky and disabling gravity to "delete it"
 		hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 		PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
 		PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
 		hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
+
+		//diff sounds depending on who was killed
+		if (shotCarEntity->name == carInfoList[0].entity->name) {
+			//make a sound
+			SoundsToPlay.push_back(std::make_pair(std::string("Heaven"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		}
+		else {
+			//make a sound
+			SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		}
+	
 	}
 
 }
