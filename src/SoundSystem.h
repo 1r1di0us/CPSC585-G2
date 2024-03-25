@@ -67,4 +67,6 @@ public:
 
     void AddToSoundDict(std::string name, std::string location);
     void PlayAllSounds();
+    void PauseChannel(int nChannelId, bool bPaused);
+
 };
