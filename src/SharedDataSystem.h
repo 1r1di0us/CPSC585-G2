@@ -23,6 +23,16 @@ using namespace snippetvehicle2;
 //needs to be here cause the struct wont see it below
 const int AMMO_START_AMOUNT = 5;
 
+//car wheel info struct
+//fuck all yall <3
+struct CarWheelInfo {
+	PxVec3 wheelForwardDir;
+	PxVec3 frontRightPos;
+	PxVec3 frontLeftPos;
+	PxVec3 backRightPos;
+	PxVec3 backLeftPos;
+};
+
 //car info struct
 struct CarInfo{
 	//waow smart pointer! I HARDLY KNOW ER
@@ -35,7 +45,7 @@ struct CarInfo{
 	float parryCooldownTimeLeft = 0;
 	int ammoCount = AMMO_START_AMOUNT;
 	PxVec3 shootDir;
-	PxVec3 wheelForwardDir;
+	CarWheelInfo carWheelInfo;
 
 	//powerup effects
 	float projectileSpeedActiveTimeLeft = 0;
