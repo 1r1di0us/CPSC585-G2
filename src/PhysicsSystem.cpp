@@ -12,7 +12,7 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 	//cooking the obstacles
 	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-32, 7.1, -35), true);
 	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20), true);
-	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(35, 0.5, -30), true);
+	CookStaticObject("./assets/Models/toyBlocksHalf1.obj", PxVec3(35, 0.5, -30), true);
 	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(-35, 0.5, 29), true);
 	
 	initMaterialFrictionTable();
