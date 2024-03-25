@@ -176,6 +176,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	//other models
 	projectile = Model("./assets/Models/ball.obj");
+	particleObj = Model("./assets/Models/cube.obj");
 
 	// SkyVAO Initialization
 	glGenVertexArrays(1, &skyVAO);
@@ -198,19 +199,19 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	// loading skymap texture
 	cubemapTexture = loadCubemap(faces);
 
-    this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
-    initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
+    //this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
+    //initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
     // Initialize particles VAO
     initParticlesVAO();
     // Load particle texture
     particleTexture = generateTexture("assets/Textures/fire.jpg", true);
-    particleShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
+    //particleShader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
 }
 
 
 
 // to do: implement uniforms for obstacle rendering, or anything else that changes infrequently
-void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft, timeLeft, std::chrono::duration<double> deltaTime) {
+void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft, std::chrono::duration<double> deltaTime) {
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -670,6 +671,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 			}
 		}
+		if (!dataSys->inMenu && !dataSys->inGameMenu && !dataSys->inResults) {
+			particleRender(deltaTime, model);
+		}
 
 		// skybox rendering, needs to be at the end of rendering
 		glDepthFunc(GL_LEQUAL);
@@ -743,14 +747,53 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
-    if (!dataSys->inMenu && !dataSys->inGameMenu && !dataSys->inResults) {
-        particleRender(deltaTime, model);
-    }
-
 	// swap buffers and poll IO events
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
+
+void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
+	glGenVertexArrays(1, VAO);
+	glGenBuffers(1, VBO);
+
+	glBindVertexArray(*VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+
+	// Calculate total size needed for vertex attributes
+	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2) +
+		model.normals.size() * sizeof(glm::vec3);
+
+	// Allocate buffer memory
+	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
+
+	// Copy vertex data
+	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
+
+	// Copy texture coordinate data
+	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
+		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
+
+	// Copy normal data
+	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2),
+		model.normals.size() * sizeof(glm::vec3), model.normals.data());
+
+	// Vertex positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Texture coordinates
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
+	glEnableVertexAttribArray(1);
+
+	// Normals
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2)));
+	glEnableVertexAttribArray(2);
+}
+
 
 void renderObject(const OBJModel& model, unsigned int* VAO) {
     glBindVertexArray(*VAO);
@@ -786,6 +829,7 @@ void RenderingSystem::generateParticles(glm::vec3 position, int count) {
         particle.color = glm::vec4(1.0f); // White color
         particle.size = glm::linearRand(0.1f, 0.4f); // Random size
         particle.lifetime = glm::linearRand(25.0f, 50.0f); // Random lifetime
+		printf("%f", particle.lifetime);
         particles.push_back(particle);
     }
 }
@@ -822,7 +866,8 @@ void RenderingSystem::particleRender(std::chrono::duration<double> deltaTime, gl
         glm::vec3 scaleFactors(particle.size, particle.size, particle.size); // Scaling factors for x, y, and z axes
         model = glm::scale(model, scaleFactors);
         shader.setMat4("model", model);
-        renderObject(particleObj, &particlesVAO);
+        //renderObject(particleObj, &particlesVAO);
+		particleObj.Draw(shader);
     }
 }
 

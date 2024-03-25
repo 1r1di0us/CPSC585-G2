@@ -260,7 +260,7 @@ int main() {
 
         // render
         // ------
-        renderingSystem.updateRenderer(camera, totalTimeLeft, totalTimePassed);
+        renderingSystem.updateRenderer(camera, totalTimeLeft, deltaTime);
 
         if (dataSys.quit) {
             break;

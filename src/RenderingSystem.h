@@ -46,7 +46,7 @@ private:
 	SharedDataSystem* dataSys;
 	Model plane, projectile, tank,
 		ammoPowerup, projectileSpeedPowerup, projectileSizePowerup, armourPowerup,
-		tankHead, tankBody, tankWheel, bunny, train, toyBlock1, toyBlock2;
+		tankHead, tankBody, tankWheel, bunny, train, toyBlock1, toyBlock2, particleObj;
 
 	// galaxy skybox
 	std::vector<std::string> faces
@@ -73,13 +73,13 @@ public:
 	Shader skyBoxShader;
 	Shader testShader; // testing it
 	std::map<char, Character> Characters_gaegu;
-	OBJModel particleObj;
+	//OBJModel particleObj;
 	unsigned int cubemapTexture;
 
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
-	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft);
+	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft, std::chrono::duration<double> deltaTime);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
     
@@ -108,6 +108,7 @@ public:
 
 };
 
+void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
 unsigned int loadCubemap(std::vector<std::string> faces);
 void renderDeathScreen(unsigned int* VAO);
 
