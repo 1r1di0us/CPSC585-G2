@@ -75,12 +75,12 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			camLeft[0] = true;
-			mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
+			//mouseControl = false; //if you press keys and not move mouse you get pan control not mouse control
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			camRight[0] = true;
-			mouseControl = false;
+			//mouseControl = false;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
@@ -165,11 +165,11 @@ void InputSystem::getGamePadInput() {
 					//y = state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 					if (x < -sens) {
 						camLeft[j + 1] = true;
-						mouseControl = false;
+						//mouseControl = false;
 					}
 					else if (x > sens) {
 						camRight[j + 1] = true;
-						mouseControl = false;
+						//mouseControl = false;
 					}
 
 					x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER]; // too lazy to make new variables
