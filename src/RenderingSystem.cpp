@@ -142,7 +142,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     powerup = Model("./assets/Models/ball.obj");
     tankHead = Model("./assets/Models/tankHead.obj");
     tankBody = Model("./assets/Models/tankBody.obj");
-    tankWheels = Model("./assets/Models/tankWheels.obj");
+    tankWheel = Model("./assets/Modesl/tankWheel.obj");
     tankWheelFL = Model("./assets/Models/tankFrontLeftWheels.obj");
     tankWheelFR = Model("./assets/Models/tankFrontRightWheels.obj");
     tankWheelBR = Model("./assets/Models/tankBackRightWheels.obj");

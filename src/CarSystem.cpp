@@ -45,11 +45,10 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
 
 		//the body of the vehicle is at i = 0
-		//TODO: commented out for now but might need to work around if need these
-		/*if (i == 0) {
-			PxGeometryHolder carChassis = shape->getGeometry();
-			vehicleBodyDimensions = carChassis.box().halfExtents * 2;
-		}*/
+		if (i == 0) {
+			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
+			shape->setGeometry(myChassis);
+		}
 
 		shape->setSimulationFilterData(vehicleFilter);
 
