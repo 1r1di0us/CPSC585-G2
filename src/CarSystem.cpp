@@ -144,12 +144,49 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 		actualProjectileRadius *= dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH;
 	}
 
+	//THANKS JESSE!
+	float dot = shootingCar->getGlobalPose().q.getBasisVector2().dot(carInfo->shootDir);
+	float det = PxVec3(0, 1, 0).dot(shootingCar->getGlobalPose().q.getBasisVector2().cross(carInfo->shootDir));
+	float shootAngle = atan2(dot, det);
+
+	//offset to be determined based on shoot angle
+	float offsetMultiplier;
+
+	//45 deg range with left and right in center
+	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) || 
+		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
+		(shootAngle <= - M_PI + M_PI / 8 && shootAngle >= - M_PI)) {
+		offsetMultiplier = 3.5;
+	}
+	//front
+	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
+		offsetMultiplier = 6.2;
+	}
+	//back
+	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
+		offsetMultiplier = 4;
+	}
+	//other
+	else {
+		offsetMultiplier = 4.5;
+	}
+
+	//changing projectile spawn
+	PxVec3 shootingPosition = shootingCar->getGlobalPose().p;
+
+	//fuck this code
+	PxVec3 tankHeadOffset = PxVec3(0);
+	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+	tankHeadOffset *= 1.3;
+	shootingPosition += tankHeadOffset;
+
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * actualProjectileRadius * 6.5,
+		PxVec3(shootingPosition.x + carInfo->shootDir.x * actualProjectileRadius * offsetMultiplier,
 			actualProjectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * actualProjectileRadius * 6.5),
+			shootingPosition.z + carInfo->shootDir.z * actualProjectileRadius * offsetMultiplier),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
