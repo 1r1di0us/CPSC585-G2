@@ -33,11 +33,14 @@ PowerupSystem powerupSys(&dataSys);
 InputSystem inputSys(&dataSys);
 RenderingSystem renderingSystem(&dataSys);
 SoundSystem soundSys;
-AiSystem aiSys(&dataSys);
 Camera camera;
+AiSystem aiSys1;
+AiSystem aiSys2;
+AiSystem aiSys3;
+AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 50.0f;
+const double TIMELIMIT = 500.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -63,8 +66,8 @@ int main() {
     std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
 
     //y axis rotation in radians
-    int angle = PxPiDivFour;
-    PxQuat carRotateQuat(angle, PxVec3(0.0f, 0.0f, 0.0f));
+    float angle = PxTwoPi;
+    PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
 
     //fake constructor (real one didnt like me)
     dataSys.InitSharedDataSystem();
@@ -134,6 +137,10 @@ int main() {
                 carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
+                aiSys1 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox)); //call the constructors
+                aiSys2 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox));
+                aiSys3 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox));
+                aiSys4 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox));
 
                 dataSys.carsInitialized = true;
             }
@@ -223,28 +230,28 @@ int main() {
                 break;
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox), deltaTime, PxVec3(0, 0, 0))) {
+            if (aiSys1.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox), deltaTime, PxVec3(20, 0, -20))) {
+            if (aiSys2.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox), deltaTime, PxVec3(15, 0, 25))) {
+            if (aiSys3.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
             }
 
-            if (aiSys.update(dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[4].entity->collisionBox), deltaTime, PxVec3(-5, 0, -15))) {
+            if (aiSys4.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));

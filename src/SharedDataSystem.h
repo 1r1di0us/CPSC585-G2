@@ -175,7 +175,7 @@ public:
 	const PxReal TIMESTEP = 1.0f / 60.0f;
 
 	//car respawn timer
-	const float CAR_RESPAWN_LENGTH = 3.0f;
+	const float CAR_RESPAWN_LENGTH = 5.0f;
 
 	//map coords for the corners
 	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-67, -67);
@@ -382,7 +382,7 @@ public:
 
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
-	PxMat33 getCamRotMatPx(float angle);
+	PxMat33 getRotMatPx(float angle);
 	PxMat33 getSoundRotMat();
 
 	// Flags
