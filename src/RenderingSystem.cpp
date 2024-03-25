@@ -158,7 +158,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	//tank models
 	tank = Model("./assets/Models/tank.obj");
 	tankHead = Model("./assets/Models/tankHead.obj");
-	tankBody = Model("./assets/Models/tankBody.obj");
+	tankBody = Model("./assets/Models/tankWithWheels.obj");
 	tankWheel = Model("./assets/Models/tankWheel.obj");
 
 	//static objects
@@ -413,7 +413,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
 		glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
 		float angle = atan2(shootDir.x, shootDir.z);
-		tankHeadModel = glm::translate(tankHeadModel, playerPos);
+
+		//fuck this code
+		glm::vec3 tankHeadOffset;
+		tankHeadOffset.x = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+		tankHeadOffset.z = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+		tankHeadOffset *= 1.3;
+
+		tankHeadModel = glm::translate(tankHeadModel, playerPos + tankHeadOffset);
 		tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 		tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		shader.setMat4("model", tankHeadModel);
@@ -484,6 +491,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 						carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
 
+						//not sure if needed but keeping for now
+						if (carInfo->entity->name == "car1") {
+							break;
+						}
+
 						//different colors for different cars
 						if (carInfo->entity->name == "car2") {
 							glActiveTexture(GL_TEXTURE0);
@@ -519,7 +531,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						glm::mat4 tankHeadModel = glm::mat4(1.0f);
 						glm::vec3 shootDir = glm::normalize(glm::vec3(carInfo->shootDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
 						float angle = atan2(shootDir.x, shootDir.z);
-						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos());
+
+						//fuck this code
+						glm::vec3 tankHeadOffset;
+						tankHeadOffset.x = dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+						tankHeadOffset.z = dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+						tankHeadOffset *= 1.3;
+
+						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos() + tankHeadOffset);
 						tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 						tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
