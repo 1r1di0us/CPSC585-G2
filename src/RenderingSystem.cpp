@@ -415,7 +415,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		float angle = atan2(shootDir.x, shootDir.z);
 
 		//fuck this code
-		glm::vec3 tankHeadOffset;
+		glm::vec3 tankHeadOffset = glm::vec3(0);
 		tankHeadOffset.x = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
 		tankHeadOffset.z = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
 		tankHeadOffset *= 1.3;
@@ -533,9 +533,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						float angle = atan2(shootDir.x, shootDir.z);
 
 						//fuck this code
-						glm::vec3 tankHeadOffset;
-						tankHeadOffset.x = dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-						tankHeadOffset.z = dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+						glm::vec3 tankHeadOffset = glm::vec3(0);
+						tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+						tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
 						tankHeadOffset *= 1.3;
 
 						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos() + tankHeadOffset);
