@@ -304,7 +304,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
-				std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
+				//std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
 				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
@@ -321,7 +321,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
-				std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
+				//std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
 				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);

@@ -40,7 +40,7 @@ AiSystem aiSys3;
 AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 500.0f;
+const double TIMELIMIT = 50.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -80,7 +80,7 @@ int main() {
     soundSys.LoadSound("assets/Music/ParrySound.wav", false);
     soundSys.AddToSoundDict("Parry", "assets/Music/ParrySound.wav");
     soundSys.LoadSound("assets/Music/HeavenShort.wav", false);
-    soundSys.AddToSoundDict("Armour", "assets/Music/HeavenShort.wav");
+    soundSys.AddToSoundDict("Heaven", "assets/Music/HeavenShort.wav");
     soundSys.LoadSound("assets/Music/ArmourDing.wav", false);
     soundSys.AddToSoundDict("Armour", "assets/Music/ArmourDing.wav");
 
