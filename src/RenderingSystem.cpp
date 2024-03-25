@@ -191,18 +191,19 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// Convert timeLeft to seconds
 		int timeLeftInSeconds = static_cast<int>(timeLeft.count());
 
+		//colors
+		glm::vec3 color;
+		glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
+		glm::vec3 darkRed = glm::vec3(1.0f, 0.0f, 0.0f);
+		glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
+		glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
+		glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
+		glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
+		glm::vec3 white = glm::vec3(1.0f);
+		glm::vec3 black = glm::vec3(0.0f);
+
 		// text only if the player is alive
 		if (dataSys->carInfoList[0].isAlive) {
-
-			//colors
-			glm::vec3 color;
-			glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
-			glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
-			glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
-			glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
-			glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
-			glm::vec3 white = glm::vec3(1.0f);
-			glm::vec3 black = glm::vec3(0.0f);
 
 			// Convert timeLeftInSeconds to string
 			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
@@ -280,12 +281,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 		}
 		else {
+
+			color = darkRed;
 			// death text
 			textShader.use();
-			std::string deathText1 = "You got hit!";
-			std::string deathText2 = "Fly off into space now!";
-			RenderText(textShader, textVAO, textVBO, deathText1, 270.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 170.0f, 100.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+			std::string deathText1 = "You died!";
+			std::string deathText2 = "Welcome to heaven!";
+			RenderText(textShader, textVAO, textVBO, deathText1, 310.0f, 500.0f, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 190.0f, 90.0f, 1.0f, color, Characters_gaegu);
 			// render the 2d screen if they are dead?
 		}
 
