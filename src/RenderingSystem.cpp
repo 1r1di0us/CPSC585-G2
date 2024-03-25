@@ -394,6 +394,34 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// if player is alive, draw the scene
 		if (dataSys->carInfoList[0].isAlive) {
 
+			//render all projectiles
+			for (CarInfo carInfo : dataSys->carInfoList) {
+
+				//get the rigid dynamic from the entity
+				auto carRigidDynamic = carInfo.entity->collisionBox;
+
+				//go through each projectile that a car has shot and render it
+				for (int j = 0; j < dataSys->carProjectileRigidDynamicDict[carRigidDynamic].size(); j++) {
+
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, redTexture);
+
+					model = glm::mat4(1.0f);
+					model = glm::translate(model, dataSys->GetEntityFromRigidDynamic(dataSys->carProjectileRigidDynamicDict[carRigidDynamic][j])->transform->getPos());
+
+					//if the car has size powerup active
+					if (carInfo.projectileSizeActiveTimeLeft > 0) {
+
+						model = glm::scale(model, glm::vec3(dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH));
+					}
+
+					shader.setMat4("model", model);
+					projectile.Draw(shader);
+
+				}
+
+			}
+
 			//rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0) (BW added +1, caused rendering issues)
 			for (int i = 0; i < dataSys->entityList.size(); i++) {
 
@@ -464,18 +492,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					}
 
 					break;
-				case (PhysicsType::PROJECTILE):
-
-					//NOTE: the projectiles that are double the size are too big for the model
-					// if(dataSys->carInfoList[i].projectileSizeActiveTimeLeft > 1){} something goes here, ask David
-
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, redTexture);
-
-					model = glm::mat4(1.0f);
-					model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-					shader.setMat4("model", model);
-					projectile.Draw(shader);
+				case (PhysicsType::PROJECTILE):					
 
 					break;
 				case (PhysicsType::POWERUP):
