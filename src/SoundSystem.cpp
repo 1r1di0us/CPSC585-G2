@@ -251,3 +251,11 @@ void SoundSystem::PlayAllSounds() {
     }
     dataSys->SoundsToPlay.clear(); //remove all sounds since we played them
 }
+
+void SoundSystem::PauseChannel(int nChannelId, bool bPaused) {
+    auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+    if (tFoundIt == sgpImplementation->mChannels.end())
+        return;
+
+    SoundSystem::ErrorCheck(tFoundIt->second->setPaused(bPaused));
+}

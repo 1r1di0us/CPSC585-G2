@@ -345,11 +345,11 @@ public:
 	bool quit = false;
 	bool inResults = false;
 	int menuOptionIndex = 0;
-	int nbMenuOptions = 3; // Currently options are play and quit
+	int nbMenuOptions = 3; // Currently options are play, controls and quit
 
 	bool inGameMenu = false;
 	int ingameOptionIndex = 0;
-	int nbIngameOptions = 2; // Options will be main menu and quit
+	int nbIngameOptions = 2; // Options are continue and quit
 
 	// Reset these on game end
 	int winningPlayer = 0;
@@ -357,6 +357,7 @@ public:
 	bool carsInitialized = false;
 	bool menuMusicPlaying = false;
 	bool gameMusicPlaying = false;
+	bool gameMusicPaused = false;
 	bool resultsMusicPlaying = false;
 
 	// Audio
