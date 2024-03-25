@@ -136,12 +136,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 
     // loading in the models
-    bedModel = Model("./assets/Models/bed_double_A1.obj");
-    funkyCube = Model("./assets/Models/funky_cube.obj");
     plane = Model("./assets/Models/planeHugeWithWalls.obj");
     projectile = Model("./assets/Models/ball.obj");
     tank = Model("./assets/Models/tank.obj");
-    powerup = Model("./assets/Models/bed_double_A1.obj");
+    powerup = Model("./assets/Models/ball.obj");
     tankHead = Model("./assets/Models/tankHead.obj");
     tankBody = Model("./assets/Models/tankBody.obj");
     tankWheels = Model("./assets/Models/tankWheels.obj");
@@ -236,8 +234,10 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         else {
             // death text
             textShader.use();
-            std::string deathText = "You got hit and are flying off into space!";
-            RenderText(textShader, textVAO, textVBO, deathText, 50.0f, 200.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+            std::string deathText1 = "You got hit!";
+            std::string deathText2 = "Fly off into space now!";
+            RenderText(textShader, textVAO, textVBO, deathText1, 150.0f, 500.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+            RenderText(textShader, textVAO, textVBO, deathText2, 100.0f, 100.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
             // render the 2d screen if they are dead?
         }
 
