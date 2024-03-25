@@ -422,12 +422,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 					model = glm::mat4(1.0f);
 					model = glm::translate(model, dataSys->GetEntityFromRigidDynamic(dataSys->carProjectileRigidDynamicDict[carRigidDynamic][j])->transform->getPos());
-
-					//if the car has size powerup active
-					if (carInfo.projectileSizeActiveTimeLeft > 0) {
-
-						model = glm::scale(model, glm::vec3(dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH));
-					}
+					model = glm::scale(model, glm::vec3(dataSys->carProjectileRigidDynamicDict[carRigidDynamic][j]->getWorldBounds().getExtents().x));
 
 					shader.setMat4("model", model);
 					projectile.Draw(shader);
