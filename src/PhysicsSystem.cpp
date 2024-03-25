@@ -12,7 +12,7 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 	//cooking the obstacles
 	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-32, 7.1, -35), true);
 	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20), true);
-	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(35, 0.5, -30), true);
+	CookStaticObject("./assets/Models/toyBlocksHalf1.obj", PxVec3(35, 0.5, -30), true);
 	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(-35, 0.5, 29), true);
 	
 	initMaterialFrictionTable();
@@ -156,7 +156,7 @@ void PhysicsSystem::stepAllVehicleMovementPhysics() {
 			//update the forward direction of the wheels
 			PxShape* wheelShape = NULL;
 			dataSys->gVehicleList[i]->mPhysXState.physxActor.rigidBody->getShapes(&wheelShape, 1, 1);
-			dataSys->carInfoList[i].carWheelInfo.wheelForwardDir = wheelShape->getLocalPose().q.getBasisVector2();
+			dataSys->carInfoList[i].wheelForwardDir = wheelShape->getLocalPose().q.getBasisVector2();
 
 			//Forward integrate the vehicle by a single TIMESTEP.
 			//Apply substepping at low forward speed to improve simulation fidelity.
