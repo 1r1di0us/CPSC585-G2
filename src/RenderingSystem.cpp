@@ -242,13 +242,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
             std::string deathText = "You got hit and are flying off into space!";
             RenderText(textShader, textVAO, textVBO, deathText, 100.0f, 200.0f, 0.75f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
             // render the 2d screen if they are dead?
-
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, deathTexture);
-            shader.use();
-            // basically draw the 2d rectangle on the background
-            glDrawArrays()
-
         }
 
 
@@ -354,7 +347,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                             glActiveTexture(GL_TEXTURE0);
                             glBindTexture(GL_TEXTURE_2D, player2Texture);
                         }
-                        if (carInfo->entity->name == "car3") {
+                        else if (carInfo->entity->name == "car3") {
                             glActiveTexture(GL_TEXTURE0);
                             glBindTexture(GL_TEXTURE_2D, player3Texture);
                         }
@@ -367,18 +360,23 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                             glBindTexture(GL_TEXTURE_2D, player5Texture);
                         }
 
+                        // tank body
                         model = glm::mat4(1.0f);
                         model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                        // make it look forward
+                        // make it look forward, double check if this is for the body
                         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, -1.0f, 0.0f));
                         model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
                         shader.setMat4("model", model);
                         tankBody.Draw(shader);
 
-                        // make tank head static; no rotation
-                        model = glm::mat4(1.0f); // clear it 
-                        model = glm::translate(model, dataSys->entityList[i].transform->getPos());
-                        shader.setMat4("model", model);
+                        // tank head
+                        glm::mat4 tankHeadModel = glm::mat4(1.0f);
+                        glm::vec3 shootDir = glm::normalize(glm::vec3(carInfo->shootDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
+                        float angle = atan2(shootDir.x, shootDir.z);
+                        tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos());
+                        tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
+                        tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+                        shader.setMat4("model", tankHeadModel);
                         tankHead.Draw(shader);
                     }
 
