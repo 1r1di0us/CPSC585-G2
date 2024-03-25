@@ -7,7 +7,6 @@ AiSystem::AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar) {
 	this->dataSys = dataSys;
 	this->aiCar = aiCar;
 	state = STATE::hunting;
-	// state = 0; // hunting = 0 hiding = 1
 	startTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
 	brakeTimer = 0;
 	coolDownTimer = 0;
@@ -273,7 +272,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 					target = &dataSys->carInfoList[i];
 					//get direction to target
 					//(targetpos + (target direction * target speed) - current position) normalized
-					aimDir = (target->entity->collisionBox->getGlobalPose().p + (target->entity->collisionBox->getGlobalPose().q.getBasisVector2() * target->entity->collisionBox->getLinearVelocity().magnitude() * deltaTime.count()) -aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
+					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
 					//double rand = -0.1 + (static_cast<double>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
 					//aimDir = dataSys->getRotMatPx(rand) * aimDir;
@@ -445,7 +444,7 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 					target = &dataSys->carInfoList[i];
 					//get direction to target
 					//(targetpos + (target direction * target speed) - current position) normalized
-					aimDir = (target->entity->collisionBox->getGlobalPose().p + (target->entity->collisionBox->getGlobalPose().q.getBasisVector2() * target->entity->collisionBox->getLinearVelocity().magnitude() * deltaTime.count()) - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
+					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 					//add random aim
 					//float rand = -0.1 + (static_cast<float>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
 					//aimDir = dataSys->getRotMatPx(rand) * aimDir;
