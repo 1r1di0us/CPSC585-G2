@@ -75,12 +75,18 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	}
 
 	bool fire = false;
+	if (aiCarInfo->isAlive) {
+		if (state == STATE::hunting) fire = hunting_behaviour(fire, deltaTime); //hunting first because why not
+		if (state == STATE::hiding) fire = hiding_behaviour(fire, deltaTime);
 
-	if (state == STATE::hunting) fire = hunting_behaviour(fire, deltaTime); //hunting first because why not
-	if (state == STATE::hiding) fire = hiding_behaviour(fire, deltaTime);
-
-	move_car();
-	aim_car(deltaTime);
+		move_car();
+		aim_car(deltaTime);
+	}
+	else {
+		shootAngle = 0;
+		moveNode = nullptr;
+		target = nullptr;
+	}
 	
 	return fire;
 } 
@@ -189,6 +195,7 @@ void AiSystem::move_car() {
 
 void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 	if (target != nullptr) {
+		aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
 		if (lockedOn) {
 			lockOnTime += (double)deltaTime.count();
 		}
@@ -196,27 +203,26 @@ void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 			lockOnTime = 0;
 		}
 	}
-
-	//resetting the shoot direction
-	aiCarInfo->shootDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+	aimDir.y = 0;
 
 	//get angle between shootDir and aimDir
 	float dot = aiCarInfo->shootDir.dot(aimDir);
 	float det = PxVec3(0, 1, 0).dot(aiCarInfo->shootDir.cross(aimDir));
 	//triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
-	float angle = atan2(dot, det);
+	float angle = atan2(dot, det) - M_PI/2; //its off by 90 degrees and I forget why
 	//move shootDir slowly
 	if (angle > 0.5 * deltaTime.count()) { //enemies rotate turrets much slower
-		aiCarInfo->shootDir = dataSys->getRotMatPx((float)(-0.75 * deltaTime.count())) * aiCarInfo->shootDir;
+		shootAngle -= 0.5 * deltaTime.count();
 	}
 	else if (angle < -0.5 * deltaTime.count()) {
-		aiCarInfo->shootDir = dataSys->getRotMatPx((float)(0.75 * deltaTime.count())) * aiCarInfo->shootDir;
+		shootAngle += 0.5 * deltaTime.count();
 	}
 	else {
-		aiCarInfo->shootDir = dataSys->getRotMatPx(-angle) * aiCarInfo->shootDir;
+		shootAngle -= angle;
 	}
+	aiCarInfo->shootDir = (dataSys->getRotMatPx(shootAngle)) * PxVec3(0, 0, -1);
 	
-	if (abs(angle) < 0.005) { //start bad
+	if (abs(angle) < 0.005) { //aim bot
 		lockedOn = true;
 	}
 }
@@ -265,7 +271,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 	if (target == nullptr) {
 		enemyDist = 150;
 		for (int i = 0; i < dataSys->carInfoList.size(); i++) {
-			if (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p != carPos) { // if the car is not us
+			if (dataSys->carInfoList[i].entity->name != aiCarInfo->entity->name) { // if the car is not us
 				if ((dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude() < enemyDist) {
 					//need to also check if they are behind walls
 					enemyDist = (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude();
@@ -288,7 +294,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 		enemyDist = (target->entity->collisionBox->getGlobalPose().p - carPos).magnitude();
 		if (startTimer == 0 && enemyDist > 0 && enemyDist < 20) { // watch out this overrides startTimer
 			//enemy very close
-			if (lockOnTime > 0.1 && !wantToFire && coolDownTimer == 0) { //we are locked on but don't want to fire yet
+			if (lockOnTime > 0.2 && !wantToFire && coolDownTimer == 0) { //we are locked on but don't want to fire yet
 				brakeTimer = 0.5; // speedy fire
 				wantToFire = true;
 			}
@@ -298,6 +304,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
+				std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
 				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
@@ -314,6 +321,7 @@ bool AiSystem::hunting_behaviour(bool fire, std::chrono::duration<double> deltaT
 			}
 			else if (brakeTimer == 0 && wantToFire) {
 				fire = true; //FIRE IN THE HOLE!!!
+				std::cout << aimDir.x << ", " << aimDir.y << ", " << aimDir.z << "    " << aiCarInfo->shootDir.x << ", " << aiCarInfo->shootDir.y << ", " << aiCarInfo->shootDir.z << ":  " << target->entity->name << std::endl;
 				wantToFire = false;
 				lockOnTime = 0; //make sure it doesn't fire again for a bit
 				coolDownTimer = 2.5 + (static_cast<double>(std::rand()) / RAND_MAX) * (3.5 - 2.5);
@@ -437,14 +445,14 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 	if (target == nullptr) {
 		enemyDist = 150;
 		for (int i = 0; i < dataSys->carInfoList.size(); i++) {
-			if (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p != aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p) {
-				if ((dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).magnitude() < enemyDist) {
+			if (dataSys->carInfoList[i].entity->name != aiCarInfo->entity->name) {
+				if ((dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude() < enemyDist) {
 					//need to also check if they are behind walls
-					enemyDist = (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).magnitude();
+					enemyDist = (dataSys->carInfoList[i].entity->collisionBox->getGlobalPose().p - carPos).magnitude();
 					target = &dataSys->carInfoList[i];
 					//get direction to target
 					//(targetpos + (target direction * target speed) - current position) normalized
-					aimDir = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).getNormalized();
+					aimDir = (target->entity->collisionBox->getGlobalPose().p - carPos).getNormalized();
 					//add random aim
 					//float rand = -0.1 + (static_cast<float>(std::rand()) / RAND_MAX) * (0.1 - -0.1);
 					//aimDir = dataSys->getRotMatPx(rand) * aimDir;
@@ -457,7 +465,7 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 		aimDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2(); //no valid targets
 	}
 	else {
-		enemyDist = (target->entity->collisionBox->getGlobalPose().p - aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p).magnitude();
+		enemyDist = (target->entity->collisionBox->getGlobalPose().p - carPos).magnitude();
 		if (startTimer == 0) {
 			if (wantToFire && lockOnTime >= 0.25) { //no slowing down this time
 				fire = true; //FIRE IN THE HOLE!!!

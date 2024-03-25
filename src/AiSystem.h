@@ -39,6 +39,7 @@ public:
 	bool movingToPowerup = false;
 	bool transitioning = false; //lets us know when we are transitioning from one state to another
 	int edgePatrol = 0;
+	float shootAngle = 0;
 
 	AiSystem();
 	AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar);
