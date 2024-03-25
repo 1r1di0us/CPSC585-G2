@@ -76,6 +76,10 @@ int main() {
     soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
     soundSys.LoadSound("assets/Music/ParrySound.wav", false);
     soundSys.AddToSoundDict("Parry", "assets/Music/ParrySound.wav");
+    soundSys.LoadSound("assets/Music/HeavenShort.wav", false);
+    soundSys.AddToSoundDict("Armour", "assets/Music/HeavenShort.wav");
+    soundSys.LoadSound("assets/Music/ArmourDing.wav", false);
+    soundSys.AddToSoundDict("Armour", "assets/Music/ArmourDing.wav");
 
     //initializing time variables
     startTime = std::chrono::high_resolution_clock::now();

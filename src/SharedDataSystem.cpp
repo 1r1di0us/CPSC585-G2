@@ -496,8 +496,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		AddToCollatCache(projectileEntity);
 
-		//make a sound
-		//TODO
+		SoundsToPlay.push_back(std::make_pair(std::string("Armour"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
 	}
 	else {
 
@@ -506,10 +505,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		shootingCarInfo->score++;
 
 		AddToCollatCache(projectileEntity);
-
-		//make a sound
-		SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
-
+		
 		//setting the data of the car that got hit to let it respawn
 		CarInfo* hitCar = GetCarInfoStructFromEntity(shotCarEntity);
 		hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
@@ -519,6 +515,17 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
 		PxVec3 carShift(hitCar->entity->collisionBox->getGlobalPose().p.x, yShift, hitCar->entity->collisionBox->getGlobalPose().p.z);
 		hitCar->entity->collisionBox->setGlobalPose(PxTransform(carShift));
+
+		//diff sounds depending on who was killed
+		if (shotCarEntity->name == carInfoList[0].entity->name) {
+			//make a sound
+			SoundsToPlay.push_back(std::make_pair(std::string("Heaven"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		}
+		else {
+			//make a sound
+			SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		}
+	
 	}
 
 }
