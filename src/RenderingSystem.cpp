@@ -52,13 +52,6 @@ float skyboxVertices[] = {
 };
 
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture,
-redTexture,
-menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
-resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
-planeTexture, gunMetalTexture, parryTexture,
-ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture;
-
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
 	// Extract the upper-left 3x3 rotation submatrix from the original matrix
@@ -124,7 +117,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
 	gunMetalTexture = generateTexture("assets/Textures/gunMetal.jpg", true);
-	parryTexture = generateTexture("assets/Textures/whiteparry.jpg", true);
+	parryTexture = generateTexture("assets/Textures/blueparry.jpg", true);
 
 	//menu
 	menuPlay = generateTexture("assets/Textures/UI/menuPlay.jpg", true);
@@ -176,6 +169,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	//other models
 	projectile = Model("./assets/Models/ball.obj");
+	particleObj = Model("./assets/Models/cube.obj");
 
 	// SkyVAO Initialization
 	glGenVertexArrays(1, &skyVAO);
@@ -197,12 +191,21 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// loading skymap texture
 	cubemapTexture = loadCubemap(faces);
+
+    //this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
+    //initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
+    // Initialize particles VAO
+    initParticlesVAO();
+    // Load particle texture
+	particleExplosionTexture = generateTexture("assets/Textures/fire.jpg", true);
+	particleSmokeTexture = generateTexture("assets/Textures/whiteParry.jpg", true);
+    //particleShader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
 }
 
 
 
 // to do: implement uniforms for obstacle rendering, or anything else that changes infrequently
-void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft) {
+void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft, std::chrono::duration<double> deltaTime) {
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -386,12 +389,25 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		if (dataSys->carInfoList[0].parryActiveTimeLeft > 0) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, parryTexture);
+			if (!dataSys->carInfoList[0].parryParticles) {
+				generateParticles(playerPos, 15, parryTexture, 30, 1, 3);
+				dataSys->carInfoList[0].parryParticles = true;
+			}
 		}
 		else {
+			dataSys->carInfoList[0].parryParticles = false;
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, player1Texture);
 		}
 		tankBody.Draw(shader);
+
+		if (dataSys->carInfoList[0].shotBullet) {
+			glm::vec3 smokePosition = dataSys->carInfoList[0].entity->transform->pos;
+			smokePosition.z += 2;
+			smokePosition.y += 2;
+			generateParticles(smokePosition, 15, particleSmokeTexture, 3, 25, 40);
+			dataSys->carInfoList[0].shotBullet = false;
+		}
 
 		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);
 		//glm::vec3 frontLeft = glm::vec3(1.245f, 0.321f, 2.563f);
@@ -555,7 +571,25 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						shader.setMat4("model", tankHeadModel);
 						//tankWheel.Draw(shader);
 						//tankWheel.Draw(shader);
+
+						// Render smoke
+						if (carInfo->shotBullet) {
+							glm::vec3 smokePosition = carInfo->entity->transform->pos;
+							smokePosition.z += 2;
+							smokePosition.y += 2;
+							generateParticles(smokePosition, 15, particleSmokeTexture, 3, 25, 40);
+							carInfo->shotBullet = false;
+						}
 					}
+                    else if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+                        if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded) {
+                            CarInfo* carInfoStruct = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+                            glm::vec3 carPos = carInfoStruct->entity->transform->pos;
+                            carPos.y -= 150.0f;
+                            generateParticles(carPos, 25, particleExplosionTexture, 3, 25, 50);
+                            dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded = true;
+                        }
+                    }
 
 					break;
 				case (PhysicsType::POWERUP):
@@ -653,6 +687,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 			}
 		}
+		if (!dataSys->inMenu && !dataSys->inGameMenu && !dataSys->inResults) {
+			particleRender(deltaTime, model);
+		}
 
 		// skybox rendering, needs to be at the end of rendering
 		glDepthFunc(GL_LEQUAL);
@@ -726,15 +763,58 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
-
-
-
 	// swap buffers and poll IO events
 	glfwSwapBuffers(window);
 	glfwPollEvents();
-
 }
 
+void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
+	glGenVertexArrays(1, VAO);
+	glGenBuffers(1, VBO);
+
+	glBindVertexArray(*VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+
+	// Calculate total size needed for vertex attributes
+	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2) +
+		model.normals.size() * sizeof(glm::vec3);
+
+	// Allocate buffer memory
+	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
+
+	// Copy vertex data
+	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
+
+	// Copy texture coordinate data
+	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
+		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
+
+	// Copy normal data
+	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2),
+		model.normals.size() * sizeof(glm::vec3), model.normals.data());
+
+	// Vertex positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// Texture coordinates
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
+	glEnableVertexAttribArray(1);
+
+	// Normals
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
+		model.textureCoordinates.size() * sizeof(glm::vec2)));
+	glEnableVertexAttribArray(2);
+}
+
+
+void renderObject(const OBJModel& model, unsigned int* VAO) {
+    glBindVertexArray(*VAO);
+    glDrawArrays(GL_TRIANGLES, 0, model.vertices.size());
+}
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
@@ -757,6 +837,80 @@ GLFWwindow* RenderingSystem::getWindow() const {
 	return window;
 }
 
+void RenderingSystem::generateParticles(glm::vec3 position, int count, unsigned int tex, float velocity, float lowerLifetime, float upperLifetime) {
+    for (int i = 0; i < count; ++i) {
+        Particle particle;
+        particle.position = position;
+        particle.velocity = glm::sphericalRand(velocity); // Random velocity
+        particle.color = glm::vec4(1.0f); // White color
+        particle.size = glm::linearRand(0.1f, 0.4f); // Random size
+        particle.lifetime = glm::linearRand(lowerLifetime, upperLifetime); // Random lifetime
+		particle.texture = tex;
+        particles.push_back(particle);
+    }
+}
+
+void RenderingSystem::particleUpdate(float deltaTime) {
+    for (auto& particle : particles) {
+        // Update particle position based on velocity
+        particle.position += particle.velocity * deltaTime * float(0.05);
+
+        // Decrease particle lifetime
+        particle.lifetime -= deltaTime;
+
+        // If particle's lifetime is over, remove it
+        if (particle.lifetime <= 0.0f) {
+            particles.erase(std::remove_if(particles.begin(), particles.end(),
+                [](const Particle& p) { return p.lifetime <= 0.0f; }), particles.end());
+        }
+    }
+}
+
+void RenderingSystem::particleRender(std::chrono::duration<double> deltaTime, glm::mat4 model) {
+    for (auto& particle : particles) {
+        particleUpdate(static_cast<float>(deltaTime.count()));
+        // Activate particle shader and set camera matrix
+        // Bind particle texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, particle.texture);
+
+        //// Render particles
+        //glBindVertexArray(particleVAO);
+        //glDrawArrays(GL_POINTS, 0, particles.size());
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, particle.position);
+        glm::vec3 scaleFactors(particle.size, particle.size, particle.size); // Scaling factors for x, y, and z axes
+        model = glm::scale(model, scaleFactors);
+        shader.setMat4("model", model);
+        //renderObject(particleObj, &particlesVAO);
+		particleObj.Draw(shader);
+    }
+}
+
+void RenderingSystem::initParticlesVAO() {
+    glGenVertexArrays(1, &particleVAO);
+    glGenBuffers(1, &particleVBO);
+
+    glBindVertexArray(particleVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, particleVBO);
+
+    // Reserve space for particles (initially empty)
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+
+    // Enable vertex attribute arrays
+    glEnableVertexAttribArray(0); // Position
+    glEnableVertexAttribArray(1); // Color
+    glEnableVertexAttribArray(2); // Size
+
+    // Position attribute (vec3)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, position));
+    // Color attribute (vec4)
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, color));
+    // Size attribute (float)
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, size));
+
+    glBindVertexArray(0); // Unbind VAO
+}
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;

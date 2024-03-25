@@ -119,6 +119,12 @@ int main() {
                 dataSys.resultsMusicPlaying = false;
             }
 
+            if (dataSys.gameMusicPlaying) {
+                soundSys.UnLoadSound(gameMusic);
+
+                dataSys.gameMusicPlaying = false;
+            }
+
             if (!dataSys.menuMusicPlaying) {
                 soundSys.LoadSound(menuMusic, false, true);
                 soundSys.PlaySound(menuMusic, FMOD_VECTOR{ 0, 0, 0 }, dataSys.MusicVolume);
@@ -271,7 +277,7 @@ int main() {
 
         // render
         // ------
-        renderingSystem.updateRenderer(camera, totalTimeLeft);
+        renderingSystem.updateRenderer(camera, totalTimeLeft, deltaTime);
 
         if (dataSys.quit) {
             break;
