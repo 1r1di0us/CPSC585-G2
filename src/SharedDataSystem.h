@@ -133,9 +133,6 @@ private:
 	//gets rid of the y
 	PxVec2 ConvertVec3ToVec2(PxVec3 vectorToConvert);
 
-	//determines if a given point is in a square
-	bool IsPointInSquare(PxVec2 point, MapSquare& square);
-
 	//checks if the point is in the world bounds
 	bool IsPointInBounds(PxVec2 point);
 
@@ -302,6 +299,9 @@ public:
 
 	//adds the obstacle to its list of map squares to test against
 	void AddObstacleToObstacleList(PxRigidStatic* obstacle);
+
+	//determines if a given point is in a square
+	bool IsPointInSquare(PxVec2 point, MapSquare& square);
 
 	/*
 	* PROJECTILES

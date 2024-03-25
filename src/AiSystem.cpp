@@ -12,7 +12,7 @@ AiSystem::AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar) {
 	coolDownTimer = 0;
 	reverseTimer = 0;
 	lockOnTime = 0;
-	navMesh = new NavMesh();
+	navMesh = new NavMesh(dataSys		);
 	pathFinder = new PathFinder(navMesh);
 	moveLocation = PxVec3(-100, -100, -100);
 	moveNode = nullptr;

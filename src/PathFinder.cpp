@@ -1,7 +1,8 @@
 #include "PathFinder.h"
 
-NavMesh::NavMesh() {
+NavMesh::NavMesh(SharedDataSystem* dataSys) {
 	this->nodes = new std::map<unsigned int, Node*>();
+	this->dataSys = dataSys;
 
 	//make vertices
 	std::vector<std::vector<PxVec3>> verts = std::vector<std::vector<PxVec3>>();
@@ -26,19 +27,33 @@ NavMesh::NavMesh() {
 	//make all the connections
 	for (int x = 0; x < 30; x++) {
 		for (int z = 0; z < 30; z++) {
-			//orthogonal connections
-			if (z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
-			if (x < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
-			if (z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
-			if (x > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
-			//diagonal connections
-			if (x > 0 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
-			if (x < 29 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
-			if (x < 29 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
-			if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
-			//Knight's move connections?
+			Node* thisNode = this->nodes->at(x * 30 + z);
+			bool isInObstacle = false;
+			for (MapSquare ms : dataSys->obstacleMapSquareList) {
+				if (dataSys->IsPointInSquare(PxVec2(thisNode->v0.x, thisNode->v0.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v1.x, thisNode->v1.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v2.x, thisNode->v2.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v3.x, thisNode->v3.z), ms)) {
+					isInObstacle = true;
+				}
+			}
+			if (!isInObstacle) {
+				//orthogonal connections
+				if (z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
+				if (x < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
+				if (z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
+				if (x > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+				//diagonal connections
+				if (x > 0 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
+				if (x < 29 && z > 0) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
+				if (x < 29 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
+				if (x > 0 && z < 29) this->nodes->at(x * 30 + z)->connections->emplace_back(std::make_pair(cost(this->nodes->at(x * 30 + z), this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
+				//Knight's move connections?
+			}
 		}
 	}
+
+
 }
 
 float NavMesh::cost(Node* src, Node* dest)
@@ -151,7 +166,7 @@ bool PathFinder::search(Node* src, Node* dest) {
 		
 	}
 	// If we loop through and never find the destination
-	std::cout << "THE DESTINATION CELL IS NOT FOUND" << std::endl;
+	std::cout << "THE DESTINATION CELL IS NOT FOUND: " << dest->centroid.x << ", " << dest->centroid.z << std::endl;
 	return false;
 }
 

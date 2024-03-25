@@ -15,6 +15,7 @@ public: // A "Node" is a square
 	PxVec3 v3; //bottom left
 	PxVec3 centroid;
 
+
 	std::vector<std::pair<float, Node*>>* connections;
 
 	PxVec3 getCentroid(Node* node) {
@@ -36,11 +37,12 @@ class NavMesh {
 public:
 	std::map<unsigned int, Node*>* nodes;
 
-	NavMesh(); //constructor
+	NavMesh(SharedDataSystem* dataSys); //constructor
 
 	Node* findEntity(PxVec3 pos);
 
 private:
+	SharedDataSystem* dataSys;
 	float cost(Node* src, Node* dest);
 };
 
