@@ -216,6 +216,16 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			std::string score = "Score:";
 			RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
+			std::string parry = "Parry Available";
+			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
+				RenderText(textShader, textVAO, textVBO, parry, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			}
+			else
+			{
+				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
+				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			}
+
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
 				if (i == 0) {
 					color = red;
