@@ -150,6 +150,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     powerup = Model("./assets/Models/bed_double_A1.obj");
     tankHead = Model("./assets/Models/tankHead.obj");
     tankBody = Model("./assets/Models/tankBody.obj");
+    tankWheels = Model("./assets/Models/tankWheels.obj");
     
 
     // SkyVAO Initialization
@@ -301,6 +302,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player1Texture);
         tankBody.Draw(shader);
+        //tankWheels.Draw(shader);
         
         // tank head
         glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -314,7 +316,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
         // if player is alive, draw the scene
         if (dataSys->carInfoList[0].isAlive) {
-
 
             // rendering plane
             model = glm::mat4(1.0f);
@@ -368,6 +369,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
                         shader.setMat4("model", model);
                         tankBody.Draw(shader);
+                        //tankWheels.Draw(shader);
 
                         // tank head
                         glm::mat4 tankHeadModel = glm::mat4(1.0f);

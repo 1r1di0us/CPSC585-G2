@@ -25,7 +25,7 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	Model bedModel, funkyCube, plane, projectile, tank, powerup, tankHead, tankBody;
+	Model bedModel, funkyCube, plane, projectile, tank, powerup, tankHead, tankBody, tankWheels;
 
 	// galaxy skybox
 	std::vector<std::string> faces
@@ -60,7 +60,6 @@ public:
 	void updateRenderer(Camera camera, std::chrono::duration<double> timeLeft);
 	//void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 	GLFWwindow* getWindow() const;
-
 
 };
 
