@@ -59,7 +59,7 @@ GLfloat quadVertices[] = {
     600.0f, 0.0f    // Bottom-right corner
 };
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture, deathTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -132,6 +132,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
     resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
     resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
+    deathTexture = generateTexture("assets/Textures/cat.jpg", true);
 
     // geom shaders
     shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
@@ -234,6 +235,19 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
                 RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
             }
+        }
+        else {
+            // death text
+            textShader.use();
+            std::string deathText = "You got hit and are flying off into space!";
+            RenderText(textShader, textVAO, textVBO, deathText, 100.0f, 200.0f, 0.75f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+            // render the 2d screen if they are dead?
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, deathTexture);
+            shader.use();
+            // basically draw the 2d rectangle on the background
+            glDrawArrays()
 
         }
 
@@ -399,13 +413,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                     break;
                 }
             }
-        }
-        // they must be dead, do not draw the scene/opponents
-        else {
-            // death text
-            textShader.use();
-            std::string deathText = "You got hit and are flying off into space!";
-            RenderText(textShader, textVAO, textVBO, deathText, 200.0f, 100.0f, 0.75f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu); // red
         }
 
         // skybox rendering, needs to be at the end of rendering
