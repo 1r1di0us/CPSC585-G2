@@ -7,14 +7,17 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 	//physx setup
 	initPhysX();
-	CookStaticObject("./assets/Models/MapNoObstacles.obj", PxVec3(0, 0, 0));
+	CookStaticObject("./assets/Models/emptyPlane.obj", PxVec3(0, 0, 0));
 	
 	//cooking the obstacles
-	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-32, 7.1, -35), true);
-	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20), true);
-	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(35, 0.5, -30), true);
+	CookStaticObject("./assets/Models/toyTrain.obj", PxVec3(-32, 7.1, -35));
+	CookStaticObject("./assets/Models/toyBunny.obj", PxVec3(35, 0.5, 20));
+	CookStaticObject("./assets/Models/toyBlocksHalf1.obj", PxVec3(35, 0.5, -30), true);
 	CookStaticObject("./assets/Models/toyBlocksHalf2.obj", PxVec3(-35, 0.5, 29), true);
 	
+	CookStaticObject("./assets/Models/trainFence.obj", PxVec3(-32, 7.1, -35), true);
+	CookStaticObject("./assets/Models/bunnyBox.obj", PxVec3(35, 0.5, 20), true);
+
 	initMaterialFrictionTable();
 	initVehicleSimContext();
 }

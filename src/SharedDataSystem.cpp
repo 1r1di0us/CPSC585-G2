@@ -455,6 +455,9 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	//if the shot car has parried
 	if (shotCarInfo->parryActiveTimeLeft > 0) {
 
+		//playing a parry sound
+		SoundsToPlay.push_back(std::make_pair(std::string("Parry"), shotCarEntity->collisionBox->getGlobalPose().p));
+
 		//change ownership of the projectile
 		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
 			if (carProjectileRigidDynamicDict[shootingCarRigidDynamic][i] == (PxRigidDynamic*)projectile) {
