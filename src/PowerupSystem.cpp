@@ -13,6 +13,8 @@ std::string PowerupSystem::PowerupTypeToString(PowerupType powerupType) {
 		return "PROJECTILESPEED";
 	case PowerupType::PROJECTILESIZE:
 		return "PROJECTILESIZE";
+	case PowerupType::ARMOUR:
+		return "ARMOUR";
 	case PowerupType::CARSPEED:
 		return "CARSPEED";
 	default:
