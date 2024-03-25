@@ -136,7 +136,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 
 	// loading in the models
-	plane = Model("./assets/Models/MapNoObstacles.obj");
+	plane = Model("./assets/Models/emptyPlane.obj");
 	projectile = Model("./assets/Models/ball.obj");
 	tank = Model("./assets/Models/tank.obj");
 	powerup = Model("./assets/Models/ball.obj");
@@ -431,6 +431,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				case (PhysicsType::PROJECTILE):
 
 					//NOTE: the projectiles that are double the size are too big for the model
+					// if(dataSys->carInfoList[i].projectileSizeActiveTimeLeft > 1){} something goes here, ask David
 
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, redTexture);

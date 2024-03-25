@@ -8,10 +8,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:/90s arcade carpet 1-basecolor.jpg
-map_Ns C:/90s arcade carpet 1-roughness.jpg
-map_refl C:/90s arcade carpet 1-metallic.jpg
-map_Bump -bm 1.000000 C:/90s arcade carpet 1-normal.jpg
+map_Kd 90s arcade carpet 1-basecolor.jpg
+map_Ns 90s arcade carpet 1-roughness.jpg
+map_refl 90s arcade carpet 1-metallic.jpg
+map_Bump -bm 1.000000 90s arcade carpet 1-normal.jpg
 
 newmtl Wood.001
 Ka 1.000000 1.000000 1.000000
@@ -20,9 +20,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:/woodcreator_1_basecolor.jpg
-map_Ns C:/woodcreator_1_roughness.jpg
-map_refl C:/woodcreator_1_metallic.jpg
+map_Kd woodcreator_1_basecolor.jpg
+map_Ns woodcreator_1_roughness.jpg
+map_refl woodcreator_1_metallic.jpg
 
 newmtl Wood.004
 Ka 1.000000 1.000000 1.000000
@@ -31,9 +31,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:/woodcreator_1_basecolor.jpg
-map_Ns C:/woodcreator_1_roughness.jpg
-map_refl C:/woodcreator_1_metallic.jpg
+map_Kd woodcreator_1_basecolor.jpg
+map_Ns woodcreator_1_roughness.jpg
+map_refl woodcreator_1_metallic.jpg
 
 newmtl Wood_Floor
 Ka 1.000000 1.000000 1.000000
@@ -42,9 +42,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:/Wood_basecolor.jpg
-map_Ns C:/Wood_roughness.jpg
-map_Bump -bm 1.000000 C:/Wood_normal.jpg
+map_Kd Wood_basecolor.jpg
+map_Ns Wood_roughness.jpg
+map_Bump -bm 1.000000 Wood_normal.jpg
 
 newmtl Wood_Floor.001
 Ka 1.000000 1.000000 1.000000
@@ -53,6 +53,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd C:/Wood_basecolor.jpg
-map_Ns C:/Wood_roughness.jpg
-map_Bump -bm 1.000000 C:/Wood_normal.jpg
+map_Kd Wood_basecolor.jpg
+map_Ns Wood_roughness.jpg
+map_Bump -bm 1.000000 Wood_normal.jpg
