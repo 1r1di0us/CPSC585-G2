@@ -142,11 +142,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	powerup = Model("./assets/Models/ball.obj");
 	tankHead = Model("./assets/Models/tankHead.obj");
 	tankBody = Model("./assets/Models/tankBody.obj");
-	tankWheels = Model("./assets/Models/tankWheels.obj");
-	tankWheelFL = Model("./assets/Models/tankFrontLeftWheels.obj");
-	tankWheelFR = Model("./assets/Models/tankFrontRightWheels.obj");
-	tankWheelBR = Model("./assets/Models/tankBackRightWheels.obj");
-	tankWheelBL = Model("./assets/Models/tankBackLeftWheels.obj");
+	tankWheel = Model("./assets/Models/tankWheel.obj");
 	bunny = Model("./assets/Models/toyBunny.obj");
 	train = Model("./assets/Models/toyTrain.obj");
 	toyBlock = Model("./assets/Models/toyBlocksHalf2.obj");
@@ -308,9 +304,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, player1Texture);
 		tankBody.Draw(shader);
-		//tankWheels.Draw(shader);
-		tankWheelBL.Draw(shader);
-		tankWheelBR.Draw(shader);
+		tankWheel.Draw(shader);
+		tankWheel.Draw(shader);
 
 		// tank head
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -331,8 +326,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 
 		shader.setMat4("model", tankHeadModel);
-		tankWheelFL.Draw(shader);
-		tankWheelFR.Draw(shader);
+		tankWheel.Draw(shader);
+		tankWheel.Draw(shader);
 
 
 		// if player is alive, draw the scene
@@ -379,9 +374,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
 						shader.setMat4("model", model);
 						tankBody.Draw(shader);
-						//tankWheels.Draw(shader);
-						tankWheelBL.Draw(shader);
-						tankWheelBR.Draw(shader);
+						tankWheel.Draw(shader);
+						tankWheel.Draw(shader);
 
 						//NOTE: does car have shields?
 
@@ -404,8 +398,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 						wheelModel = glm::rotate(wheelModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
-						tankWheelFL.Draw(shader);
-						tankWheelFR.Draw(shader);
+						tankWheel.Draw(shader);
+						tankWheel.Draw(shader);
 					}
 
 					break;
