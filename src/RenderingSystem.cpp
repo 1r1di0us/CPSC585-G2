@@ -386,7 +386,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         // front wheels
                         glm::mat4 tankWheelRight = glm::mat4(1.0f);
                         glm::mat4 tankWheelLeft = glm::mat4(1.0f);
-                        glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
+                        glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->wheelForwardDir.y, carInfo->wheelForwardDir.z));
+                        angle = atan2(wheelDir.x, wheelDir.z);
+                        glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), dataSys->entityList[i].transform->getPos());
+                        //wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
+                        wheelModel = glm::rotate(wheelModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+                        shader.setMat4("model", tankHeadModel);
+                        tankWheelFL.Draw(shader);
+                        tankWheelFR.Draw(shader);
                     }
 
                     break;
