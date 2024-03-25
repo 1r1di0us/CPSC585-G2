@@ -465,14 +465,17 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//getting the new forward direction of the projectile
 		PxVec3 projectileBackwardVector = projectileEntity->collisionBox->getGlobalPose().q.getBasisVector2() * -1;
 
+		//getting the actual radius of the projectile (to not worry about powerups)
+		float projectileRadius = projectile->getWorldBounds().getExtents().x;
+
 		//send the projectile back the way it came
 			//doing the offset based on the same math as the shooting math
 		projectileEntity->collisionBox->setGlobalPose(
 			PxTransform(
 				PxVec3(
-					projectileEntity->collisionBox->getGlobalPose().p.x + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5,
+					projectileEntity->collisionBox->getGlobalPose().p.x + projectileBackwardVector.x * projectileRadius * 6.5,
 					projectileEntity->collisionBox->getGlobalPose().p.y,
-					projectileEntity->collisionBox->getGlobalPose().p.z + projectileBackwardVector.x * PROJECTILE_RADIUS * 6.5),
+					projectileEntity->collisionBox->getGlobalPose().p.z + projectileBackwardVector.x * projectileRadius * 6.5),
 				projectileEntity->collisionBox->getGlobalPose().q));
 
 		//stoled from car shoot ahahah
@@ -482,6 +485,16 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		shotCarInfo->parryActiveTimeLeft = 0;
 		shotCarInfo->parryCooldownTimeLeft = PARRY_COOLDOWN_TIME_LEFT;
 
+	}
+	//armour tanks the bullet
+	else if (shotCarInfo->hasArmour) {
+
+		shotCarInfo->hasArmour = false;
+
+		AddToCollatCache(projectileEntity);
+
+		//make a sound
+		//TODO
 	}
 	else {
 
@@ -523,13 +536,19 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
 		break;
-	case PowerupType::CARSPEED:
+	case PowerupType::ARMOUR:
 
+		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
 		break;
 	case PowerupType::PROJECTILESIZE:
 
+		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
 		break;
 	case PowerupType::PROJECTILESPEED:
+
+		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		break;
+	case PowerupType::CARSPEED:
 
 		break;
 	default:
