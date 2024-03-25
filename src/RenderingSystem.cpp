@@ -353,24 +353,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			// Original view
 			glm::vec3 offsetFromPlayer;
 			if (dataSys->carInfoList[0].isAlive) {
-
-				//HERE
-				//printf("");
-
-				for (int i = 0; i < dataSys->obstacleMapSquareList.size(); i++) {
-
-					float minX = std::min(dataSys->obstacleMapSquareList[i].bottomLeft.x, dataSys->obstacleMapSquareList[i].topRight.x);
-					float maxX = std::max(dataSys->obstacleMapSquareList[i].bottomLeft.x, dataSys->obstacleMapSquareList[i].topRight.x);
-					float minY = std::min(dataSys->obstacleMapSquareList[i].bottomLeft.y, dataSys->obstacleMapSquareList[i].topRight.y);
-					float maxY = std::max(dataSys->obstacleMapSquareList[i].bottomLeft.y, dataSys->obstacleMapSquareList[i].topRight.y);
-
-					// Check if the point is within 5 units of any edge
-					if (camera.Position.x >= (minX - 5.0f) && camera.Position.x <= (maxX + 5.0f) &&
-						camera.Position.z >= (minY - 5.0f) && camera.Position.z <= (maxY + 5.0f)) {
-						printf("too close\n");
-					}
-				}
-
 				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
 			}
 			else {
