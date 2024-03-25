@@ -151,7 +151,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     tankHead = Model("./assets/Models/tankHead.obj");
     tankBody = Model("./assets/Models/tankBody.obj");
     tankWheels = Model("./assets/Models/tankWheels.obj");
-    
+    tankWheelFL = Model("./assets/Models/tankFrontLeftWheels.obj");
+    tankWheelFR = Model("./assets/Models/tankFrontRightWheels.obj");
 
     // SkyVAO Initialization
     glGenVertexArrays(1, &skyVAO);
@@ -236,12 +237,13 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
                 RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
             }
+         
         }
         else {
             // death text
             textShader.use();
             std::string deathText = "You got hit and are flying off into space!";
-            RenderText(textShader, textVAO, textVBO, deathText, 100.0f, 200.0f, 0.75f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
+            RenderText(textShader, textVAO, textVBO, deathText, 50.0f, 200.0f, 1.0f, glm::vec3(1.0f, 0.5f, 0.5f), Characters_gaegu);
             // render the 2d screen if they are dead?
         }
 
@@ -302,7 +304,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, player1Texture);
         tankBody.Draw(shader);
-        //tankWheels.Draw(shader);
+        tankWheels.Draw(shader);
+        //tankWheelFL.Draw(shader);
+        //tankWheelFR.Draw(shader);
         
         // tank head
         glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -369,7 +373,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                         model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
                         shader.setMat4("model", model);
                         tankBody.Draw(shader);
-                        //tankWheels.Draw(shader);
+                        tankWheels.Draw(shader);
 
                         // tank head
                         glm::mat4 tankHeadModel = glm::mat4(1.0f);
