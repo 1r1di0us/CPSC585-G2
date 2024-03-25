@@ -7,7 +7,7 @@ PhysicsSystem::PhysicsSystem(SharedDataSystem* dataSys) { // Constructor
 
 	//physx setup
 	initPhysX();
-	CookStaticObject("./assets/Models/MapNoObstacles.obj", PxVec3(0, 0, 0));
+	CookStaticObject("./assets/Models/emptyPlane.obj", PxVec3(0, 0, 0));
 	
 	//like so:
 	//CookStaticObject("./assets/Models/funkyLeg1.obj", PxVec3(0, 20, 0), true);
