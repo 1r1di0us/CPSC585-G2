@@ -532,7 +532,6 @@ void RenderingSystem::generateParticles(glm::vec3 position, int count) {
         particle.color = glm::vec4(1.0f); // White color
         particle.size = glm::linearRand(0.1f, 0.4f); // Random size
         particle.lifetime = glm::linearRand(25.0f, 50.0f); // Random lifetime
-        printf("lifetime: %f\n", particle.lifetime);
         particles.push_back(particle);
     }
 }
@@ -542,14 +541,11 @@ void RenderingSystem::particleUpdate(float deltaTime) {
         // Update particle position based on velocity
         particle.position += particle.velocity * deltaTime * float(0.05);
 
-        //printf("Before Decrease: %f\n", particle.lifetime);
         // Decrease particle lifetime
         particle.lifetime -= deltaTime;
-        //printf("After Decrease: %f\n", particle.lifetime);
 
         // If particle's lifetime is over, remove it
         if (particle.lifetime <= 0.0f) {
-            printf("deleting");
             particles.erase(std::remove_if(particles.begin(), particles.end(),
                 [](const Particle& p) { return p.lifetime <= 0.0f; }), particles.end());
         }
