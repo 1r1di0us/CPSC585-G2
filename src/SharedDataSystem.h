@@ -178,8 +178,8 @@ public:
 	const float CAR_RESPAWN_LENGTH = 3.0f;
 
 	//map coords for the corners
-	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-70, -70);
-	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(70, 70);
+	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-67, -67);
+	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(67, 67);
 	
 	//the approximate size of the map. rectangular
 	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
@@ -198,7 +198,8 @@ public:
 	const PxReal POWERUP_SPAWN_HEIGHT = 1.0f;
 
 	//min spawn distance from static objects
-	const PxReal STATIC_SPAWN_OFFSET = 5.0f;
+		//might have to be minimum the size of the car to make sure that car spawning is safe
+	const PxReal STATIC_SPAWN_OFFSET = 3.0f;
 
 	//the spawn rate of a random powerup
 	const float RANDOM_POWERUP_SPAWN_RATE = 7.0f;
@@ -265,7 +266,7 @@ public:
 	*/
 
 	//makes a floating box for boundary demo purposes
-	void MAKE_BOX_DEBUG(PxReal x, PxReal z);
+	void MAKE_BOX_DEBUG(PxReal x, PxReal z, PxReal y = 5);
 
 	/*
 	* CAR FUNCTIONS
@@ -391,11 +392,11 @@ public:
 	bool quit = false;
 	bool inResults = false;
 	int menuOptionIndex = 0;
-	int nbMenuOptions = 3; // Currently options are play and quit
+	int nbMenuOptions = 3; // Currently options are play, controls and quit
 
 	bool inGameMenu = false;
 	int ingameOptionIndex = 0;
-	int nbIngameOptions = 2; // Options will be main menu and quit
+	int nbIngameOptions = 2; // Options are continue and quit
 
 	// Reset these on game end
 	int winningPlayer = 0;
@@ -403,6 +404,7 @@ public:
 	bool carsInitialized = false;
 	bool menuMusicPlaying = false;
 	bool gameMusicPlaying = false;
+	bool gameMusicPaused = false;
 	bool resultsMusicPlaying = false;
 
 	// Audio

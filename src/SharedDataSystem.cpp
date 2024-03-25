@@ -88,21 +88,15 @@ void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameTyp
 		mapSquareList[i].pointsInIt.clear();
 	}
 
-	//go through the map square list and populate each one fully before moving on to the next one
-	while (pointsOfSameType.size() > 0) {
+	//place each point in the correct map square
+		//ignores points out of bounds and points that are out of any map squares (deleting them due to obstacles)
+	for (int i = 0; i < pointsOfSameType.size(); i++) {
 
-		for (int i = 0; i < mapSquareList.size(); i++) {
-			//gets rid of out of bounds points
-			IsPointInBounds(pointsOfSameType.at(0));
-			if (!IsPointInBounds(pointsOfSameType.at(0))) {
-				pointsOfSameType.erase(pointsOfSameType.begin());
-				break;
-			}
-			
-			if (IsPointInSquare(pointsOfSameType.at(0), mapSquareList[i])) {
-				mapSquareList[i].numPoints++;
-				mapSquareList[i].pointsInIt.emplace_back(pointsOfSameType.at(0));
-				pointsOfSameType.erase(pointsOfSameType.begin());
+		for (int j = 0; j < mapSquareList.size(); j++) {
+
+			if (IsPointInSquare(pointsOfSameType.at(i), mapSquareList[j])) {
+				mapSquareList[j].numPoints++;
+				mapSquareList[j].pointsInIt.emplace_back(pointsOfSameType.at(i));
 				break;
 			}
 
@@ -220,14 +214,13 @@ PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquar
 * PUBLIC FUNCTIONS
 */
 
-void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z) {
+void SharedDataSystem::MAKE_BOX_DEBUG(PxReal x, PxReal z, PxReal y) {
 
 	if (DEBUG_BOXES) {
 
 		//define a box
 		physx::PxShape* shape = gPhysics->createShape(physx::PxBoxGeometry(0.25f, 0.25f, 0.25f), *gMaterial);
-
-		PxRigidStatic* boxBody = gPhysics->createRigidStatic(PxTransform(x, 5, z));
+		PxRigidStatic* boxBody = gPhysics->createRigidStatic(PxTransform(x, y, z));
 		boxBody->setName("DEBUG BOX");
 		boxBody->attachShape(*shape);
 		boxBody->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
@@ -840,11 +833,11 @@ void SharedDataSystem::InitSharedDataSystem() {
 	//make all obstacle debug boxes
 	for (int i = 0; i < obstacleMapSquareList.size(); i++) {
 
-		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].bottomLeft.y);
-		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].topRight.y);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].bottomLeft.y, 10);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].topRight.y, 10);
 
-		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].topRight.y);
-		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].bottomLeft.y);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].bottomLeft.x, obstacleMapSquareList[i].topRight.y, 10);
+		MAKE_BOX_DEBUG(obstacleMapSquareList[i].topRight.x, obstacleMapSquareList[i].bottomLeft.y, 10);
 	}
 }
 
