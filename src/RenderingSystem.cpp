@@ -57,7 +57,7 @@ redTexture,
 menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
 resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
 planeTexture, gunMetalTexture, parryTexture,
-ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture;
+ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, explosionTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -197,12 +197,20 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// loading skymap texture
 	cubemapTexture = loadCubemap(faces);
+
+    this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
+    initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
+    // Initialize particles VAO
+    initParticlesVAO();
+    // Load particle texture
+    particleTexture = generateTexture("assets/Textures/fire.jpg", true);
+    particleShader = Shader("src/vertex_shader.txt", "src/fragment_shader.txt");
 }
 
 
 
 // to do: implement uniforms for obstacle rendering, or anything else that changes infrequently
-void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft) {
+void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double> timeLeft, timeLeft, std::chrono::duration<double> deltaTime) {
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 
@@ -556,6 +564,15 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						//tankWheel.Draw(shader);
 						//tankWheel.Draw(shader);
 					}
+                    else if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->isAlive) {
+                        if (!dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded) {
+                            CarInfo* carInfoStruct = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
+                            glm::vec3 carPos = carInfoStruct->entity->transform->pos;
+                            carPos.y -= 150.0f;
+                            generateParticles(carPos, 25);
+                            dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->exploded = true;
+                        }
+                    }
 
 					break;
 				case (PhysicsType::POWERUP):
@@ -726,15 +743,19 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
-
-
+    if (!dataSys->inMenu && !dataSys->inGameMenu && !dataSys->inResults) {
+        particleRender(deltaTime, model);
+    }
 
 	// swap buffers and poll IO events
 	glfwSwapBuffers(window);
 	glfwPollEvents();
-
 }
 
+void renderObject(const OBJModel& model, unsigned int* VAO) {
+    glBindVertexArray(*VAO);
+    glDrawArrays(GL_TRIANGLES, 0, model.vertices.size());
+}
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
@@ -757,6 +778,78 @@ GLFWwindow* RenderingSystem::getWindow() const {
 	return window;
 }
 
+void RenderingSystem::generateParticles(glm::vec3 position, int count) {
+    for (int i = 0; i < count; ++i) {
+        Particle particle;
+        particle.position = position;
+        particle.velocity = glm::sphericalRand(3.0f); // Random velocity
+        particle.color = glm::vec4(1.0f); // White color
+        particle.size = glm::linearRand(0.1f, 0.4f); // Random size
+        particle.lifetime = glm::linearRand(25.0f, 50.0f); // Random lifetime
+        particles.push_back(particle);
+    }
+}
+
+void RenderingSystem::particleUpdate(float deltaTime) {
+    for (auto& particle : particles) {
+        // Update particle position based on velocity
+        particle.position += particle.velocity * deltaTime * float(0.05);
+
+        // Decrease particle lifetime
+        particle.lifetime -= deltaTime;
+
+        // If particle's lifetime is over, remove it
+        if (particle.lifetime <= 0.0f) {
+            particles.erase(std::remove_if(particles.begin(), particles.end(),
+                [](const Particle& p) { return p.lifetime <= 0.0f; }), particles.end());
+        }
+    }
+}
+
+void RenderingSystem::particleRender(std::chrono::duration<double> deltaTime, glm::mat4 model) {
+    for (auto& particle : particles) {
+        particleUpdate(static_cast<float>(deltaTime.count()));
+        // Activate particle shader and set camera matrix
+        // Bind particle texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, particleTexture);
+
+        //// Render particles
+        //glBindVertexArray(particleVAO);
+        //glDrawArrays(GL_POINTS, 0, particles.size());
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, particle.position);
+        glm::vec3 scaleFactors(particle.size, particle.size, particle.size); // Scaling factors for x, y, and z axes
+        model = glm::scale(model, scaleFactors);
+        shader.setMat4("model", model);
+        renderObject(particleObj, &particlesVAO);
+    }
+}
+
+void RenderingSystem::initParticlesVAO() {
+    glGenVertexArrays(1, &particleVAO);
+    glGenBuffers(1, &particleVBO);
+
+    glBindVertexArray(particleVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, particleVBO);
+
+    // Reserve space for particles (initially empty)
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+
+    // Enable vertex attribute arrays
+    glEnableVertexAttribArray(0); // Position
+    glEnableVertexAttribArray(1); // Color
+    glEnableVertexAttribArray(2); // Size
+
+    // Position attribute (vec3)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, position));
+    // Color attribute (vec4)
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, color));
+    // Size attribute (float)
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, size));
+
+    glBindVertexArray(0); // Unbind VAO
+}
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;

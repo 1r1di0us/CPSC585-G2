@@ -30,6 +30,7 @@ struct CarInfo{
 	int score = 0;
 	//THANKS MURTAZA!
 	bool isAlive = true;
+	bool exploded = false;
 	float respawnTimeLeft = 0;
 	float parryActiveTimeLeft = 0;
 	float parryCooldownTimeLeft = 0;

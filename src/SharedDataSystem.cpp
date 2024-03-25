@@ -1,3 +1,4 @@
+#pragma once
 #include "SharedDataSystem.h"
 
 /*
@@ -514,6 +515,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		CarInfo* hitCar = GetCarInfoStructFromEntity(shotCarEntity);
 		hitCar->respawnTimeLeft = CAR_RESPAWN_LENGTH;
 		hitCar->isAlive = false;
+		hitCar->exploded = false;
 		//moving into the sky and disabling gravity to "delete it"
 		hitCar->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, true);
 		PxReal yShift = hitCar->entity->collisionBox->getGlobalPose().p.y + 150;
