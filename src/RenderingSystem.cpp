@@ -304,8 +304,22 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, player1Texture);
 		tankBody.Draw(shader);
-		tankWheel.Draw(shader);
-		tankWheel.Draw(shader);
+
+		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);
+		//glm::vec3 frontLeft = glm::vec3(1.245f, 0.321f, 2.563f);
+		//glm::vec3 backRight = glm::vec3(-1.245f, 0.321f, 0.1f);
+		//glm::vec3 backLeft = glm::vec3(1.245f, 0.321f, 0.1f);
+
+		//glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
+		//wheelModel = glm::rotate(wheelModel, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+		//wheelModel = glm::translate(wheelModel, backRight);
+		//shader.setMat4("model", wheelModel);
+		//tankWheel.Draw(shader);
+		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
+		//wheelModel = glm::translate(wheelModel, backLeft);
+		//printf("wheel location: %f, %f, %f\n", dataSys->carInfoList[0].carWheelInfo.backRightPos.x, dataSys->carInfoList[0].carWheelInfo.backRightPos.y, dataSys->carInfoList[0].carWheelInfo.backRightPos.z);
+		//shader.setMat4("model", wheelModel);
+		//tankWheel.Draw(shader);
 
 		// tank head
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -317,19 +331,26 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		shader.setMat4("model", tankHeadModel);
 		tankHead.Draw(shader);
 
-		// front wheels
-		glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.x,
-			dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.y,
-			dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.z));
+		//// front wheels
+		//glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.x,
+		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.y,
+		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.z));
 
-		angle = atan2(wheelDir.x, wheelDir.z);
-		glm::mat4 wheelModel = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		//angle = atan2(wheelDir.x, wheelDir.z);
+		//glm::mat4 wheelModel = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		//wheelModel = glm::translate(wheelModel, playerPos);
 		//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 
-		shader.setMat4("model", tankHeadModel);
-		tankWheel.Draw(shader);
-		tankWheel.Draw(shader);
+		//shader.setMat4("model", tankHeadModel);
+		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
+		//std::cout << dataSys->carInfoList[0].carWheelInfo.frontRightPos.x << std::endl;
+		//glm::vec3 wheelGlobal = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontRightPos.x, dataSys->carInfoList[0].carWheelInfo.frontRightPos.y, dataSys->carInfoList[0].carWheelInfo.frontRightPos.z));
+		//shader.setMat4("model", wheelModel);
+		////tankWheel.Draw(shader);
+		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
+		//wheelModel = glm::translate(wheelModel, glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontLeftPos.x, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.y, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.z)));
+		//shader.setMat4("model", wheelModel);
+		////tankWheel.Draw(shader);
 
 
 		// if player is alive, draw the scene
@@ -376,8 +397,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
 						shader.setMat4("model", model);
 						tankBody.Draw(shader);
-						tankWheel.Draw(shader);
-						tankWheel.Draw(shader);
+						//tankWheel.Draw(shader);
+						//tankWheel.Draw(shader);
 
 						//NOTE: does car have shields?
 
@@ -400,8 +421,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 						wheelModel = glm::rotate(wheelModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
-						tankWheel.Draw(shader);
-						tankWheel.Draw(shader);
+						//tankWheel.Draw(shader);
+						//tankWheel.Draw(shader);
 					}
 
 					break;
@@ -481,7 +502,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					// render obstacles
 
 					model = glm::mat4(1.0f);
-					model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+					model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
 					model = glm::translate(model, dataSys->entityList[i].transform->getPos());
 					shader.use();
 					shader.setMat4("model", model);
