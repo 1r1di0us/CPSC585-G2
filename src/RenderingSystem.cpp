@@ -314,7 +314,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 
-			color = darkRed;
+			color = black;
 			// death text
 			textShader.use();
 			std::string deathText1 = "You died!";
