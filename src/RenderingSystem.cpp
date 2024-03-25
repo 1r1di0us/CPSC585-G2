@@ -193,24 +193,29 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// text only if the player is alive
 		if (dataSys->carInfoList[0].isAlive) {
 
-			// Convert timeLeftInSeconds to string
-			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			// Need to add ammo count when implemented
-			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
+			//colors
+			glm::vec3 color;
 			glm::vec3 red = glm::vec3(1.0f, 0.5f, 0.5f);    // Adjusted to be darker
 			glm::vec3 blue = glm::vec3(0.7f, 0.7f, 1.0f);
 			glm::vec3 green = glm::vec3(0.7f, 1.0f, 0.7f);
 			glm::vec3 yellow = glm::vec3(1.0f, 1.0f, 0.7f);
 			glm::vec3 pink = glm::vec3(1.0f, 0.75f, 0.75f);  // Adjusted to be darker
+			glm::vec3 white = glm::vec3(1.0f);
+			glm::vec3 black = glm::vec3(0.0f);
+
+			// Convert timeLeftInSeconds to string
+			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			//ammo count
+			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
+			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			//scoreboard
+			std::string score = "Score:";
+			RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
-				glm::vec3 color;
 				if (i == 0) {
 					color = red;
 				}
@@ -229,6 +234,37 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				float yOffset = i * 30;
 				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
 				RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
+			}
+
+			//displays active powerups (temp until VFX)
+			color = yellow;
+
+			//coordinate vars
+			//NEEDS TO EVENTUALLY BE BASED ON SCREEN SIZE
+			float x = 5.0f;
+			float y = 545.0f;
+
+			std::string message;
+			
+			//player has armour
+			if (dataSys->carInfoList[0].hasArmour) {
+				message = "ARMOUR ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				y -= 20.0f;
+			}
+				
+			//player has projectile size powerup
+			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
+				message = "PROJECTILE SIZE INCREASE ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				y -= 20.0f;
+			}
+
+			//player has projectile speed powerup
+			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
+				message = "PROJECTILE SPEED INCREASE ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				y -= 20.0f;
 			}
 
 		}
@@ -442,7 +478,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 					break;
 				case (PhysicsType::POWERUP):
-
+					
 					model = glm::mat4(1.0f);
 					model = glm::translate(model, dataSys->entityList[i].transform->getPos());
 
@@ -450,56 +486,48 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					switch (dataSys->GetPowerupInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->powerupType) {
 					case PowerupType::AMMO:
 
-						model = glm::mat4(1.0f);
-						model = glm::translate(model, dataSys->entityList[i].transform->getPos());
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
 
-						//changes based on powerup type
-						switch (dataSys->GetPowerupInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->powerupType) {
-						case PowerupType::AMMO:
-
-							glActiveTexture(GL_TEXTURE0);
-							glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-
-							shader.setMat4("model", model);
-							projectile.Draw(shader);
-
-							break;
-						case PowerupType::PROJECTILESPEED:
-
-							glActiveTexture(GL_TEXTURE0);
-							glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
-
-							shader.setMat4("model", model);
-							projectile.Draw(shader);
-
-							break;
-						case PowerupType::PROJECTILESIZE:
-
-							glActiveTexture(GL_TEXTURE0);
-							glBindTexture(GL_TEXTURE_2D, player2Texture);
-
-							shader.setMat4("model", model);
-							projectile.Draw(shader);
-
-							break;
-						case PowerupType::ARMOUR:
-
-							glActiveTexture(GL_TEXTURE0);
-							glBindTexture(GL_TEXTURE_2D, player4Texture);
-
-							shader.setMat4("model", model);
-							projectile.Draw(shader);
-
-						case PowerupType::CARSPEED:
-
-							break;
-						default:
-							printf("not possible for this powerup type to be rendered");
-							break;
-						}
+						shader.setMat4("model", model);
+						projectile.Draw(shader);
 
 						break;
+					case PowerupType::PROJECTILESPEED:
+
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, player5Texture);
+
+						shader.setMat4("model", model);
+						projectile.Draw(shader);
+
+						break;
+					case PowerupType::PROJECTILESIZE:
+
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, player2Texture);
+
+						shader.setMat4("model", model);
+						projectile.Draw(shader);
+
+						break;
+					case PowerupType::ARMOUR:
+
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, player4Texture);
+
+						shader.setMat4("model", model);
+						projectile.Draw(shader);
+
+					case PowerupType::CARSPEED:
+
+						break;
+					default:
+						printf("not possible for this powerup type to be rendered");
+						break;
 					}
+
+					break;
 				case (PhysicsType::STATIC):
 					// render obstacles
 
