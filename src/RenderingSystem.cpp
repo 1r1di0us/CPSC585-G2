@@ -22,12 +22,12 @@ float skyboxVertices[] = {
     -1.0f,  1.0f,  1.0f,
     -1.0f, -1.0f,  1.0f,
 
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
+    1.0f, -1.0f, -1.0f,
+    1.0f, -1.0f,  1.0f,
+    1.0f,  1.0f,  1.0f,
+    1.0f,  1.0f,  1.0f,
+    1.0f,  1.0f, -1.0f,
+    1.0f, -1.0f, -1.0f,
 
     -1.0f, -1.0f,  1.0f,
     -1.0f,  1.0f,  1.0f,
@@ -51,15 +51,8 @@ float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
-// Define the vertex data for the quad to overlay the screen
-GLfloat quadVertices[] = {
-    0.0f, 0.0f,          // Bottom-left corner
-    0.0f, 800.0f,  // Top-left corner
-    600.0f, 800.0f, // Top-right corner
-    600.0f, 0.0f    // Bottom-right corner
-};
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture, deathTexture;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -126,13 +119,14 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     menuControls = generateTexture("assets/Textures/UI/menuControls.jpg", true);
     menuQuit = generateTexture("assets/Textures/UI/menuQuit.jpg", true);
     controlsMenu = generateTexture("assets/Textures/UI/controlsMenu.jpg", true);
+    pauseMenuContinue = generateTexture("assets/Textures/UI/pauseMenuContinue.jpg", true);
+    pauseMenuQuit = generateTexture("assets/Textures/UI/pauseMenuQuit.jpg", true);
     resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
     resultsP2 = generateTexture("assets/Textures/UI/resultsP2.jpg", true);
     resultsP3 = generateTexture("assets/Textures/UI/resultsP3.jpg", true);
     resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
     resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
     resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
-    deathTexture = generateTexture("assets/Textures/cat.jpg", true);
 
     // geom shaders
     shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
@@ -476,10 +470,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
     }
 
     // Setup UI if necessary
-    if (dataSys->inMenu || dataSys->inResults) {
+    if (dataSys->inMenu || dataSys->inResults || dataSys->inGameMenu) {
         GLuint fboId = 0;
         glGenFramebuffers(1, &fboId);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
+
         if (dataSys->inMenu) {
             if (dataSys->inControlsMenu) {
                 glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, controlsMenu, 0);
@@ -516,6 +511,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
                 }
             }
             
+        }
+        else if (dataSys->inGameMenu) {
+            if (dataSys->ingameOptionIndex == 0) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pauseMenuContinue, 0);
+            }
+            else if (dataSys->ingameOptionIndex == 1) {
+                glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pauseMenuQuit, 0);
+            }
         }
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // if not already bound
         glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT,
