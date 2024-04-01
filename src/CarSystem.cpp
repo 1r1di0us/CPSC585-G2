@@ -45,11 +45,10 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
 
 		//the body of the vehicle is at i = 0
-		//TODO: commented out for now but might need to work around if need these
-		/*if (i == 0) {
-			PxGeometryHolder carChassis = shape->getGeometry();
-			vehicleBodyDimensions = carChassis.box().halfExtents * 2;
-		}*/
+		if (i == 0) {
+			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
+			shape->setGeometry(myChassis);
+		}
 
 		shape->setSimulationFilterData(vehicleFilter);
 
@@ -63,6 +62,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	gVehicle->mEngineDriveState.gearboxState.targetGear = gVehicle->mEngineDriveParams.gearBoxParams.neutralGear + 1;
 
 	//Set the vehicle to use the automatic gearbox.
+	//gVehicle->mTransmissionCommandState.targetGear = gVehicle->mTransmissionCommandState.eAUTOMATIC_GEAR;
+	//set the vehicle to be in 1st gear
 	gVehicle->mTransmissionCommandState.targetGear = 2;
 
 	//adding car to needed lists
@@ -145,12 +146,49 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 		actualProjectileRadius *= dataSys->PROJECTILE_SIZE_POWERUP_STRENGTH;
 	}
 
+	//THANKS JESSE!
+	float dot = shootingCar->getGlobalPose().q.getBasisVector2().dot(carInfo->shootDir);
+	float det = PxVec3(0, 1, 0).dot(shootingCar->getGlobalPose().q.getBasisVector2().cross(carInfo->shootDir));
+	float shootAngle = atan2(dot, det);
+
+	//offset to be determined based on shoot angle
+	float offsetMultiplier;
+
+	//45 deg range with left and right in center
+	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) || 
+		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
+		(shootAngle <= - M_PI + M_PI / 8 && shootAngle >= - M_PI)) {
+		offsetMultiplier = 3.5;
+	}
+	//front
+	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
+		offsetMultiplier = 6.2;
+	}
+	//back
+	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
+		offsetMultiplier = 4;
+	}
+	//other
+	else {
+		offsetMultiplier = 4.5;
+	}
+
+	//changing projectile spawn
+	PxVec3 shootingPosition = shootingCar->getGlobalPose().p;
+
+	//fuck this code
+	PxVec3 tankHeadOffset = PxVec3(0);
+	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+	tankHeadOffset *= 1.3;
+	shootingPosition += tankHeadOffset;
+
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingCar->getGlobalPose().p.x + carInfo->shootDir.x * actualProjectileRadius * 6.5,
+		PxVec3(shootingPosition.x + carInfo->shootDir.x * actualProjectileRadius * offsetMultiplier,
 			actualProjectileRadius * 2,
-			shootingCar->getGlobalPose().p.z + carInfo->shootDir.z * actualProjectileRadius * 6.5),
+			shootingPosition.z + carInfo->shootDir.z * actualProjectileRadius * offsetMultiplier),
 		shootingCar->getGlobalPose().q);
 
 	//define a projectile
@@ -207,6 +245,7 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 
 	//subtract one ammo from the count
 	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->ammoCount--;
+	dataSys->GetCarInfoStructFromEntity(dataSys->GetEntityFromRigidDynamic(shootingCar))->shotBullet = true;
 
 	if (dataSys->DEBUG_PRINTS) printf("after reduce ammo count\n");
 

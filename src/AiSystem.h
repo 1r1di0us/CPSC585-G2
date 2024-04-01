@@ -4,24 +4,49 @@
 #include <math.h>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 #include <random>
+#include <map>
+#include "PathFinder.h"
 
-enum State;
+enum class STATE { hiding, hunting };
 
 class AiSystem {
 public:
 	SharedDataSystem* dataSys;
-	State state;
-	double timer;
-	double brakeTimer;
+	STATE state;
+	NavMesh* navMesh;
+	PathFinder* pathFinder;
+	double startTimer;
+	double brakeTimer; //for shooting
+	double coolDownTimer;
+	double reverseTimer;
+	double lockOnTime;
 	PxVec3 moveLocation;
-	std::default_random_engine rand;
-	std::normal_distribution<double> distribution;
+	Node* moveNode;
+	int nodeIterator = 0;
+	float enemyDist = 0;
+	std::vector<Node*> centerNodes; //for patrolling
+	std::vector<Node*> edgeNodes;
+	EngineDriveVehicle* aiCar;
+	CarInfo* target = nullptr;
+	CarInfo* aiCarInfo = nullptr;
+	physx::PxRigidDynamic* targetPowerup = nullptr;
+	PxVec3 aimDir = PxVec3(0, 0, -1);
+	PxVec3 carPos;
+	bool wantToFire = false;
+	bool lockedOn = false;
+	bool movingToPowerup = false;
+	bool transitioning = false; //lets us know when we are transitioning from one state to another
+	int edgePatrol = 0;
+	float shootAngle = 0;
 
-	AiSystem(SharedDataSystem* dataSys);
-	bool update(EngineDriveVehicle* aiCar, std::chrono::duration<double> deltaTime, PxVec3 movLoc);
-
-	bool sit_behaviour(EngineDriveVehicle* aiCar, bool fire);
-	bool spin_behaviour(EngineDriveVehicle* aiCar, bool fire);
-	bool moveto_behaviour(EngineDriveVehicle* aiCar, bool fire);
+	AiSystem();
+	AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar);
+	bool update(std::chrono::duration<double> deltaTime);
+	bool hunting_behaviour(bool fire, std::chrono::duration<double> deltaTime);
+	bool hiding_behaviour(bool fire, std::chrono::duration<double> deltaTime);
+	void astar_path_finding();
+	void move_car();
+	void aim_car(std::chrono::duration<double> deltaTime);
 };

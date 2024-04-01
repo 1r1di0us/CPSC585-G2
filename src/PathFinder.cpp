@@ -1,0 +1,292 @@
+#include "PathFinder.h"
+
+NavMesh::NavMesh(SharedDataSystem* dataSys) {
+	this->nodes = new std::map<unsigned int, Node*>();
+	this->dataSys = dataSys;
+
+	//make vertices
+	std::vector<std::vector<PxVec3>> verts = std::vector<std::vector<PxVec3>>();
+	int i = 0;
+	for (float x = -75; x <= 75; x += 5.f) { //make vertices every 5 units and add them into the vertices pile
+		verts.emplace_back(std::vector<PxVec3>());
+		for (float z = -75; z <= 75; z += 5.f) { // z is horizontal yes
+			verts[i].emplace_back(PxVec3(x, 0.f, z));  //31 x 31 vertices
+		}
+		i++;
+	}
+
+	//make nodes and fill map with nodes
+	int id = 0;
+	for (double x = 0; x < 30; x++) {
+		for (double z = 0; z < 30; z++) {
+			this->nodes->insert({ id, new Node(id, verts[x][z], verts[x][z + 1], verts[x + 1][z + 1], verts[x + 1][z]) });
+			id++;
+		}
+	}
+
+	//make all the connections
+	for (int x = 0; x < 30; x++) {
+		for (int z = 0; z < 30; z++) {
+			Node* thisNode = this->nodes->at(x * 30 + z);
+			bool isInObstacle = false;
+			for (MapSquare ms : dataSys->obstacleMapSquareList) {
+				if (dataSys->IsPointInSquare(PxVec2(thisNode->v0.x, thisNode->v0.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v1.x, thisNode->v1.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v2.x, thisNode->v2.z), ms)
+					|| dataSys->IsPointInSquare(PxVec2(thisNode->v3.x, thisNode->v3.z), ms)) {
+					isInObstacle = true;
+				}
+			}
+			if (!isInObstacle) {
+				//orthogonal connections
+				if (z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z - 1))->v0.x, this->nodes->at(x * 30 + (z - 1))->v0.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z - 1))->v1.x, this->nodes->at(x * 30 + (z - 1))->v1.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z - 1))), this->nodes->at(x * 30 + (z - 1)))); //top centre
+				}
+				if (x < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + z)->v1.x, this->nodes->at((x + 1) * 30 + z)->v1.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + z)->v2.x, this->nodes->at((x + 1) * 30 + z)->v2.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + z)), this->nodes->at((x + 1) * 30 + z))); //centre right
+				}
+				if (z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z + 1))->v2.x, this->nodes->at(x * 30 + (z + 1))->v2.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at(x * 30 + (z + 1))->v3.x, this->nodes->at(x * 30 + (z + 1))->v3.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at(x * 30 + (z + 1))), this->nodes->at(x * 30 + (z + 1)))); //bottom centre
+				}
+				if (x > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + z)->v3.x, this->nodes->at((x - 1) * 30 + z)->v3.z), ms)
+							|| dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + z)->v0.x, this->nodes->at((x - 1) * 30 + z)->v0.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + z)), this->nodes->at((x - 1) * 30 + z))); //centre left
+				}
+				//diagonal connections
+				if (x > 0 && z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + (z - 1))->v0.x, this->nodes->at((x - 1) * 30 + (z - 1))->v0.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + (z - 1))), this->nodes->at((x - 1) * 30 + (z - 1)))); //top left
+				}
+				if (x < 29 && z > 0) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + (z - 1))->v1.x, this->nodes->at((x + 1) * 30 + (z - 1))->v1.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + (z - 1))), this->nodes->at((x + 1) * 30 + (z - 1)))); //top right
+				}
+				if (x < 29 && z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x + 1) * 30 + (z + 1))->v2.x, this->nodes->at((x + 1) * 30 + (z + 1))->v2.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x + 1) * 30 + (z + 1))), this->nodes->at((x + 1) * 30 + (z + 1)))); //bottom right
+				}
+				if (x > 0 && z < 29) {
+					isInObstacle = false;
+					for (MapSquare ms : dataSys->obstacleMapSquareList) {
+						if (dataSys->IsPointInSquare(PxVec2(this->nodes->at((x - 1) * 30 + (z + 1))->v3.x, this->nodes->at((x - 1) * 30 + (z + 1))->v3.z), ms)) {
+							isInObstacle = true;
+						}
+					}
+					if (!isInObstacle) thisNode->connections->emplace_back(std::make_pair(cost(thisNode, this->nodes->at((x - 1) * 30 + (z + 1))), this->nodes->at((x - 1) * 30 + (z + 1)))); //bottom left
+				}
+			}
+		}
+	}
+
+
+}
+
+float NavMesh::cost(Node* src, Node* dest)
+{
+	// calc distance between centers
+	float dx = glm::abs(src->centroid.x - dest->centroid.x);
+	//float dy = glm::abs(src->centroid.y - dest->centroid.y);
+	float dy = 0; //all the ys are 0 atm
+	float dz = glm::abs(src->centroid.z - dest->centroid.z);
+
+	return glm::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+Node* NavMesh::findEntity(PxVec3 pos) {
+	int x = (int)floor((pos.x + 75) / 5);
+	int z = (int)floor((pos.z + 75) / 5);
+	return nodes->at(x * 30 + z);
+}
+
+PathFinder::PathFinder(NavMesh* navMesh) {
+	this->navMesh = navMesh;
+	path = std::stack<PxVec3>();
+}
+
+bool PathFinder::search(Node* src, Node* dest) {
+
+	if (src == NULL) {
+		std::cout << "NULL SOURCE" << std::endl;
+		return false;
+	}
+	else if (dest == NULL) {
+		std::cout << "NULL DESTINATION" << std::endl;
+		return false;
+	}
+
+	if (isDestination(src, dest)) {
+		//std::cout << "ALREADY AT DESTINATION!" << std::endl;
+		return true;
+	}
+
+	// Search data structs
+
+	std::map<unsigned int, bool> explored;
+	std::set<std::pair<float, Node*>> frontier;
+	std::map<unsigned int, unsigned int> parents;
+
+	// add src node to frontier (0 cost)
+
+	frontier.insert(std::make_pair(0.f, src));
+
+	// And to explored
+	explored.insert({ frontier.begin()->second->id, false });
+
+	// And to parent
+	parents.insert({ src->id, src->id });
+
+	// Loop !
+
+	while (!frontier.empty()) {
+
+		// Get a reference to first in frontier, and remove it
+
+		std::pair<float, Node*> p = *frontier.begin();
+		frontier.erase(frontier.begin());
+
+		// Add to explored
+		explored.find(p.second->id)->second = true;
+
+		float gNew = 0;
+		float hNew = 0;
+		float fNew = 0;
+
+		// Init connections in explored
+		for (unsigned int i = 0; i < p.second->connections->size(); i++) {
+
+			if (explored.find(p.second->connections->at(i).second->id) == explored.end()) {
+				explored.insert({ p.second->connections->at(i).second->id, false });
+			}
+		}
+
+		// Go through all connections
+		for (unsigned int i = 0; i < p.second->connections->size(); i++) {
+
+			//get reference
+			std::pair<float, Node*> temp = p.second->connections->at(i);
+
+
+			//Check if we at destination
+			if (isDestination(temp.second, dest)) {
+				parents.insert_or_assign(temp.second->id, p.second->id);
+				this->tracePath(temp.second, dest, parents);
+
+				return true;
+			}
+
+			// Have not explored this node yet
+			else if (!explored.find(temp.second->id)->second) {
+				// Update cost!
+
+				// Cost so far // Cost of current edge
+				gNew = p.first + temp.first; // Actual cost
+				hNew = calculateHCost(temp.second, dest); // Heuristic cost
+				fNew = gNew + hNew; // Total Cost
+
+				// Add to frontier
+				frontier.insert(std::make_pair(fNew, temp.second));
+				parents.insert_or_assign(temp.second->id, p.second->id);
+			}
+		}
+		
+	}
+	// If we loop through and never find the destination
+	//std::cout << "THE DESTINATION CELL IS NOT FOUND: " << dest->centroid.x << ", " << dest->centroid.z << std::endl;
+	return false;
+}
+
+bool PathFinder::isDestination(Node * src, Node * dest) {
+	if (src->id == dest->id) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+PxVec3 PathFinder::getNextWaypoint() {
+	if (path.size() > 0) {
+		PxVec3 vector = path.top();
+		path.pop();
+
+		return vector;
+	}
+	else {
+		return PxVec3(-100, -100, -100);
+		std::cout << "Path is Empty :(" << std::endl;
+	}
+
+}
+
+float PathFinder::calculateHCost(Node* src, Node* dest) {
+	PxVec3 srcCenter = src->v0 + src->v1 + src->v2 / 3.f;
+	PxVec3 destCenter = dest->v0 + dest->v1 + dest->v2 / 3.f;
+
+	// get euc dist
+	float dx = abs(srcCenter.x - destCenter.x);
+	float dy = abs(srcCenter.y - destCenter.y);
+	float dz = abs(srcCenter.z - destCenter.z);
+
+	return sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+void PathFinder::tracePath(Node* src, Node* dest, std::map<unsigned int, unsigned int> parents) {
+	std::vector<PxVec3> bPath;
+
+	// Get rid of any pre-existing paths
+	while (!this->path.empty()) {
+		this->path.pop();
+	}
+
+	// traverse
+	unsigned int temp = dest->id;
+	while (temp != parents.find(temp)->second) {
+		bPath.push_back(this->navMesh->nodes->find(temp)->second->centroid);
+		path.push(this->navMesh->nodes->find(temp)->second->centroid);
+		temp = parents.find(temp)->second;
+	}
+	bPath.push_back(this->navMesh->nodes->find(temp)->second->centroid);
+	path.push(this->navMesh->nodes->find(temp)->second->centroid);
+}

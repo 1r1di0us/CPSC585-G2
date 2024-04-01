@@ -38,6 +38,7 @@
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ModelLoader.cpp" />
+    <ClCompile Include="src\PathFinder.cpp" />
     <ClCompile Include="src\PhysicsSystem.cpp" />
     <ClCompile Include="src\PowerupSystem.cpp" />
     <ClCompile Include="src\RenderingSystem.cpp" />
@@ -68,6 +69,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ModelLoader.h" />
+    <ClInclude Include="src\PathFinder.h" />
     <ClInclude Include="src\PhysicsSystem.h" />
     <ClInclude Include="src\PowerupSystem.h" />
     <ClInclude Include="src\RenderingSystem.h" />
@@ -82,17 +84,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\Models\backpack.mtl" />
-    <None Include="assets\Models\bed_double_A.mtl" />
+    <None Include="assets\Models\bed_double_A1.mtl" />
     <None Include="assets\Models\box_A.mtl" />
     <None Include="assets\Models\building_E.mtl" />
+    <None Include="assets\Models\funky_cube.mtl" />
     <None Include="assets\Models\planeHugeWithWalls.mtl" />
+    <None Include="assets\Models\tankBody.mtl" />
+    <None Include="assets\Models\tankHead.mtl" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmod.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\core\lib\x64\fmodL.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudio.dll" />
     <None Include="libraries\FMOD Studio API Windows\api\studio\lib\x64\fmodstudioL.dll" />
     <None Include="src\assets\models\bed_double_A.mtl" />
-    <None Include="src\fragment_shader.txt" />
-    <None Include="src\vertex_shader.txt" />
+    <None Include="src\shaders\fragment_shader.txt" />
+    <None Include="src\shaders\vertex_shader.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\Fonts\arial.ttf" />
@@ -101,16 +106,17 @@
     <Font Include="assets\Fonts\Nexa-Trial-Heavy.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\fragment_shader_text.txt" />
-    <Text Include="src\model_loading_fragment.txt" />
-    <Text Include="src\model_loading_vertex.txt" />
-    <Text Include="src\vertex_shader_text.txt" />
+    <Text Include="src\shaders\fragment_shader_text.txt" />
+    <Text Include="src\shaders\skybox_fragment.txt" />
+    <Text Include="src\shaders\skybox_vertex.txt" />
+    <Text Include="src\shaders\vertex_shader_text.txt" />
     <Text Include="x64\Release\CPSC585-G2.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Models\ao.jpg" />
     <Image Include="assets\Models\diffuse.jpg" />
-    <Image Include="assets\Models\furniturebits_texture.png" />
+    <Image Include="assets\Models\bed_double_A1_diffuse.png" />
+    <Image Include="assets\Models\funky_cube.png" />
     <Image Include="assets\Models\normal.png" />
     <Image Include="assets\Models\roughness.jpg" />
     <Image Include="assets\Models\specular.jpg" />
@@ -168,7 +174,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Object>
-    <Object Include="assets\Models\bed_double_A.obj">
+    <Object Include="assets\Models\bed_double_A1.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
@@ -183,6 +189,10 @@
     <Object Include="assets\Models\cube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="assets\Models\funky_cube.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
     <Object Include="assets\Models\planeHugeWithWalls.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -335,13 +345,9 @@ copy "$(SolutionDir)assets\Textures" "$(TargetDir)assets\Textures"</Command>
     <PostBuildEvent>
       <Command>mkdir "$(TargetDir)src"
 
-copy "$(SolutionDir)src\fragment_shader.txt" "$(TargetDir)src\fragment_shader.txt"
+mkdir "$(TargetDir)src\shaders"
 
-copy "$(SolutionDir)src\fragment_shader_text.txt" "$(TargetDir)src\fragment_shader_text.txt"
-
-copy "$(SolutionDir)src\vertex_shader.txt" "$(TargetDir)src\vertex_shader.txt"
-
-copy "$(SolutionDir)src\vertex_shader_text.txt" "$(TargetDir)src\vertex_shader_text.txt"
+copy "$(SolutionDir)src\shaders" "$(TargetDir)src\shaders"
 
 mkdir "$(TargetDir)assets"
 
@@ -351,9 +357,21 @@ mkdir "$(TargetDir)assets\Models"
 
 copy "$(SolutionDir)assets\Models" "$(TargetDir)assets\Models"
 
+mkdir "$(TargetDir)assets\Models\textureJPGS"
+
+copy "$(SolutionDir)assets\Models\textureJPGS" "$(TargetDir)assets\Models\textureJPGS"
+
+mkdir "$(TargetDir)assets\Models\Powerups"
+
+copy "$(SolutionDir)assets\Models\Powerups" "$(TargetDir)assets\Models\Powerups"
+
 mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"
+
+mkdir "$(TargetDir)assets\skybox"
+
+copy "$(SolutionDir)assets\skybox" "$(TargetDir)assets\skybox"
 
 mkdir "$(TargetDir)assets\Fonts"
 
