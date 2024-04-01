@@ -28,17 +28,24 @@ struct CarInfo{
 	//waow smart pointer! I HARDLY KNOW ER
 	std::shared_ptr<Entity> entity;
 	int score = 0;
+	PxVec3 wheelForwardDir;
+	
+	//life
 	//THANKS MURTAZA!
 	bool isAlive = true;
 	bool exploded = false;
-	bool shotBullet = false;
 	float respawnTimeLeft = 0;
+	float iFramesLeft = 0;
+
+	//shooting
+	bool shotBullet = false;
+	int ammoCount = AMMO_START_AMOUNT;
+	PxVec3 shootDir;
+
+	//parry
 	float parryActiveTimeLeft = 0;
 	bool parryParticles = false;
 	float parryCooldownTimeLeft = 0;
-	int ammoCount = AMMO_START_AMOUNT;
-	PxVec3 shootDir;
-	PxVec3 wheelForwardDir;
 
 	//powerup effects
 	float projectileSpeedActiveTimeLeft = 0;
@@ -176,6 +183,9 @@ public:
 
 	//car respawn timer
 	const float CAR_RESPAWN_LENGTH = 5.0f;
+
+	//iframe duration
+	const float IFRAME_DURATION = 1.5f;
 
 	//map coords for the corners
 	const PxVec2 BOTTOM_LEFT_MAP_COORD = PxVec2(-67, -67);

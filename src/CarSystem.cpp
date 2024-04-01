@@ -107,6 +107,7 @@ void CarSystem::RespawnAllCars() {
 			carInfo->ammoCount = AMMO_START_AMOUNT;
 			carInfo->entity->collisionBox->setActorFlag(PxActorFlag::Enum::eDISABLE_GRAVITY, false);
 			carInfo->entity->collisionBox->setGlobalPose(PxTransform(spawnVec));
+			carInfo->iFramesLeft = dataSys->IFRAME_DURATION;
 		}
 		else {
 
@@ -194,6 +195,10 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//define a projectile
 	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(actualProjectileRadius), *dataSys->gMaterial);
 
+	//makes the shape a trigger volume (cant be both a simulation shape and trigger volume at same time)
+	shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+
 	//creating collision flags for each projectile
 	physx::PxFilterData projectileFilter(COLLISION_FLAG_PROJECTILE, COLLISION_FLAG_PROJECTILE_AGAINST, 0, 0);
 	shape->setSimulationFilterData(projectileFilter);
@@ -275,5 +280,9 @@ void CarSystem::UpdateAllCarCooldowns() {
 		//the projectile size powerup
 		if (dataSys->carInfoList[i].projectileSizeActiveTimeLeft > 0)
 			dataSys->carInfoList[i].projectileSizeActiveTimeLeft -= dataSys->TIMESTEP;
+
+		//iframes? more like die frames
+		if (dataSys->carInfoList[i].iFramesLeft > 0)
+			dataSys->carInfoList[i].iFramesLeft -= dataSys->TIMESTEP;
 	}
 }
