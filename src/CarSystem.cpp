@@ -158,19 +158,19 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) || 
 		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
 		(shootAngle <= - M_PI + M_PI / 8 && shootAngle >= - M_PI)) {
-		offsetMultiplier = 3.5;
+		offsetMultiplier = 2.5;
 	}
 	//front
 	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-		offsetMultiplier = 6.2;
+		offsetMultiplier = 5.2;
 	}
 	//back
 	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 4;
+		offsetMultiplier = 3;
 	}
 	//other
 	else {
-		offsetMultiplier = 4.5;
+		offsetMultiplier = 3.5;
 	}
 
 	//changing projectile spawn
@@ -186,10 +186,13 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
 	PxTransform spawnTransform = PxTransform(
-		PxVec3(shootingPosition.x + carInfo->shootDir.x * actualProjectileRadius * offsetMultiplier,
-			actualProjectileRadius * 2,
-			shootingPosition.z + carInfo->shootDir.z * actualProjectileRadius * offsetMultiplier),
+		PxVec3(shootingPosition.x + carInfo->shootDir.x * (actualProjectileRadius + offsetMultiplier),
+			0,
+			shootingPosition.z + carInfo->shootDir.z * (actualProjectileRadius + offsetMultiplier)),
 		shootingCar->getGlobalPose().q);
+
+	//dynamic setting of spawn height
+	actualProjectileRadius < 2 ? spawnTransform.p.y = 2 : spawnTransform.p.y = actualProjectileRadius + 0.1f;
 
 	//define a projectile
 	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(actualProjectileRadius), *dataSys->gMaterial);
