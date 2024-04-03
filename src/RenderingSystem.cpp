@@ -52,7 +52,12 @@ float skyboxVertices[] = {
 };
 
 
-unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture, menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit, resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, planeTexture, gunMetalTexture, rainbow;
+unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture,
+redTexture,
+menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
+resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
+planeTexture, gunMetalTexture, parryTexture,
+ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture;
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -108,26 +113,40 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	// create and set textures
 	planeTexture = generateTexture("assets/Textures/wood.jpg", true);
 	//stbi_set_flip_vertically_on_load(true); // to vertically flip the image
+
+	//cars
 	player1Texture = generateTexture("assets/Textures/player1.jpg", true);
 	player2Texture = generateTexture("assets/Textures/player2.jpg", true);
 	player3Texture = generateTexture("assets/Textures/player3.jpg", true);
 	player4Texture = generateTexture("assets/Textures/player4.jpg", true);
 	player5Texture = generateTexture("assets/Textures/player5.jpg", true);
+
+	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
 	gunMetalTexture = generateTexture("assets/Textures/gunMetal.jpg", true);
+	parryTexture = generateTexture("assets/Textures/whiteparry.jpg", true);
+
+	//menu
 	menuPlay = generateTexture("assets/Textures/UI/menuPlay.jpg", true);
 	menuControls = generateTexture("assets/Textures/UI/menuControls.jpg", true);
 	menuQuit = generateTexture("assets/Textures/UI/menuQuit.jpg", true);
 	controlsMenu = generateTexture("assets/Textures/UI/controlsMenu.jpg", true);
 	pauseMenuContinue = generateTexture("assets/Textures/UI/pauseMenuContinue.jpg", true);
 	pauseMenuQuit = generateTexture("assets/Textures/UI/pauseMenuQuit.jpg", true);
+
+	//results
 	resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
 	resultsP2 = generateTexture("assets/Textures/UI/resultsP2.jpg", true);
 	resultsP3 = generateTexture("assets/Textures/UI/resultsP3.jpg", true);
 	resultsP4 = generateTexture("assets/Textures/UI/resultsP4.jpg", true);
 	resultsP5 = generateTexture("assets/Textures/UI/resultsP5.jpg", true);
 	resultsTie = generateTexture("assets/Textures/UI/resultsTie.jpg", true);
-	rainbow = generateTexture("assets/Textures/whiteparry.jpg", true);
+
+	//powerups
+	ammoPowerupTexture = gunMetalTexture;
+	projectileSpeedPowerupTexture = gunMetalTexture;
+	projectileSizePowerupTexture = gunMetalTexture;
+	armourPowerupTexture = gunMetalTexture;
 
 	// geom shaders
 	shader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
@@ -136,18 +155,27 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	skyBoxShader.setInt("skybox", 0);
 
 
-	// loading in the models
-	plane = Model("./assets/Models/emptyPlane.obj");
-	projectile = Model("./assets/Models/ball.obj");
+	//tank models
 	tank = Model("./assets/Models/tank.obj");
-	shieldPowerup = Model("./assets/Models/shieldPowerup.obj");
 	tankHead = Model("./assets/Models/tankHead.obj");
-	tankBody = Model("./assets/Models/tankBody.obj");
+	tankBody = Model("./assets/Models/tankWithWheels.obj");
 	tankWheel = Model("./assets/Models/tankWheel.obj");
+
+	//static objects
+	plane = Model("./assets/Models/emptyPlane.obj");
 	bunny = Model("./assets/Models/toyBunny.obj");
 	train = Model("./assets/Models/toyTrain.obj");
 	toyBlock2 = Model("./assets/Models/toyBlocksHalf2.obj");
 	toyBlock1 = Model("./assets/Models/toyBlocksHalf1.obj");
+
+	//powerup models
+	ammoPowerup = Model("./assets/Models/Powerups/ammo.obj");
+	projectileSpeedPowerup = Model("./assets/Models/Powerups/projectileSpeed.obj");
+	projectileSizePowerup = Model("./assets/Models/Powerups/projectileSize.obj");
+	armourPowerup = Model("./assets/Models/Powerups/armour.obj");
+
+	//other models
+	projectile = Model("./assets/Models/ball.obj");
 
 	// SkyVAO Initialization
 	glGenVertexArrays(1, &skyVAO);
@@ -357,7 +385,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// binding textures
 		if (dataSys->carInfoList[0].parryActiveTimeLeft > 0) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, rainbow);
+			glBindTexture(GL_TEXTURE_2D, parryTexture);
 		}
 		else {
 			glActiveTexture(GL_TEXTURE0);
@@ -385,7 +413,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
 		glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
 		float angle = atan2(shootDir.x, shootDir.z);
-		tankHeadModel = glm::translate(tankHeadModel, playerPos);
+
+		//fuck this code
+		glm::vec3 tankHeadOffset = glm::vec3(0);
+		tankHeadOffset.x = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+		tankHeadOffset.z = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+		tankHeadOffset *= 1.3;
+
+		tankHeadModel = glm::translate(tankHeadModel, playerPos + tankHeadOffset);
 		tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 		tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		shader.setMat4("model", tankHeadModel);
@@ -456,6 +491,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 						carInfo = dataSys->GetCarInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]));
 
+						//not sure if needed but keeping for now
+						if (carInfo->entity->name == "car1") {
+							break;
+						}
+
 						//different colors for different cars
 						if (carInfo->entity->name == "car2") {
 							glActiveTexture(GL_TEXTURE0);
@@ -491,7 +531,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						glm::mat4 tankHeadModel = glm::mat4(1.0f);
 						glm::vec3 shootDir = glm::normalize(glm::vec3(carInfo->shootDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
 						float angle = atan2(shootDir.x, shootDir.z);
-						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos());
+
+						//fuck this code
+						glm::vec3 tankHeadOffset = glm::vec3(0);
+						tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+						tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+						tankHeadOffset *= 1.3;
+
+						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos() + tankHeadOffset);
 						tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 						tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
@@ -511,9 +558,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					}
 
 					break;
-				case (PhysicsType::PROJECTILE):					
-
-					break;
 				case (PhysicsType::POWERUP):
 					
 					model = glm::mat4(1.0f);
@@ -523,38 +567,49 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					switch (dataSys->GetPowerupInfoStructFromEntity(std::make_shared<Entity>(dataSys->entityList[i]))->powerupType) {
 					case PowerupType::AMMO:
 
+						model = glm::scale(model, glm::vec3(0.3f));
+
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, gunMetalTexture);
+						glBindTexture(GL_TEXTURE_2D, ammoPowerupTexture);
 
 						shader.setMat4("model", model);
-						projectile.Draw(shader);
+						ammoPowerup.Draw(shader);
 
 						break;
 					case PowerupType::PROJECTILESPEED:
 
+						model = glm::translate(model, glm::vec3(0, -1.3, 0));
+						model = glm::scale(model, glm::vec3(0.22f));
+
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, player5Texture);
+						glBindTexture(GL_TEXTURE_2D, projectileSpeedPowerupTexture);
 
 						shader.setMat4("model", model);
-						projectile.Draw(shader);
+						projectileSpeedPowerup.Draw(shader);
 
 						break;
 					case PowerupType::PROJECTILESIZE:
 
+						model = glm::translate(model, glm::vec3(0, 1.2, 0));
+						model = glm::rotate(model, glm::half_pi<float>(), glm::vec3(0, 0, 1));
+						model = glm::scale(model, glm::vec3(0.09f));
+
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, player2Texture);
+						glBindTexture(GL_TEXTURE_2D, projectileSizePowerupTexture);
 
 						shader.setMat4("model", model);
-						projectile.Draw(shader);
+						projectileSizePowerup.Draw(shader);
 
 						break;
 					case PowerupType::ARMOUR:
 
+						model = glm::scale(model, glm::vec3(0.095f));
+
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, player4Texture);
+						glBindTexture(GL_TEXTURE_2D, armourPowerupTexture);
 
 						shader.setMat4("model", model);
-						projectile.Draw(shader);
+						armourPowerup.Draw(shader);
 
 					case PowerupType::CARSPEED:
 
@@ -569,7 +624,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					// render obstacles
 
 					model = glm::mat4(1.0f);
-					model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+					model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 					model = glm::translate(model, dataSys->entityList[i].transform->getPos());
 					shader.use();
 					shader.setMat4("model", model);

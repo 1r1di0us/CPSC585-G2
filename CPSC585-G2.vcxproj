@@ -359,6 +359,14 @@ mkdir "$(TargetDir)assets\Models"
 
 copy "$(SolutionDir)assets\Models" "$(TargetDir)assets\Models"
 
+mkdir "$(TargetDir)assets\Models\textureJPGS"
+
+copy "$(SolutionDir)assets\Models\textureJPGS" "$(TargetDir)assets\Models\textureJPGS"
+
+mkdir "$(TargetDir)assets\Models\Powerups"
+
+copy "$(SolutionDir)assets\Models\Powerups" "$(TargetDir)assets\Models\Powerups"
+
 mkdir "$(TargetDir)assets\vehicledata"
 
 copy "$(SolutionDir)assets\vehicledata" "$(TargetDir)assets\vehicledata"

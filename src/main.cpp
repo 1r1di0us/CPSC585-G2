@@ -42,6 +42,7 @@ const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<d
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
 std::chrono::high_resolution_clock::time_point lastTime;
+std::chrono::duration<double> gameTimePassed;
 std::chrono::duration<double> totalTimePassed;
 std::chrono::duration<double> totalTimeLeft = std::chrono::duration<double>(TIMELIMIT);
 std::chrono::high_resolution_clock::time_point previousIterationTime;
@@ -75,7 +76,14 @@ int main() {
     soundSys.AddToSoundDict("Bwud", "assets/Music/PianoClusterBwud.wav");
     soundSys.LoadSound("assets/Music/ParrySound.wav", false);
     soundSys.AddToSoundDict("Parry", "assets/Music/ParrySound.wav");
+    soundSys.LoadSound("assets/Music/HeavenShort.wav", false);
+    soundSys.AddToSoundDict("Armour", "assets/Music/HeavenShort.wav");
+    soundSys.LoadSound("assets/Music/ArmourDing.wav", false);
+    soundSys.AddToSoundDict("Armour", "assets/Music/ArmourDing.wav");
 
+    //initializing time variables
+    startTime = std::chrono::high_resolution_clock::now();
+    currentTime = startTime;
     lastTime = std::chrono::high_resolution_clock::now();
     previousIterationTime = lastTime;
 
@@ -86,6 +94,10 @@ int main() {
     int seconds = 1;
 
     while (!glfwWindowShouldClose(window)) {
+
+        //FPS counter var
+        totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - startTime);
+
         // input
         // -----
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -169,8 +181,8 @@ int main() {
             }
             //updating how much time has passed
             currentTime = std::chrono::high_resolution_clock::now();
-            totalTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime);
-            totalTimeLeft = totalTimeLeft - totalTimePassed;
+            gameTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime);
+            totalTimeLeft = totalTimeLeft - gameTimePassed;
             lastTime = currentTime;
 
             //calculating the total time passed since the last physics update
@@ -193,17 +205,6 @@ int main() {
                 }
                 dataSys.inResults = true;
             }
-
-            //if another second has passed, print the fps
-            if (totalTimePassed.count() / seconds >= 1) {
-
-                printf("FPS: %d\n", FPSCOUNTER);
-                FPSCOUNTER = 0;
-                seconds += 1;
-            }
-
-            //increases the frame counter
-            FPSCOUNTER++;
 
             switch (inputSys.InputToMovement(deltaTime)) {
             //shoot
@@ -268,6 +269,17 @@ int main() {
         if (dataSys.quit) {
             break;
         }
+
+        //if another second has passed, print the fps
+        if (totalTimePassed.count() / seconds >= 1) {
+
+            printf("FPS: %d\n", FPSCOUNTER);
+            FPSCOUNTER = 0;
+            seconds += 1;
+        }
+
+        //increases the frame counter
+        FPSCOUNTER++;
     }
 
     //game loop ends

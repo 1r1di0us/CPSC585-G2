@@ -25,7 +25,9 @@ class RenderingSystem {
 
 private:
 	SharedDataSystem* dataSys;
-	Model plane, projectile, tank, shieldPowerup, tankHead, tankBody, tankWheel, bunny, train, toyBlock1, toyBlock2;
+	Model plane, projectile, tank,
+		ammoPowerup, projectileSpeedPowerup, projectileSizePowerup, armourPowerup,
+		tankHead, tankBody, tankWheel, bunny, train, toyBlock1, toyBlock2;
 
 	// galaxy skybox
 	std::vector<std::string> faces
