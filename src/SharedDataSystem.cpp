@@ -511,13 +511,16 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		//send the projectile back the way it came
 			//doing the offset based on the same math as the shooting math
-		projectileEntity->collisionBox->setGlobalPose(
-			PxTransform(
-				PxVec3(
-					shootingPosition.x + projectileBackwardVector.x * projectileRadius * offsetMultiplier,
-					shootingPosition.y,
-					shootingPosition.z + projectileBackwardVector.x * projectileRadius * offsetMultiplier),
-				projectileEntity->collisionBox->getGlobalPose().q));
+		PxVec3 spawnVec = PxVec3(
+				shootingPosition.x + projectileBackwardVector.x * (projectileRadius + offsetMultiplier),
+				0,
+				shootingPosition.z + projectileBackwardVector.z * (projectileRadius + offsetMultiplier));
+
+		//dynamic setting of spawn height
+		projectileRadius < 2 ? spawnVec.y = 2 : spawnVec.y = projectileRadius + 0.1f;
+
+		//setting the spawn position
+		projectileEntity->collisionBox->setGlobalPose(PxTransform(spawnVec, projectileEntity->collisionBox->getGlobalPose().q));
 
 		//stoled from car shoot ahahah
 		projectileEntity->collisionBox->setLinearVelocity(SHOOT_FORCE * PxVec3(projectileBackwardVector.x, 0, projectileBackwardVector.z));
