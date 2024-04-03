@@ -140,7 +140,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	plane = Model("./assets/Models/emptyPlane.obj");
 	projectile = Model("./assets/Models/ball.obj");
 	tank = Model("./assets/Models/tank.obj");
-	powerup = Model("./assets/Models/ball.obj");
+	shieldPowerup = Model("./assets/Models/shieldPowerup.obj");
 	tankHead = Model("./assets/Models/tankHead.obj");
 	tankBody = Model("./assets/Models/tankBody.obj");
 	tankWheel = Model("./assets/Models/tankWheel.obj");

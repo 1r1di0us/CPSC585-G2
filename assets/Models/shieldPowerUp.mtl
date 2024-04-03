@@ -1,0 +1,38 @@
+# Blender 4.0.2 MTL File: 'plane1.blend'
+# www.blender.org
+
+newmtl Gold
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Gold_Base_color.jpg
+map_Ns C:/Gold_Roughness.jpg
+map_refl C:/Gold_Metallic.jpg
+map_Bump -bm 1.000000 C:/Gold_Normal.jpg
+
+newmtl Metal
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Metal_Base_color.jpg
+map_Ns C:/Metal_Roughness.jpg
+map_refl C:/Metal_Base_color000.jpg
+map_Bump -bm 1.000000 C:/Metal_Normal.jpg
+
+newmtl Wood
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Wood_Base_color.jpg
+map_Ns C:/Wood_Roughness.jpg
+map_refl C:/Wood_Metallic.jpg
+map_Bump -bm 1.000000 C:/Wood_Normal.jpg

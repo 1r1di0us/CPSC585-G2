@@ -47,19 +47,19 @@ void PowerupSystem::SpawnPowerup(PxVec3 spawnPosition, PowerupType powerupType) 
 	dataSys->gScene->addActor(*powerupBody);
 
 	//creating the powerup entity to add to the entity list
-	Entity powerup;
-	powerup.name = PowerupTypeToString(powerupType) + "powerup" + std::to_string(dataSys->spawnedPowerupCounter++);
-	powerup.CreateTransformFromPhysX(PxTransform(spawnPosition));
-	powerup.physType = PhysicsType::POWERUP;
-	powerup.collisionBox = powerupBody;
+	Entity shieldPowerup;
+	shieldPowerup.name = PowerupTypeToString(powerupType) + "powerup" + std::to_string(dataSys->spawnedPowerupCounter++);
+	shieldPowerup.CreateTransformFromPhysX(PxTransform(spawnPosition));
+	shieldPowerup.physType = PhysicsType::POWERUP;
+	shieldPowerup.collisionBox = powerupBody;
 
-	powerupBody->setName(powerup.name.c_str());
+	powerupBody->setName(shieldPowerup.name.c_str());
 
-	dataSys->entityList.emplace_back(powerup);
+	dataSys->entityList.emplace_back(shieldPowerup);
 
 	//making the powerup info to add to the list
 	PowerupInfo powerupInfo;
-	powerupInfo.entity = std::make_shared<Entity>(powerup);
+	powerupInfo.entity = std::make_shared<Entity>(shieldPowerup);
 	powerupInfo.powerupType = powerupType;
 
 	dataSys->allPowerupList.emplace_back(powerupInfo);

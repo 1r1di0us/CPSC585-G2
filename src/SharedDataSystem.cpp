@@ -523,13 +523,13 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 }
 
-void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) {
+void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* shieldPowerup) {
 
 	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic before\n");
 
 	//converting the actors to entities
 	std::shared_ptr<Entity> carEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)car);
-	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
+	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)shieldPowerup);
 
 	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic after\n");
 
