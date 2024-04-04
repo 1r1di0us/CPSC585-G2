@@ -113,6 +113,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	player3Texture = generateTexture("assets/Textures/player3.jpg", true);
 	player4Texture = generateTexture("assets/Textures/player4.jpg", true);
 	player5Texture = generateTexture("assets/Textures/player5.jpg", true);
+	playerInvincibleTexture = generateTexture("assets/Textures/playerInvincible.jpg", true);
 
 	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
@@ -198,7 +199,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
     initParticlesVAO();
     // Load particle texture
 	particleExplosionTexture = generateTexture("assets/Textures/fire.jpg", true);
-	particleSmokeTexture = generateTexture("assets/Textures/whiteParry.jpg", true);
+	particleSmokeTexture = generateTexture("assets/Textures/playerInvincible.jpg", true);
     //particleShader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
 }
 
@@ -394,6 +395,10 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				dataSys->carInfoList[0].parryParticles = true;
 			}
 		}
+		else if (dataSys->carInfoList[0].iFramesLeft > 0) {
+			glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
+		}
 		else {
 			dataSys->carInfoList[0].parryParticles = false;
 			glActiveTexture(GL_TEXTURE0);
@@ -512,8 +517,12 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 							break;
 						}
 
+						if (carInfo->iFramesLeft > 0) {
+							glActiveTexture(GL_TEXTURE0);
+							glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
+						}
 						//different colors for different cars
-						if (carInfo->entity->name == "car2") {
+						else if (carInfo->entity->name == "car2") {
 							glActiveTexture(GL_TEXTURE0);
 							glBindTexture(GL_TEXTURE_2D, player2Texture);
 						}

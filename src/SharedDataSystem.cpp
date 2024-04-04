@@ -539,6 +539,13 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		SoundsToPlay.push_back(std::make_pair(std::string("Armour"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
 	}
+	//iframes?
+	else if (shotCarInfo->iFramesLeft > 0) {
+
+		//do nothing, let projectile pass through
+		return;
+
+	}
 	else {
 
 		//increase score of car that shot
