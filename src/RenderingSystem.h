@@ -106,7 +106,7 @@ public:
 	Shader particleShader;
 	void initParticlesVAO();
 
-	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, redTexture,
+	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, playerInvincibleTexture, redTexture,
 		menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
 		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
 		planeTexture, gunMetalTexture, parryTexture, ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, particleExplosionTexture, particleSmokeTexture;
