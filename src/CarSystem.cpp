@@ -42,10 +42,11 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	PxU32 shapes = gVehicle->mPhysXState.physxActor.rigidBody->getNbShapes();
 	for (PxU32 i = 0; i < shapes; i++) {
 		PxShape* shape = NULL;
-		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
-
 		//the body of the vehicle is at i = 0
+		
+		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
 		if (i == 0) {
+			//shape = dataSys->gPhysics->createShape(physx::PxCapsuleGeometry(0.5, 0.8), *dataSys->gMaterial);
 			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
 			shape->setGeometry(myChassis);
 		}

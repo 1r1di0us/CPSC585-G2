@@ -342,14 +342,24 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 
 	//reverse overrides all
 	if (rev) {
-		playerCar->mTransmissionCommandState.targetGear = 0;
+		if (playerCar->mTransmissionCommandState.targetGear == 2) {
+			PxVec3 myDir = -carDir * 10;
+			myDir.y = 0;
+			dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
+			playerCar->mTransmissionCommandState.targetGear = 0;
+		}
 		playerCar->mCommandState.steer = 0;
 		playerCar->mCommandState.throttle = 1;
 		playerCar->mCommandState.nbBrakes = 0;
 		playerCar->mCommandState.brakes[0] = 0;
 	}
 	else {
-		playerCar->mTransmissionCommandState.targetGear = 2;
+		if (playerCar->mTransmissionCommandState.targetGear == 0) {
+			PxVec3 myDir = carDir * 10;
+			myDir.y = 0;
+			dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
+			playerCar->mTransmissionCommandState.targetGear = 2;
+		}
 	}
 
 	//camera shenanigans	
