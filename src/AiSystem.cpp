@@ -62,6 +62,7 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	if (reverseTimer < deltaTime.count() && reverseTimer > 0) { //positive reverse timer is the time until we decide to reverse
 		reverseTimer = -1.0; //negative reverse timer is the time we actually reverse
 		aiCar->mTransmissionCommandState.targetGear = 0;
+		aiCar->mTankDriveTransmissionCommandState.targetGear = 0;  // tank attempt
 	}
 	else if (reverseTimer > deltaTime.count()) {
 		reverseTimer -= deltaTime.count();
@@ -69,6 +70,7 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	else if (reverseTimer > -deltaTime.count() && reverseTimer < 0) {
 		reverseTimer = 0.0;
 		aiCar->mTransmissionCommandState.targetGear = 2; //set back in first gear
+		aiCar->mTankDriveTransmissionCommandState.targetGear = 2; //set back in first gear  // tank attempt
 	}
 	else if (reverseTimer < -deltaTime.count()) {
 		reverseTimer += deltaTime.count();

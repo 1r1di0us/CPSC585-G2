@@ -343,6 +343,7 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	//reverse overrides all
 	if (rev) {
 		playerCar->mTransmissionCommandState.targetGear = 0;
+		playerCar->mTankDriveTransmissionCommandState.targetGear = 0;  // tank attempt
 		playerCar->mCommandState.steer = 0;
 		playerCar->mCommandState.throttle = 1;
 		playerCar->mCommandState.nbBrakes = 0;
@@ -350,6 +351,7 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	}
 	else {
 		playerCar->mTransmissionCommandState.targetGear = 2;
+		playerCar->mTankDriveTransmissionCommandState.targetGear = 2;  // tank attempt
 	}
 
 	//camera shenanigans	

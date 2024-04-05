@@ -21,8 +21,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	readEngineDrivetrainParamsFromJsonFile(gVehicleDataPath, "EngineDrive.json",
 		gVehicle->mEngineDriveParams);
 
-	//Set the states to default.
-	if (!gVehicle->initialize(*dataSys->gPhysics, PxCookingParams(PxTolerancesScale()), *dataSys->gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE)) {
+	//Set the states to default.																								// changed to tank(?)
+	if (!gVehicle->initialize(*dataSys->gPhysics, PxCookingParams(PxTolerancesScale()), *dataSys->gMaterial, EngineDriveVehicle::eDIFFTYPE_TANKDRIVE)) {
 		printf("Car initialization failed\n");
 		exit(69);
 	}
@@ -65,6 +65,7 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	//gVehicle->mTransmissionCommandState.targetGear = gVehicle->mTransmissionCommandState.eAUTOMATIC_GEAR;
 	//set the vehicle to be in 1st gear
 	gVehicle->mTransmissionCommandState.targetGear = 2;
+	gVehicle->mTankDriveTransmissionCommandState.targetGear = 2; // tank attempt
 
 	//adding car to needed lists
 	dataSys->carRigidDynamicList.emplace_back((PxRigidDynamic*)gVehicle->mPhysXState.physxActor.rigidBody);
