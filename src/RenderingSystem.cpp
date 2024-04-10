@@ -94,8 +94,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	}
 
 	// Extract width and height from the video mode
-	int monitorWidth = mode->width;
-	int monitorHeight = mode->height;
+	monitorWidth = mode->width;
+	monitorHeight = mode->height;
 
 	// windowed fullscreen, cuts off some of the text though
 	glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
@@ -211,7 +211,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// text VAO VBO Initialization
 	textShader = Shader("src/shaders/vertex_shader_text.txt", "src/shaders/fragment_shader_text.txt");
-	glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
+	//glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
+	glm::mat4 textProjection = glm::ortho(0.0f, float(monitorWidth), 0.0f, float(monitorHeight));
 	textShader.use();
 	glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
@@ -266,24 +267,54 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			// Convert timeLeftInSeconds to string
 			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			//RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//ammo count
 			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			//RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//scoreboard
 			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			//RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			// NDC Coordinate for variable screen size
+			float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
+			float ndcY = 1.0f - (2.0f * 570.0f) / monitorHeight; // Convert y coordinate
+			RenderText(textShader, textVAO, textVBO, timeLeftStr, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
+			ndcY = 1.0f - (2.0f * 10.0f) / monitorHeight; // Convert y coordinate
+			RenderText(textShader, textVAO, textVBO, ammoCount, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			// Convert screen coordinates to NDC
+			ndcX = (2.0f * 610.0f) / monitorWidth - 1.0f;  // Convert x coordinate
+			ndcY = 1.0f - (2.0f * 570.0f) / monitorHeight; // Convert y coordinate
+
+			// Render text at the converted NDC coordinates
+			RenderText(textShader, textVAO, textVBO, score, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
 
 			std::string parry = "Parry Available";
 			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
-				RenderText(textShader, textVAO, textVBO, parry, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+				//RenderText(textShader, textVAO, textVBO, parry, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+				// Convert screen coordinates to NDC
+				float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
+				float ndcY = 1.0f - (2.0f * 40.0f) / monitorHeight; // Convert y coordinate
+				RenderText(textShader, textVAO, textVBO, parry, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
 			}
 			else
 			{
 				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+				//RenderText(textShader, textVAO, textVBO, parryTime, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+				// Convert screen coordinates to NDC
+				float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
+				float ndcY = 1.0f - (2.0f * 40.0f) / monitorHeight; // Convert y coordinate
+				RenderText(textShader, textVAO, textVBO, parryTime, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+
 			}
 
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
@@ -364,7 +395,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 		// this should be the camera matrix
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		//projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		
+		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 1000.0f);
 
 		// getting the car position and rotation
 		glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;

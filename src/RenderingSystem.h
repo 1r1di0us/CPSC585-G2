@@ -67,6 +67,7 @@ public:
 
 	// variables
 	GLFWwindow* window;
+	int monitorWidth, monitorHeight;
 	unsigned int VAO, VBO, textVAO, textVBO, skyVAO, skyVBO, particlesVAO, particlesVBO;
 	Shader textShader;
 	Shader shader;
