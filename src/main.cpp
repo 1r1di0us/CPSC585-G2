@@ -236,7 +236,7 @@ int main() {
                 break;
             }
 
-            if (aiSys1.update(deltaTime)) {
+            /*if (aiSys1.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
@@ -262,7 +262,7 @@ int main() {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
                     dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
                 }
-            }
+            }*/
 
             //only updating the physics at max 60hz while everything else updates at max speed
             if (timeUntilPhysicsUpdate.count() <= 0.0f) {
