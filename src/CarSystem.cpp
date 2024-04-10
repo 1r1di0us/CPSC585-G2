@@ -22,7 +22,7 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 		gVehicle->mEngineDriveParams);
 
 	//Set the states to default.																								// changed to tank(?)
-	if (!gVehicle->initialize(*dataSys->gPhysics, PxCookingParams(PxTolerancesScale()), *dataSys->gMaterial, EngineDriveVehicle::eDIFFTYPE_TANKDRIVE)) {
+	if (!gVehicle->initialize(*dataSys->gPhysics, PxCookingParams(PxTolerancesScale()), *dataSys->gMaterial, EngineDriveVehicle::eDIFFTYPE_FOURWHEELDRIVE)) {
 		printf("Car initialization failed\n");
 		exit(69);
 	}
