@@ -78,7 +78,34 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
+	
+	GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+	if (!primaryMonitor) {
+		// Handle error
+		glfwTerminate();
+		return;
+	}
+
+	// Get the video mode of the primary monitor
+	const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+	if (!mode) {
+		glfwTerminate();
+		return;
+	}
+
+	// Extract width and height from the video mode
+	int monitorWidth = mode->width;
+	int monitorHeight = mode->height;
+
+	// windowed fullscreen, cuts off some of the text though
+	glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
+
+	// fullscreen fullscreen
+	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", get, NULL);
+	//window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
+
+
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -92,7 +119,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return;
 	}
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glViewport(0, 0, monitorWidth, monitorHeight);
+
 
 	stbi_set_flip_vertically_on_load(true); // to vertically flip the image
 
@@ -193,8 +221,6 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	// loading skymap texture
 	cubemapTexture = loadCubemap(faces);
 
-    //this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
-    //initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
     // Initialize particles VAO
     initParticlesVAO();
     // Load particle texture
