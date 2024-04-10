@@ -23,7 +23,7 @@
 	"GearboxParams":
 	{
 		"NeutralGear": 1,
-		"Ratios": [-4.0, 0.0, 4.0, 2.0, 1.5, 1.1, 1.0],
+		"Ratios": [-2.85, 0.0, 4.0, 2.0, 1.5, 1.1, 1.0],
 		"FinalRatio": 4.0,
 		"SwitchTime": 0.5
 	},

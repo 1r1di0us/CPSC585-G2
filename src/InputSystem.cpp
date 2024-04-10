@@ -458,6 +458,7 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
 		playerCar->mTransmissionCommandState.targetGear = 0;
 	}
+	printf("speed: %f\n", playerCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().normalize());
 	//}
 
 	//camera shenanigans	
