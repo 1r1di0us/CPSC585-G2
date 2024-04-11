@@ -284,20 +284,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// text only if the player is alive
 		if (dataSys->carInfoList[0].isAlive) {
 
-			//// Convert timeLeftInSeconds to string
-			//std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			//RenderText(textShader, textVAO, textVBO, timeLeftStr, timeTextPos.first, timeTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			////ammo count
-			//std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			//RenderText(textShader, textVAO, textVBO, ammoCount, ammoTextPos.first, ammoTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			////scoreboard
-			//std::string score = "Score:";
-			//RenderText(textShader, textVAO, textVBO, score, scoreTextPos.first, scoreTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-
-						// Convert timeLeftInSeconds to string
+			// Convert timeLeftInSeconds to string
 			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
 			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f/800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
@@ -345,29 +332,29 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			//coordinate vars
 			//NEEDS TO EVENTUALLY BE BASED ON SCREEN SIZE
-			float x = 5.0f;
-			float y = 545.0f;
+			float x = 5.0f/800.0f * monitorWidth;
+			float y = 545.0f/600.0f * monitorHeight;
 
 			std::string message;
 			
 			//player has armour
 			if (dataSys->carInfoList[0].hasArmour) {
 				message = "ARMOUR ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 				
 			//player has projectile size powerup
 			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
 				message = "PROJECTILE SIZE INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
 			//player has projectile speed powerup
 			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
 				message = "PROJECTILE SPEED INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
