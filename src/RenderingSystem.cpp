@@ -370,7 +370,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 		}
 		else {
-
 			color = black;
 			// death text
 			textShader.use();
@@ -381,7 +380,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f/800.0f * monitorWidth, 90.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
 			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f/800.0f * monitorWidth, 50.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
 			
-	
 		}
 
 		// activate shader
@@ -399,7 +397,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::mat4 projection = glm::mat4(1.0f);
 		//projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		
-		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 1000.0f);
+		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 300.0f);
 
 		// getting the car position and rotation
 		glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;
