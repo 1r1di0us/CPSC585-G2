@@ -121,6 +121,22 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	}
 	glViewport(0, 0, monitorWidth, monitorHeight);
 
+	// get all the relative text positions
+	//auto timePair = convertToPixels(0.0125f, 0.94f);
+	//timeTextPos.first = timePair.first;
+	//timeTextPos.second = timePair.second;
+
+	//auto ammoPair = convertToPixels(0.0125f, 0.04f);
+	//ammoTextPos.first = ammoPair.first;
+	//ammoTextPos.second = ammoPair.second;
+
+	//auto scorePair = convertToPixels(0.7625f, 0.94f);
+	//scoreTextPos.first = scorePair.first;
+	//scoreTextPos.second = scorePair.second;
+
+	//auto parryPair = convertToPixels(0.0125f, 0.08f);
+	//parryTextPos.first = parryPair.first;
+	//parryTextPos.second = parryPair.second;
 
 	stbi_set_flip_vertically_on_load(true); // to vertically flip the image
 
@@ -265,56 +281,39 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		// text only if the player is alive
 		if (dataSys->carInfoList[0].isAlive) {
 
-			// Convert timeLeftInSeconds to string
+			//// Convert timeLeftInSeconds to string
+			//std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+			//RenderText(textShader, textVAO, textVBO, timeLeftStr, timeTextPos.first, timeTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			////ammo count
+			//std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
+			//RenderText(textShader, textVAO, textVBO, ammoCount, ammoTextPos.first, ammoTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			////scoreboard
+			//std::string score = "Score:";
+			//RenderText(textShader, textVAO, textVBO, score, scoreTextPos.first, scoreTextPos.second, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+
+						// Convert timeLeftInSeconds to string
 			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			//RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f/800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//ammo count
 			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			//RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f / 800.0f * monitorWidth, 30.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//scoreboard
 			std::string score = "Score:";
-			//RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			// NDC Coordinate for variable screen size
-			float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
-			float ndcY = 1.0f - (2.0f * 570.0f) / monitorHeight; // Convert y coordinate
-			RenderText(textShader, textVAO, textVBO, timeLeftStr, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
-			ndcY = 1.0f - (2.0f * 10.0f) / monitorHeight; // Convert y coordinate
-			RenderText(textShader, textVAO, textVBO, ammoCount, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			// Convert screen coordinates to NDC
-			ndcX = (2.0f * 610.0f) / monitorWidth - 1.0f;  // Convert x coordinate
-			ndcY = 1.0f - (2.0f * 570.0f) / monitorHeight; // Convert y coordinate
-
-			// Render text at the converted NDC coordinates
-			RenderText(textShader, textVAO, textVBO, score, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
+			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			std::string parry = "Parry Available";
 			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
-				//RenderText(textShader, textVAO, textVBO, parry, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-				// Convert screen coordinates to NDC
-				float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
-				float ndcY = 1.0f - (2.0f * 40.0f) / monitorHeight; // Convert y coordinate
-				RenderText(textShader, textVAO, textVBO, parry, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
+				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 			else
 			{
 				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				//RenderText(textShader, textVAO, textVBO, parryTime, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-				// Convert screen coordinates to NDC
-				float ndcX = (2.0f * 10.0f) / monitorWidth - 1.0f;  // Convert x coordinate
-				float ndcY = 1.0f - (2.0f * 40.0f) / monitorHeight; // Convert y coordinate
-				RenderText(textShader, textVAO, textVBO, parryTime, ndcX, ndcY, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-
+				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
@@ -335,7 +334,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 				float yOffset = i * 30;
 				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-				RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.0f, color, Characters_gaegu);
 			}
 
 			//displays active powerups (temp until VFX)
@@ -377,9 +376,12 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			textShader.use();
 			std::string deathText1 = "You died!";
 			std::string deathText2 = "Welcome to heaven!";
-			RenderText(textShader, textVAO, textVBO, deathText1, 310.0f, 500.0f, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 190.0f, 90.0f, 1.0f, color, Characters_gaegu);
-			// render the 2d screen if they are dead?
+			std::string deathTimer = "Respawn in: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].respawnTimeLeft));
+			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f/800.0f * monitorWidth, 500.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f/800.0f * monitorWidth, 90.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f/800.0f * monitorWidth, 50.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			
+	
 		}
 
 		// activate shader
@@ -979,6 +981,7 @@ void RenderingSystem::initParticlesVAO() {
 
     glBindVertexArray(0); // Unbind VAO
 }
+
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -1011,4 +1014,11 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+
+// Convert ratios to pixel coordinates
+std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRatio) {
+	float pixelX = xRatio * monitorWidth;
+	float pixelY = yRatio * monitorHeight;
+	return std::make_pair(pixelX, pixelY);
 }
