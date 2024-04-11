@@ -52,27 +52,22 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 		//	PxCapsuleGeometry myChassis = PxCapsuleGeometry(0.5, 0.8);
 		//	PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
 		//	shape->setGeometry(myChassis);
-			gVehicle->mPhysXState.physxActor.rigidBody->detachShape(*shape);
-			shape->release();
+			/*gVehicle->mPhysXState.physxActor.rigidBody->detachShape(*shape);
+			shape->release();*/
 
-			dataSys->doit();
+			dataSys->getCamRotMat();
+
+			//dataSys->doit();
 			physx::PxShape* myShape = dataSys->gPhysics->createShape(physx::PxCapsuleGeometry(0.5, 0.8), *dataSys->gMaterial);
+			myShape->setLocalPose(PxTransform(PxVec3(0,5,0)));
 			gVehicle->mPhysXState.physxActor.rigidBody->attachShape(*myShape);
 
-			myShape->setSimulationFilterData(vehicleFilter);
-
-			myShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-			myShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-			myShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 		}
-		else {
+		shape->setSimulationFilterData(vehicleFilter);
 
-			shape->setSimulationFilterData(vehicleFilter);
-
-			shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-			shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-		}
+		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 	}
 
 	//Set the vehicle in 1st gear.
