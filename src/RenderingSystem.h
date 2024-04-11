@@ -67,7 +67,8 @@ public:
 
 	// variables
 	GLFWwindow* window;
-	int monitorWidth, monitorHeight;
+	GLFWmonitor* primaryMonitor;
+	int monitorWidth, monitorHeight, monitorRefresh;
 	unsigned int VAO, VBO, textVAO, textVBO, skyVAO, skyVBO, particlesVAO, particlesVBO;
 	Shader textShader;
 	Shader shader;
@@ -122,7 +123,7 @@ public:
 
 	// Convert ratios to pixel coordinates
 	std::pair<float, float> convertToPixels(float xRatio, float yRatio);
-
+	void toggleFullscreen(GLFWwindow* window);
 
 };
 

@@ -428,4 +428,5 @@ public:
 	// Camera
 	float cameraAngle = M_PI;
 	int useBirdsEyeView = 0;
+	int useWindowFullscreen = 0;
 };

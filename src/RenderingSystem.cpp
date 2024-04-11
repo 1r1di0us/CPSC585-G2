@@ -77,9 +77,10 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	
-	GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+	primaryMonitor = glfwGetPrimaryMonitor();
 	if (!primaryMonitor) {
 		// Handle error
 		glfwTerminate();
@@ -96,14 +97,15 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	// Extract width and height from the video mode
 	monitorWidth = mode->width;
 	monitorHeight = mode->height;
+	monitorRefresh = mode->refreshRate;
 
 	// windowed fullscreen, cuts off some of the text though
-	glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
-	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
+	//glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+	//window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
 
 	// fullscreen fullscreen
 	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", get, NULL);
-	//window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
+	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
 
 
 	if (window == NULL)
@@ -255,6 +257,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 	// input
 	processInput(window);
+	toggleFullscreen(window);
 
 	// render
 	// clear the colorbuffer and the depthbuffer
@@ -1019,4 +1022,21 @@ std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRa
 	float pixelX = xRatio * monitorWidth;
 	float pixelY = yRatio * monitorHeight;
 	return std::make_pair(pixelX, pixelY);
+}
+
+// Function to toggle fullscreen mode
+void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
+	if (dataSys->useWindowFullscreen) {
+		// Switch to windowed fullscreen mode
+		glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+		glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
+	}
+	else {
+		// Switch to regular fullscreen mode
+		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
+	}
+	// Adjust viewport to match window size
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
 }

@@ -107,6 +107,24 @@ void InputSystem::getKeyboardInput(GLFWwindow* window) {
 			}
 		}
 
+		if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) { //toggle birds eye view
+			if (dataSys->useWindowFullscreen == 0) {
+				dataSys->useWindowFullscreen = 1;
+			}
+			else if (dataSys->useWindowFullscreen == 2) {
+				dataSys->useWindowFullscreen = 3;
+			}
+		}
+		else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
+			if (dataSys->useWindowFullscreen == 1) {
+				dataSys->useWindowFullscreen = 2;
+			}
+			else if (dataSys->useWindowFullscreen == 3) {
+				dataSys->useWindowFullscreen = 0;
+			}
+		}
+
+
 		//prevx = xpos;
 		//prevy = ypos;
 		//glfwGetCursorPos(window, &xpos, &ypos);
