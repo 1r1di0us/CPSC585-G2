@@ -173,6 +173,8 @@ public:
 	/*
 	* CONSTANTS:
 	*/
+	int thing = 0;
+	void doit();
 
 	//debug mode
 	bool DEBUG_PRINTS = false;

@@ -39,23 +39,40 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	//TODO: look at shapes and adding to rigid dynamic list
 
 	//making all parts of the vehicle have collisions with the outside world
+
 	PxU32 shapes = gVehicle->mPhysXState.physxActor.rigidBody->getNbShapes();
 	for (PxU32 i = 0; i < shapes; i++) {
 		PxShape* shape = NULL;
-		//the body of the vehicle is at i = 0
 		
 		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
+
+		//the body of the vehicle is at i = 0
 		if (i == 0) {
-			//shape = dataSys->gPhysics->createShape(physx::PxCapsuleGeometry(0.5, 0.8), *dataSys->gMaterial);
-			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
-			shape->setGeometry(myChassis);
+			
+		//	PxCapsuleGeometry myChassis = PxCapsuleGeometry(0.5, 0.8);
+		//	PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
+		//	shape->setGeometry(myChassis);
+			gVehicle->mPhysXState.physxActor.rigidBody->detachShape(*shape);
+			shape->release();
+
+			dataSys->doit();
+			physx::PxShape* myShape = dataSys->gPhysics->createShape(physx::PxCapsuleGeometry(0.5, 0.8), *dataSys->gMaterial);
+			gVehicle->mPhysXState.physxActor.rigidBody->attachShape(*myShape);
+
+			myShape->setSimulationFilterData(vehicleFilter);
+
+			myShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+			myShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+			myShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 		}
+		else {
 
-		shape->setSimulationFilterData(vehicleFilter);
+			shape->setSimulationFilterData(vehicleFilter);
 
-		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+			shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+		}
 	}
 
 	//Set the vehicle in 1st gear.

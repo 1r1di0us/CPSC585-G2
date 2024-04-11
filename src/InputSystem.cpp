@@ -216,6 +216,15 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 	
 	PxVec3 intentDir = { 0, 0, 0 };
 	PxVec3 carDir = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
+
+	//flip car back over
+	PxTransform testTrans = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose();
+	PxVec3 upDir = testTrans.q.rotate(PxVec3(0, 1, 0));
+	if (upDir.y <= 0) {
+		PxVec3 oldPos = playerCar->mPhysXState.physxActor.rigidBody->getGlobalPose().p;
+		playerCar->mPhysXState.physxActor.rigidBody->setGlobalPose(PxTransform(PxVec3(oldPos.x, 10.f, oldPos.z)));
+	}
+
 	float carSpeed = playerCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().magnitude();
 	std::vector<int> checkvals = {0};
 	for (int i = 0; i < 16; i++) {
