@@ -883,10 +883,6 @@ void SharedDataSystem::resetSharedDataSystem() {
 	}
 }
 
-void SharedDataSystem::doit() {
-	thing += 5;
-}
-
 void SharedDataSystem::InitSharedDataSystem() {
 
 	//generate the map squares for both cars and powerups

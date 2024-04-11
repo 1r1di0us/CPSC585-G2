@@ -52,8 +52,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 		//	PxCapsuleGeometry myChassis = PxCapsuleGeometry(0.5, 0.8);
 		//	PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
 		//	shape->setGeometry(myChassis);
-			/*gVehicle->mPhysXState.physxActor.rigidBody->detachShape(*shape);
-			shape->release();*/
+			gVehicle->mPhysXState.physxActor.rigidBody->detachShape(*shape);
+			shape->release();
 
 			dataSys->getCamRotMat();
 
