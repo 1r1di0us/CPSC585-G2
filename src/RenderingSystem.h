@@ -67,6 +67,8 @@ public:
 
 	// variables
 	GLFWwindow* window;
+	GLFWmonitor* primaryMonitor;
+	int monitorWidth, monitorHeight, monitorRefresh;
 	unsigned int VAO, VBO, textVAO, textVBO, skyVAO, skyVBO, particlesVAO, particlesVBO;
 	Shader textShader;
 	Shader shader;
@@ -75,7 +77,13 @@ public:
 	std::map<char, Character> Characters_gaegu;
 	//OBJModel particleObj;
 	unsigned int cubemapTexture;
+	
+	// text positions
+	std::pair<float, float> timeTextPos, ammoTextPos, scoreTextPos, parryTextPos;
 
+
+
+	// functions
 	RenderingSystem(SharedDataSystem* dataSys);
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void processInput(GLFWwindow* window);
@@ -110,9 +118,16 @@ public:
 		menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
 		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
 		planeTexture, gunMetalTexture, parryTexture, ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, particleExplosionTexture, particleSmokeTexture;
+
+
+
+	// Convert ratios to pixel coordinates
+	std::pair<float, float> convertToPixels(float xRatio, float yRatio);
+	void toggleFullscreen(GLFWwindow* window);
+
 };
 
-void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
+//void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO);
 unsigned int loadCubemap(std::vector<std::string> faces);
 void renderDeathScreen(unsigned int* VAO);
 

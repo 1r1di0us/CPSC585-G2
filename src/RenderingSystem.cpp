@@ -77,8 +77,37 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
+	
+	primaryMonitor = glfwGetPrimaryMonitor();
+	if (!primaryMonitor) {
+		// Handle error
+		glfwTerminate();
+		return;
+	}
+
+	// Get the video mode of the primary monitor
+	const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+	if (!mode) {
+		glfwTerminate();
+		return;
+	}
+
+	// Extract width and height from the video mode
+	monitorWidth = mode->width;
+	monitorHeight = mode->height;
+	monitorRefresh = mode->refreshRate;
+
+	// windowed fullscreen, cuts off some of the text though
+	//glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+	//window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
+
+	// fullscreen fullscreen
+	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", get, NULL);
+	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
+
+
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -92,7 +121,24 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return;
 	}
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glViewport(0, 0, monitorWidth, monitorHeight);
+
+	// get all the relative text positions
+	//auto timePair = convertToPixels(0.0125f, 0.94f);
+	//timeTextPos.first = timePair.first;
+	//timeTextPos.second = timePair.second;
+
+	//auto ammoPair = convertToPixels(0.0125f, 0.04f);
+	//ammoTextPos.first = ammoPair.first;
+	//ammoTextPos.second = ammoPair.second;
+
+	//auto scorePair = convertToPixels(0.7625f, 0.94f);
+	//scoreTextPos.first = scorePair.first;
+	//scoreTextPos.second = scorePair.second;
+
+	//auto parryPair = convertToPixels(0.0125f, 0.08f);
+	//parryTextPos.first = parryPair.first;
+	//parryTextPos.second = parryPair.second;
 
 	stbi_set_flip_vertically_on_load(true); // to vertically flip the image
 
@@ -183,7 +229,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// text VAO VBO Initialization
 	textShader = Shader("src/shaders/vertex_shader_text.txt", "src/shaders/fragment_shader_text.txt");
-	glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
+	//glm::mat4 textProjection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
+	glm::mat4 textProjection = glm::ortho(0.0f, float(monitorWidth), 0.0f, float(monitorHeight));
 	textShader.use();
 	glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
@@ -193,8 +240,6 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	// loading skymap texture
 	cubemapTexture = loadCubemap(faces);
 
-    //this->particleObj = LoadModelFromPath("./assets/Models/cube.obj");
-    //initOBJVAO(particleObj, &particlesVAO, &particlesVBO);
     // Initialize particles VAO
     initParticlesVAO();
     // Load particle texture
@@ -212,6 +257,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 	// input
 	processInput(window);
+	toggleFullscreen(window);
 
 	// render
 	// clear the colorbuffer and the depthbuffer
@@ -240,24 +286,24 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			// Convert timeLeftInSeconds to string
 			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f/800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//ammo count
 			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f, 10.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f / 800.0f * monitorWidth, 30.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//scoreboard
 			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f, 570.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			std::string parry = "Parry Available";
 			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
-				RenderText(textShader, textVAO, textVBO, parry, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 			else
 			{
 				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f, 40.0f, 0.75f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
@@ -278,7 +324,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 				float yOffset = i * 30;
 				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-				RenderText(textShader, textVAO, textVBO, playerScore, 610.0f, 540.0f - yOffset, 0.75f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.0f, color, Characters_gaegu);
 			}
 
 			//displays active powerups (temp until VFX)
@@ -286,43 +332,44 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			//coordinate vars
 			//NEEDS TO EVENTUALLY BE BASED ON SCREEN SIZE
-			float x = 5.0f;
-			float y = 545.0f;
+			float x = 5.0f/800.0f * monitorWidth;
+			float y = 545.0f/600.0f * monitorHeight;
 
 			std::string message;
 			
 			//player has armour
 			if (dataSys->carInfoList[0].hasArmour) {
 				message = "ARMOUR ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 				
 			//player has projectile size powerup
 			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
 				message = "PROJECTILE SIZE INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
 			//player has projectile speed powerup
 			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
 				message = "PROJECTILE SPEED INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.35f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
 		}
 		else {
-
 			color = black;
 			// death text
 			textShader.use();
 			std::string deathText1 = "You died!";
 			std::string deathText2 = "Welcome to heaven!";
-			RenderText(textShader, textVAO, textVBO, deathText1, 310.0f, 500.0f, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 190.0f, 90.0f, 1.0f, color, Characters_gaegu);
-			// render the 2d screen if they are dead?
+			std::string deathTimer = "Respawn in: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].respawnTimeLeft));
+			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f/800.0f * monitorWidth, 500.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f/800.0f * monitorWidth, 90.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f/800.0f * monitorWidth, 50.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			
 		}
 
 		// activate shader
@@ -338,7 +385,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 		// this should be the camera matrix
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		//projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		
+		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 300.0f);
 
 		// getting the car position and rotation
 		glm::vec3 playerPos = dataSys->carInfoList[0].entity->transform->pos;
@@ -920,6 +969,7 @@ void RenderingSystem::initParticlesVAO() {
 
     glBindVertexArray(0); // Unbind VAO
 }
+
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -952,4 +1002,28 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+
+// Convert ratios to pixel coordinates
+std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRatio) {
+	float pixelX = xRatio * monitorWidth;
+	float pixelY = yRatio * monitorHeight;
+	return std::make_pair(pixelX, pixelY);
+}
+
+// Function to toggle fullscreen mode
+void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
+	if (dataSys->useWindowFullscreen) {
+		// Switch to windowed fullscreen mode
+		glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+		glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
+	}
+	else {
+		// Switch to regular fullscreen mode
+		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
+	}
+	// Adjust viewport to match window size
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
 }
