@@ -388,16 +388,14 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 			// Original view
-			glm::vec3 offsetFromPlayer;
-			if (dataSys->carInfoList[0].isAlive) {
-				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-			}
-			else {
+			glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+			bool collisionDetected = false;
+			if (!dataSys->carInfoList[0].isAlive) {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
 
-			std::cout << "before" << std::endl;
-			std::cout << "camera Pos: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+
 
 			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
 			{
@@ -405,14 +403,17 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				if (collision)
 				{
 					std::cout << "Is colliding with obstacle: " << collision << std::endl;
-
+					collisionDetected = true; // Set collision flag to true
+					break; // Exit loop early since collision detected
 				}
 			}
 
-			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+			// Update offset based on collision detection
+			if (collisionDetected) {
+				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f); // Adjusted offset
+			}
 
-			std::cout << "after" << std::endl;
-			std::cout << "camera Pos: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
