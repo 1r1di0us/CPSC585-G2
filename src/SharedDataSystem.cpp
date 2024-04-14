@@ -624,9 +624,8 @@ void SharedDataSystem::CarCarCollisionLogic(PxActor* car1, PxActor* car2) {
 	std::shared_ptr<Entity> car2Entity = GetEntityFromRigidDynamic((PxRigidDynamic*)car2);
 
 	if (DEBUG_PRINTS) printf("CarCarCollisionLogic after\n");
-	printf("Car collisions\n");
 
-	SoundsToPlay.push_back(std::make_pair(std::string("CarCrash"), getSoundRotMat() * car1Entity->collisionBox->getGlobalPose().p));
+	//SoundsToPlay.push_back(std::make_pair(std::string("CarCrash"), getSoundRotMat() * car1Entity->collisionBox->getGlobalPose().p));
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
