@@ -403,15 +403,18 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				if (collision)
 				{
 					std::cout << "Is colliding with obstacle: " << collision << std::endl;
-					collisionDetected = true; // Set collision flag to true
+					offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f); // Adjusted offset
+					
+					//collisionDetected = true; // Set collision flag to true
+
 					break; // Exit loop early since collision detected
 				}
 			}
 
 			// Update offset based on collision detection
-			if (collisionDetected) {
-				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f); // Adjusted offset
-			}
+			//if (collisionDetected) {
+			//	offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f); // Adjusted offset
+			//}
 
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 
