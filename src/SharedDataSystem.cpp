@@ -152,7 +152,7 @@ PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquar
 		bestSquare = &mapSquareList[0];
 
 		for (int i = 0; i < mapSquareList.size(); i++) {
-			if (mapSquareList[i].numPoints == minAcceptablePoints || mapSquareList[i].numPoints < bestSquare->numPoints) {
+			if (mapSquareList[i].numPoints <= minAcceptablePoints || mapSquareList[i].numPoints < bestSquare->numPoints) {
 				bestSquare = &mapSquareList[i];
 				if (bestSquare->numPoints == 0) {
 
