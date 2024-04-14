@@ -150,24 +150,53 @@ void PhysicsSystem::initVehicleSimContext() {
 //does all the logic for doing one step through every vehicle movement component
 void PhysicsSystem::stepAllVehicleMovementPhysics() {
 
+	//variable declaration
+	PxTransform carPos;
+	float tolerance = 0.2f;
+	PxVec3 upDir;
+	PxVec3 linVel;
+	PxVec3 forwardDir;
+	PxReal forwardSpeed;
+	PxU8 nbSubsteps;
+	PxShape* wheelShape = NULL;
+
 	//goes through each vehicles movement component and updates them one at a time
 	for (int i = 0; i < dataSys->gVehicleList.size(); i++) {
 
 		//simulate only if the vehicle is alive
 		if (dataSys->carInfoList[i].isAlive) {
 
+			//car transform to use multiple times
+			carPos = dataSys->carInfoList[i].entity->collisionBox->getGlobalPose();
+
+			//gets the up vector of the car
+			upDir = carPos.q.getBasisVector1();
+
+			//Apply substepping at low forward speed to improve simulation fidelity.
+			linVel = dataSys->carRigidDynamicList[i]->getLinearVelocity();
+			forwardDir = carPos.q.getBasisVector2();
+			forwardSpeed = linVel.dot(forwardDir);
+			nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
+
+			//if the car's up direction isnt pointing up
+			if (upDir.y < 1 - tolerance) {
+
+				//flip the car to be upright and drop it in from a small height
+				dataSys->carInfoList[i].entity->collisionBox->setGlobalPose(PxTransform(
+					PxVec3(carPos.p.x,
+						dataSys->CAR_SPAWN_HEIGHT,
+						carPos.p.z),
+
+					PxQuat(0.0f, forwardDir)
+				));
+
+			}
+
 			//update the forward direction of the wheels
-			PxShape* wheelShape = NULL;
 			dataSys->gVehicleList[i]->mPhysXState.physxActor.rigidBody->getShapes(&wheelShape, 1, 1);
 			dataSys->carInfoList[i].wheelForwardDir = wheelShape->getLocalPose().q.getBasisVector2();
 
 			//Forward integrate the vehicle by a single TIMESTEP.
-			//Apply substepping at low forward speed to improve simulation fidelity.
-			const PxVec3 linVel = dataSys->carRigidDynamicList[i]->getLinearVelocity();
-			const PxVec3 forwardDir = dataSys->carRigidDynamicList[i]->getGlobalPose().q.getBasisVector2();
-			const PxReal forwardSpeed = linVel.dot(forwardDir);
-			const PxU8 nbSubsteps = (forwardSpeed < 5.0f ? 3 : 1);
-
 			dataSys->gVehicleList[i]->mComponentSequence.setSubsteps(dataSys->gVehicleList[i]->mComponentSequenceSubstepGroupHandle, nbSubsteps);
 			dataSys->gVehicleList[i]->step(dataSys->TIMESTEP, this->gVehicleSimulationContext);
 		}
