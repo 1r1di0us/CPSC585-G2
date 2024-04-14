@@ -83,6 +83,12 @@ int main() {
     soundSys.AddToSoundDict("Heaven", "assets/Music/HeavenShort.wav");
     soundSys.LoadSound("assets/Music/ArmourDing.wav", false);
     soundSys.AddToSoundDict("Armour", "assets/Music/ArmourDing.wav");
+    soundSys.LoadSound("assets/Music/PowerUp.wav", false);
+    soundSys.AddToSoundDict("PowerUp", "assets/Music/PowerUp.wav");
+    soundSys.LoadSound("assets/Music/Reload.wav", false);
+    soundSys.AddToSoundDict("Reload", "assets/Music/Reload.wav");
+    soundSys.LoadSound("assets/Music/CarCrash.wav", false);
+    soundSys.AddToSoundDict("CarCrash", "assets/Music/CarCrash.wav");
 
     //initializing time variables
     startTime = std::chrono::high_resolution_clock::now();

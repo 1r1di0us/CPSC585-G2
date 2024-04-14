@@ -363,6 +363,7 @@ public:
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
+	void CarCarCollisionLogic(PxActor* car1, PxActor* car2);
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
 
 	//clean up any objects that could be collided with at the same time

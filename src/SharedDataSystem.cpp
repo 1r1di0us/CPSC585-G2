@@ -594,29 +594,48 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	case PowerupType::AMMO:
 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
+		SoundsToPlay.push_back(std::make_pair(std::string("Reload"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
 		break;
 	case PowerupType::ARMOUR:
 
 		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
+		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
 		break;
 	case PowerupType::PROJECTILESIZE:
 
 		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
+		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
 		break;
 	case PowerupType::PROJECTILESPEED:
 
 		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
 		break;
 	case PowerupType::CARSPEED:
 
+		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
 		break;
 	default:
 		printf("unknown powerup type\n");
 		break;
 	}
 
+
 	AddToCollatCache(powerupEntity);
 
+}
+
+void SharedDataSystem::CarCarCollisionLogic(PxActor* car1, PxActor* car2) {
+
+	if (DEBUG_PRINTS) printf("CarCarCollisionLogic before\n");
+
+	//converting the actors to entities
+	std::shared_ptr<Entity> car1Entity = GetEntityFromRigidDynamic((PxRigidDynamic*)car1);
+	std::shared_ptr<Entity> car2Entity = GetEntityFromRigidDynamic((PxRigidDynamic*)car2);
+
+	if (DEBUG_PRINTS) printf("CarCarCollisionLogic after\n");
+
+	//SoundsToPlay.push_back(std::make_pair(std::string("CarCrash"), getSoundRotMat() * car1Entity->collisionBox->getGlobalPose().p));
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
@@ -712,6 +731,9 @@ void SharedDataSystem::ResolveCollisions() {
 					break;
 				case PhysicsType::POWERUP:
 					CarPowerupCollisionLogic(actor1, actor2);
+					break;
+				case PhysicsType::CAR:
+					CarCarCollisionLogic(actor1, actor2);
 					break;
 				default:
 					break;
