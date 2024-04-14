@@ -139,7 +139,7 @@ int main() {
                 carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec2(19.0f, 21.0f), carRotateQuat);
+                carSys.SpawnNewCar(PxVec2(19.0f, 25.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
                 carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
