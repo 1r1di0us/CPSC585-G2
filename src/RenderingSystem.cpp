@@ -4,6 +4,7 @@
 //void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadCubemap(std::vector<std::string> faces);
+bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight);
 
 std::map<char, Character> Characters_gaegu;
 float skyboxVertices[] = {
@@ -77,7 +78,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
+	//glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	
 	primaryMonitor = glfwGetPrimaryMonitor();
@@ -105,7 +106,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// fullscreen fullscreen
 	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", get, NULL);
-	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
 
 
 	if (window == NULL)
@@ -121,24 +122,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return;
 	}
-	glViewport(0, 0, monitorWidth, monitorHeight);
-
-	// get all the relative text positions
-	//auto timePair = convertToPixels(0.0125f, 0.94f);
-	//timeTextPos.first = timePair.first;
-	//timeTextPos.second = timePair.second;
-
-	//auto ammoPair = convertToPixels(0.0125f, 0.04f);
-	//ammoTextPos.first = ammoPair.first;
-	//ammoTextPos.second = ammoPair.second;
-
-	//auto scorePair = convertToPixels(0.7625f, 0.94f);
-	//scoreTextPos.first = scorePair.first;
-	//scoreTextPos.second = scorePair.second;
-
-	//auto parryPair = convertToPixels(0.0125f, 0.08f);
-	//parryTextPos.first = parryPair.first;
-	//parryTextPos.second = parryPair.second;
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 	stbi_set_flip_vertically_on_load(true); // to vertically flip the image
 
@@ -411,10 +395,30 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			else {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
+
+			std::cout << "before" << std::endl;
+			std::cout << "camera Pos: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+
+			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
+			{
+				bool collision = checkCollision(camera.Position, dataSys->carInfoList[0].shootDir, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
+				if (collision)
+				{
+					std::cout << "Is colliding with obstacle: " << collision << std::endl;
+
+				}
+			}
+
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+
+			std::cout << "after" << std::endl;
+			std::cout << "camera Pos: " << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << std::endl;
+
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 		}
+
+
 
 		// rendering player car
 		shader.use();
@@ -463,22 +467,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			dataSys->carInfoList[0].shotBullet = false;
 		}
 
-		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);
-		//glm::vec3 frontLeft = glm::vec3(1.245f, 0.321f, 2.563f);
-		//glm::vec3 backRight = glm::vec3(-1.245f, 0.321f, 0.1f);
-		//glm::vec3 backLeft = glm::vec3(1.245f, 0.321f, 0.1f);
-
-		//glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::rotate(wheelModel, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
-		//wheelModel = glm::translate(wheelModel, backRight);
-		//shader.setMat4("model", wheelModel);
-		//tankWheel.Draw(shader);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::translate(wheelModel, backLeft);
-		//printf("wheel location: %f, %f, %f\n", dataSys->carInfoList[0].carWheelInfo.backRightPos.x, dataSys->carInfoList[0].carWheelInfo.backRightPos.y, dataSys->carInfoList[0].carWheelInfo.backRightPos.z);
-		//shader.setMat4("model", wheelModel);
-		//tankWheel.Draw(shader);
-
 		// tank head
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
 		glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
@@ -495,30 +483,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		shader.setMat4("model", tankHeadModel);
 		tankHead.Draw(shader);
-
-		//// front wheels
-		//glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.x,
-		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.y,
-		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.z));
-		// front wheels
-		//glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].wheelForwardDir.x, dataSys->carInfoList[0].wheelForwardDir.y, dataSys->carInfoList[0].wheelForwardDir.z));
-
-		//angle = atan2(wheelDir.x, wheelDir.z);
-		//glm::mat4 wheelModel = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-		//wheelModel = glm::translate(wheelModel, playerPos);
-		//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
-
-		//shader.setMat4("model", tankHeadModel);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//std::cout << dataSys->carInfoList[0].carWheelInfo.frontRightPos.x << std::endl;
-		//glm::vec3 wheelGlobal = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontRightPos.x, dataSys->carInfoList[0].carWheelInfo.frontRightPos.y, dataSys->carInfoList[0].carWheelInfo.frontRightPos.z));
-		//shader.setMat4("model", wheelModel);
-		////tankWheel.Draw(shader);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::translate(wheelModel, glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontLeftPos.x, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.y, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.z)));
-		//shader.setMat4("model", wheelModel);
-		////tankWheel.Draw(shader);
-
 
 		// if player is alive, draw the scene
 		if (dataSys->carInfoList[0].isAlive) {
@@ -826,47 +790,47 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 	glfwPollEvents();
 }
 
-void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
-	glGenVertexArrays(1, VAO);
-	glGenBuffers(1, VBO);
-
-	glBindVertexArray(*VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-
-	// Calculate total size needed for vertex attributes
-	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2) +
-		model.normals.size() * sizeof(glm::vec3);
-
-	// Allocate buffer memory
-	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
-
-	// Copy vertex data
-	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
-
-	// Copy texture coordinate data
-	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
-		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
-
-	// Copy normal data
-	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2),
-		model.normals.size() * sizeof(glm::vec3), model.normals.data());
-
-	// Vertex positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// Texture coordinates
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
-	glEnableVertexAttribArray(1);
-
-	// Normals
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2)));
-	glEnableVertexAttribArray(2);
-}
+//void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
+//	glGenVertexArrays(1, VAO);
+//	glGenBuffers(1, VBO);
+//
+//	glBindVertexArray(*VAO);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+//
+//	// Calculate total size needed for vertex attributes
+//	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
+//		model.textureCoordinates.size() * sizeof(glm::vec2) +
+//		model.normals.size() * sizeof(glm::vec3);
+//
+//	// Allocate buffer memory
+//	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
+//
+//	// Copy vertex data
+//	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
+//
+//	// Copy texture coordinate data
+//	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
+//		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
+//
+//	// Copy normal data
+//	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
+//		model.textureCoordinates.size() * sizeof(glm::vec2),
+//		model.normals.size() * sizeof(glm::vec3), model.normals.data());
+//
+//	// Vertex positions
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//	glEnableVertexAttribArray(0);
+//
+//	// Texture coordinates
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
+//	glEnableVertexAttribArray(1);
+//
+//	// Normals
+//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
+//		model.textureCoordinates.size() * sizeof(glm::vec2)));
+//	glEnableVertexAttribArray(2);
+//}
 
 
 void renderObject(const OBJModel& model, unsigned int* VAO) {
@@ -1012,18 +976,85 @@ std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRa
 }
 
 // Function to toggle fullscreen mode
+//void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
+//	if (dataSys->useWindowFullscreen) {
+//		// Switch to windowed fullscreen mode
+//		//glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
+//		//glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
+//		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
+//	}
+//	else {
+//		// Switch to regular fullscreen mode
+//		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, SCR_WIDTH, SCR_HEIGHT, monitorRefresh);
+//	}
+//	// Adjust viewport to match window size
+//	int width, height;
+//	glfwGetFramebufferSize(window, &width, &height);
+//	glViewport(0, 0, width, height);
+//}
+// Function to toggle fullscreen mode
+// Function to toggle fullscreen mode
 void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	if (dataSys->useWindowFullscreen) {
-		// Switch to windowed fullscreen mode
-		glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
-		glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
+		// Switch to fullscreen mode
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		if (mode != nullptr) {
+			glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+			// Adjust viewport to match window size
+			int width, height;
+			glfwGetFramebufferSize(window, &width, &height);
+			glViewport(0, 0, width, height);
+		}
 	}
 	else {
-		// Switch to regular fullscreen mode
-		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
+		// Switch to windowed mode with a size of 800 x 600
+		glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
+		glfwSetWindowMonitor(window, nullptr, 100, 100, SCR_WIDTH, SCR_HEIGHT, GLFW_DONT_CARE);
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	}
-	// Adjust viewport to match window size
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
+}
+
+
+//bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight) {
+//	glm::vec2 bottomLeftVec2(bottomLeft.x, bottomLeft.y);
+//	glm::vec2 topRightVec2(topRight.x, topRight.y);
+//	glm::vec2 shootDirVec2(shootDir.x, shootDir.z);
+//
+//	std::cout << "shootdirx: " << shootDir.x << "shootdirz" << shootDir.z << std::endl;
+//	glm::vec2 cameraPosVec2(cameraPos.x, cameraPos.z);
+//
+//	// Calculate intersection points with each side of the bounding box
+//	glm::vec2 tMin = (bottomLeftVec2 - cameraPosVec2) / shootDirVec2;
+//	glm::vec2 tMax = (topRightVec2 - cameraPosVec2) / shootDirVec2;
+//
+//	// Calculate minimum and maximum t-values for intersection
+//	glm::vec2 t1 = glm::min(tMin, tMax);
+//	glm::vec2 t2 = glm::max(tMin, tMax);
+//
+//	// Find the maximum of minimums and minimum of maximums
+//	float tEnter = glm::max(glm::max(t1.x, t1.y), 0.0f);
+//	float tExit = glm::min(glm::min(t2.x, t2.y), 1.0f);
+//
+//	// Check if ray intersects the bounding box
+//	return tEnter < tExit;
+//}
+
+bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight) {
+	// Ignore the y-coordinate of the camera position
+	glm::vec2 cameraPos2D(cameraPos.x, cameraPos.z);
+
+	// Debugging prints
+	//std::cout << "Camera Position: (" << cameraPos.x << ", " << cameraPos.z << ")" << std::endl;
+	//std::cout << "Bounding Box Bottom Left: (" << bottomLeft.x << ", " << bottomLeft.y << ")" << std::endl;
+	//std::cout << "Bounding Box Top Right: (" << topRight.x << ", " << topRight.y << ")" << std::endl;
+
+	// Check if camera position is within the bounding box
+	bool insideBox =
+		cameraPos2D.x >= bottomLeft.x && cameraPos2D.x <= topRight.x &&
+		cameraPos2D.y >= bottomLeft.y && cameraPos2D.y <= topRight.y;
+
+	// Debugging print for result
+	std::cout << "Inside Bounding Box: " << (insideBox ? "Yes" : "No") << std::endl;
+
+	return insideBox;
 }
