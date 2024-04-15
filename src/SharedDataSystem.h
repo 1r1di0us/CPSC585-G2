@@ -182,7 +182,7 @@ public:
 	const PxReal TIMESTEP = 1.0f / 60.0f;
 
 	//car respawn timer
-	const float CAR_RESPAWN_LENGTH = 5.0f;
+	const float CAR_RESPAWN_LENGTH = 4.0f;
 
 	//iframe duration
 	const float IFRAME_DURATION = 1.5f;
@@ -196,10 +196,10 @@ public:
 	const PxReal MAPLENGTHZ = TOP_RIGHT_MAP_COORD.y - BOTTOM_LEFT_MAP_COORD.y;
 
 	//the min distance cars can spawn from other cars
-	const PxReal CAR_MIN_SPAWN_DISTANCE = 15.0f;
+	const PxReal CAR_MIN_SPAWN_DISTANCE = 25.0f;
 
 	//the min spawn distance between powerups
-	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 10.0f;
+	const PxReal POWERUP_MIN_SPAWN_DISTANCE = 15.0f;
 
 	//the spawn height of cars
 	const PxReal CAR_SPAWN_HEIGHT = 0.5f;
@@ -212,10 +212,10 @@ public:
 	const PxReal STATIC_SPAWN_OFFSET = 3.0f;
 
 	//the spawn rate of a random powerup
-	const float RANDOM_POWERUP_SPAWN_RATE = 7.0f;
+	const float RANDOM_POWERUP_SPAWN_RATE = 9.0f;
 
 	//the spawn rate of an ammo spawn powerup
-	const float AMMO_POWERUP_SPAWN_RATE = 5.0f;
+	const float AMMO_POWERUP_SPAWN_RATE = 7.0f;
 
 	//the max number of ammo spawn powerups
 	const int NUMBER_OF_AMMO_POWERUPS = 3;
@@ -230,7 +230,7 @@ public:
 	const float PARRY_COOLDOWN_TIME_LEFT = 5.0f;
 
 	//how long can you parry for
-	const float PARRY_ACTIVE_DURATION = 1.0f;
+	const float PARRY_ACTIVE_DURATION = 1.2f;
 
 	//force at which to shoot the projectile
 	const float SHOOT_FORCE = 100;
