@@ -908,11 +908,11 @@ float SharedDataSystem::CalculateShootingOffset(float shootAngle) {
 	}
 	//front
 	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-		offsetMultiplier = 5.2;
+		offsetMultiplier = 3;
 	}
 	//back
 	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 3;
+		offsetMultiplier = 3.5;
 	}
 	//other
 	else {
