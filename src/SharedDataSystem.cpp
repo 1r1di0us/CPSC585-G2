@@ -634,7 +634,11 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	case PowerupType::PROJECTILESIZE:
 
-		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
+		//updating car info vars
+		CarInfo* carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
+		carInfo->ammoCount++;
+
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
 				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
@@ -643,7 +647,11 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		break;
 	case PowerupType::PROJECTILESPEED:
 
-		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		//updating car info vars
+		CarInfo* carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		carInfo->ammoCount++;
+
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
 				getSoundRotMat(0.0)* carEntity->collisionBox->getGlobalPose().p,
@@ -651,6 +659,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 			});
 		break;
 	case PowerupType::CARSPEED:
+		//NOT IMPLEMENTED
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
 				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
