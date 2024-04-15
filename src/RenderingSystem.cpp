@@ -932,7 +932,7 @@ void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	else {
 		// Switch to windowed mode with a size of 800 x 600
 		glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
-		glfwSetWindowMonitor(window, nullptr, 100, 100, SCR_WIDTH, SCR_HEIGHT, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(window, NULL, 0, 20, SCR_WIDTH, SCR_HEIGHT, GLFW_DONT_CARE);
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	}
 }
