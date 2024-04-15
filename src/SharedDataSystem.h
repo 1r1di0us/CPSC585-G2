@@ -242,7 +242,7 @@ public:
 	const float SHOOT_FORCE = 100;
 
 	//the projectile radius
-	const PxReal DEFAULT_PROJECTILE_RADIUS = 1.0f;
+	const PxReal DEFAULT_PROJECTILE_RADIUS = 0.7f;
 
 	//the length of the projectile size powerup
 	const float PROJECTILE_SIZE_POWERUP_DURATION = 4.0f;

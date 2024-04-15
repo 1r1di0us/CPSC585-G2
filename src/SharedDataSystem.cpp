@@ -612,6 +612,9 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	if (carEntity->name != carInfoList[0].entity->name) {
 		soundVol = -20.0;
 	}
+
+	CarInfo* carInfo;
+
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
 	case PowerupType::AMMO:
@@ -635,7 +638,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	case PowerupType::PROJECTILESIZE:
 
 		//updating car info vars
-		CarInfo* carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo = GetCarInfoStructFromEntity(carEntity);
 		carInfo->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
 		carInfo->ammoCount++;
 
@@ -648,7 +651,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	case PowerupType::PROJECTILESPEED:
 
 		//updating car info vars
-		CarInfo* carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo = GetCarInfoStructFromEntity(carEntity);
 		carInfo->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
 		carInfo->ammoCount++;
 
