@@ -381,71 +381,9 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 				}
 			}
 		}
-		/*if (angle > 3 * M_PI / 4 || angle < -3 * M_PI / 4) {
-				PxVec3 myDir = -carDir * 10;
-				myDir.y = 0;
-				dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
-				playerCar->mTransmissionCommandState.targetGear = 0;
-				playerCar->mCommandState.steer = -angle;
-				backwards = true;
-		}
-		else if (angle <= 1 && angle >= -1) {
-			playerCar->mCommandState.steer = -angle;
-			playerCar->mCommandState.throttle = 1;
-			playerCar->mCommandState.nbBrakes = 0;
-			playerCar->mCommandState.brakes[0] = 0;
-		}
-		else if (angle < -1) {
-			playerCar->mCommandState.steer = 1;
-			if (carSpeed > 15.0) {
-				playerCar->mCommandState.throttle = 0;
-				playerCar->mCommandState.nbBrakes = 1;
-				playerCar->mCommandState.brakes[0] = 1;
-			}
-			else {
-				playerCar->mCommandState.throttle = 1;
-				playerCar->mCommandState.nbBrakes = 0;
-				playerCar->mCommandState.brakes[0] = 0;
-			}
-		}
-		else if (angle > 1) {
-			playerCar->mCommandState.steer = -1;
-			if (carSpeed > 15.0) {
-				playerCar->mCommandState.throttle = 0;
-				playerCar->mCommandState.nbBrakes = 1;
-				playerCar->mCommandState.brakes[0] = 1;
-			}
-			else {
-				playerCar->mCommandState.throttle = 1;
-				playerCar->mCommandState.nbBrakes = 0;
-				playerCar->mCommandState.brakes[0] = 0;
-			}
-		}
-		if (angle > -1 * M_PI / 4 && angle < 1 * M_PI / 4) {
-			backwards = false;
-		}*/
 	}
 
 	//reverse overrides all
-	/*if (rev) {
-		if (backwards == false && playerCar->mTransmissionCommandState.targetGear == 2) {
-			PxVec3 myDir = -carDir * 10;
-			myDir.y = 0;
-			dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
-			playerCar->mTransmissionCommandState.targetGear = 0;
-		}
-		if (backwards == true && playerCar->mTransmissionCommandState.targetGear == 0) {
-			PxVec3 myDir = carDir * 10;
-			myDir.y = 0;
-			dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
-			playerCar->mTransmissionCommandState.targetGear = 2;
-		}
-		playerCar->mCommandState.steer = 0;
-		playerCar->mCommandState.throttle = 1;
-		playerCar->mCommandState.nbBrakes = 0;
-		playerCar->mCommandState.brakes[0] = 0;
-	}
-	else {*/
 	if (playerCar->mTransmissionCommandState.targetGear == 0 && backwards == false) {
 		PxVec3 myDir = carDir * 10;
 		myDir.y = 0;
@@ -458,8 +396,6 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		dataSys->GetRigidDynamicFromVehicle(playerCar)->setLinearVelocity(myDir);
 		playerCar->mTransmissionCommandState.targetGear = 0;
 	}
-	printf("speed: %f\n", playerCar->mPhysXState.physxActor.rigidBody->getLinearVelocity().normalize());
-	//}
 
 	//camera shenanigans	
 	if (cl && !cr) {
