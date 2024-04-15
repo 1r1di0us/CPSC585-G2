@@ -251,7 +251,7 @@ public:
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
 
 	//the min distance the camera will start to activate anti clip measures
-	const float CAMERA_CLIP_DISTANCE = 5.0f;
+	const float CAMERA_CLIP_DISTANCE = 2.0f;
 
 	//the GOAT list of entities
 	std::vector<Entity> entityList;

@@ -392,6 +392,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			if (!dataSys->carInfoList[0].isAlive) {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
+			else {
+				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+			}
 
 			//checks each obstacle and map for clipping
 			float distance = CamDistanceFromNearestClipSurface(camera.Position);
