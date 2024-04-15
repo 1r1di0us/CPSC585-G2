@@ -278,16 +278,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			//scoreboard
 			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			std::string parry = "Parry Available";
 			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
 				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-			}
-			else
-			{
-				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
@@ -308,7 +303,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 				float yOffset = i * 30;
 				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.0f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.25f, color, Characters_gaegu);
 			}
 
 			//displays active powerups (temp until VFX)
@@ -324,21 +319,21 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			//player has armour
 			if (dataSys->carInfoList[0].hasArmour) {
 				message = "ARMOUR ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 				
 			//player has projectile size powerup
 			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
 				message = "PROJECTILE SIZE INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
 			//player has projectile speed powerup
 			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
 				message = "PROJECTILE SPEED INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
