@@ -636,25 +636,28 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 
 
-		//hudShader.use();
-		//hudShader.setInt("texture1", 0);
-		//glDisable(GL_DEPTH_TEST);
-		//projection = glm::mat4(1.0f);
-		//projection = glm::ortho(0.0f, float(SCR_WIDTH), 0.0f, float(SCR_HEIGHT), -1.0f, 1.0f);
-		//view = glm::mat4(1.0f);
+		hudShader.use();
+		hudShader.setInt("texture1", 0);
+		glDisable(GL_DEPTH_TEST);
+		projection = glm::mat4(1.0f);
+		projection = glm::ortho(0.0f, float(SCR_WIDTH), 0.0f, float(SCR_HEIGHT), -1.0f, 1.0f);
+		view = glm::mat4(1.0f);
 		//hudShader.setMat4("projection", projection);
 		//hudShader.setMat4("view", view);
-		//glBindVertexArray(transparentVAO);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, hud);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, hud);
+
+		glBindVertexArray(transparentVAO);
+
 		//model = glm::mat4(1.0f);
 		//hudShader.setMat4("model", model);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		//glEnable(GL_DEPTH_TEST);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glEnable(GL_DEPTH_TEST);
 
-		//projection = glm::mat4(1.0f);
-		//projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 300.0f);
-		//shader.setMat4("projection", projection);
+		projection = glm::mat4(1.0f);
+		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 300.0f);
+		shader.setMat4("projection", projection);
 
 		// text only if the player is alive
 		if (dataSys->carInfoList[0].isAlive) {
