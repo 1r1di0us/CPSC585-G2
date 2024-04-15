@@ -426,6 +426,7 @@ public:
 	float SfxVolume = -20.0;
 
 	// Camera
+	//float cameraAngle = M_PI * 2; This also fixes the starting camera position
 	float cameraAngle = M_PI;
 	int useBirdsEyeView = 0;
 };

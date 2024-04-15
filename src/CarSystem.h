@@ -23,6 +23,10 @@ struct Command
 	PxF32 steer;
 	PxU32 gear;
 	PxF32 duration;
+	PxF32 brake0;			//Tanks have two brake controllers:
+	PxF32 brake1;			//  one brake controller for the left track and one for the right track.
+	PxF32 thrust0;			//Tanks have two thrust controllers that divert engine torque to the left and right tracks:
+	PxF32 thrust1;			//  one thrust controller for the left track and one for the right track.
 };
 
 class CarSystem {
