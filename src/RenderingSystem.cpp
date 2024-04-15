@@ -659,11 +659,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		if (dataSys->carInfoList[0].isAlive) {
 
 			// Convert timeLeftInSeconds to string
-			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
+			std::string timeLeftStr = std::to_string(timeLeftInSeconds);
 			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//ammo count
-			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
+			std::string ammoCount = std::to_string(dataSys->carInfoList[0].ammoCount);
 			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f / 800.0f * monitorWidth, 30.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			//scoreboard
@@ -740,9 +740,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			std::string deathText1 = "You died!";
 			std::string deathText2 = "Welcome to heaven!";
 			std::string deathTimer = "Respawn in: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].respawnTimeLeft));
-			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f / 800.0f * monitorWidth, 500.0f / 600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f / 800.0f * monitorWidth, 90.0f / 600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f / 800.0f * monitorWidth, 50.0f / 600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f / 800.0f * monitorWidth, 500.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f / 800.0f * monitorWidth, 90.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f / 800.0f * monitorWidth, 50.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
 
 		}
 
