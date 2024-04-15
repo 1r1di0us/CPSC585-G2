@@ -47,6 +47,8 @@ private:
 
 	bool backwards = false;
 
+	float turnSpeed = 1.5;
+
 	//mouse related things
 	//bool initMouse = false;
 	//double xpos, ypos, prevx, prevy, initx, inity;

@@ -417,10 +417,10 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 
 	//camera shenanigans	
 	if (cl && !cr) {
-		dataSys->cameraAngle += 1.5 * deltaTime.count();
+		dataSys->cameraAngle += turnSpeed * deltaTime.count();
 	}
 	else if (cr && !cl) {
-		dataSys->cameraAngle -= 1.5 * deltaTime.count();
+		dataSys->cameraAngle -= turnSpeed * deltaTime.count();
 	}
 
 
