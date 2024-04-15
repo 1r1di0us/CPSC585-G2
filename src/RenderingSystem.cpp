@@ -413,7 +413,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			//glm::vec3 targetOffset = offsetFromPlayer;
 
 			if (collisionDetected) {
-				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 7.0f);
+				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
 				//offsetFromPlayer = glm::mix(glm::vec3(0.0f, 8.0f, 20.0f), glm::vec3(0.0f, 2.0f, 5.0f), transitionSpeed);
 				//targetOffset = glm::vec3(0.0f, 5.0f, 5.0f);
 			}
@@ -514,7 +514,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					projectile.Draw(shader);
 
 				}
-
 			}
 
 			//rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0) (BW added +1, caused rendering issues)
@@ -567,10 +566,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
 						shader.setMat4("model", model);
 						tankBody.Draw(shader);
-						//tankWheel.Draw(shader);
-						//tankWheel.Draw(shader);
-
-						//NOTE: does car have shields?
 
 						// tank head
 						glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -588,18 +583,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
 						tankHead.Draw(shader);
-
-						// front wheels
-						glm::mat4 tankWheelRight = glm::mat4(1.0f);
-						glm::mat4 tankWheelLeft = glm::mat4(1.0f);
-						glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->wheelForwardDir.y, carInfo->wheelForwardDir.z));
-						angle = atan2(wheelDir.x, wheelDir.z);
-						glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), dataSys->entityList[i].transform->getPos());
-						//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
-						wheelModel = glm::rotate(wheelModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-						shader.setMat4("model", tankHeadModel);
-						//tankWheel.Draw(shader);
-						//tankWheel.Draw(shader);
 
 						// Render smoke
 						if (carInfo->shotBullet) {
