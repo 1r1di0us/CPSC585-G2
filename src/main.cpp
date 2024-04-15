@@ -66,7 +66,7 @@ int main() {
     std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
 
     //y axis rotation in radians
-    float angle = PxTwoPi;
+    float angle = PxPi;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
 
     //fake constructor (real one didnt like me)
