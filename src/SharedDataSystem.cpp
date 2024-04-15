@@ -978,10 +978,6 @@ PxMat33 SharedDataSystem::getRotMatPx(float angle) {
 	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
 }
 
-PxMat33 SharedDataSystem::getSoundRotMat() {
-	return getSoundRotMat((float)M_PI);
-}
-
 PxMat33 SharedDataSystem::getSoundRotMat(float angle_change) {
 	return PxMat33({ cos(angle_change - cameraAngle), 0, sin(angle_change - cameraAngle) }, { 0, 1, 0 }, { -sin(angle_change - cameraAngle), 0, -cos(angle_change - cameraAngle) });
 }
