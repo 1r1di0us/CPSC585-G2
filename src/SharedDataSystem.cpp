@@ -297,6 +297,16 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 	return deadCarVec;
 }
 
+PxVec3 SharedDataSystem::TurretOffsetVector(CarInfo* carInfo) {
+
+	PxVec3 tankHeadOffset = PxVec3(0);
+	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+	tankHeadOffset *= 1.7;
+
+	return tankHeadOffset;
+}
+
 PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
 
 	//has some code re-use for easy function usage
@@ -502,12 +512,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//changing projectile spawn
 		PxVec3 shootingPosition = shotCarEntity->collisionBox->getGlobalPose().p;
 
-		//fuck this code
-		PxVec3 tankHeadOffset = PxVec3(0);
-		tankHeadOffset.x = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-		tankHeadOffset.z = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-		tankHeadOffset *= 1.3;
-		shootingPosition += tankHeadOffset;
+		shootingPosition += TurretOffsetVector(shotCarInfo);
 
 		//send the projectile back the way it came
 			//doing the offset based on the same math as the shooting math
@@ -619,7 +624,6 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		printf("unknown powerup type\n");
 		break;
 	}
-
 
 	AddToCollatCache(powerupEntity);
 
@@ -903,6 +907,11 @@ void SharedDataSystem::resetSharedDataSystem() {
 
 		entityList.emplace_back(STATIC_OBJECT_LIST[i]);
 	}
+}
+
+glm::vec3 SharedDataSystem::ConvertPXVec3ToGLM(PxVec3 vec3) {
+	
+	return glm::vec3(vec3.x, vec3.y, vec3.z);
 }
 
 void SharedDataSystem::InitSharedDataSystem() {

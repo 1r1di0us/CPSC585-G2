@@ -177,12 +177,8 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	//changing projectile spawn
 	PxVec3 shootingPosition = shootingCar->getGlobalPose().p;
 
-	//fuck this code
-	PxVec3 tankHeadOffset = PxVec3(0);
-	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-	tankHeadOffset *= 1.3;
-	shootingPosition += tankHeadOffset;
+	//offsets the shooting position by the turret location
+	shootingPosition += dataSys->TurretOffsetVector(carInfo);
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile

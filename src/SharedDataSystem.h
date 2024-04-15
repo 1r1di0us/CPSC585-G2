@@ -250,9 +250,6 @@ public:
 	//the magnitude of the projectile speed multiplier
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
 
-	//adding a map entity that persists through games
-	Entity MAP;
-
 	//the GOAT list of entities
 	std::vector<Entity> entityList;
 
@@ -296,6 +293,9 @@ public:
 
 	//gets the list of dead cars to do shit to
 	std::vector<CarInfo*> GetListOfDeadCars();
+
+	//calculates the tank head offset
+	PxVec3 TurretOffsetVector(CarInfo* carInfo);
 
 	/*
 	* RESPAWN
@@ -387,6 +387,9 @@ public:
 	/*
 	* GENERAL
 	*/
+
+	//converts a PxVec3 to a glm vec3
+	glm::vec3 ConvertPXVec3ToGLM(PxVec3 vec3);
 
 	//fake constructor cause i couldnt get the real one to work
 	void InitSharedDataSystem();
