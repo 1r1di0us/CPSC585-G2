@@ -391,6 +391,9 @@ public:
 	//converts a PxVec3 to a glm vec3
 	glm::vec3 ConvertPXVec3ToGLM(PxVec3 vec3);
 
+	//calculates the shooting offset based on car size
+	float CalculateShootingOffset(float shootAngle);
+
 	//fake constructor cause i couldnt get the real one to work
 	void InitSharedDataSystem();
 

@@ -488,26 +488,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		float shootAngle = atan2(dot, det);
 
 		//offset to be determined based on shoot angle
-		float offsetMultiplier;
-
-		//45 deg range with left and right in center
-		if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
-			(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
-			(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
-			offsetMultiplier = 3.5;
-		}
-		//front
-		else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-			offsetMultiplier = 6.2;
-		}
-		//back
-		else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-			offsetMultiplier = 4;
-		}
-		//other
-		else {
-			offsetMultiplier = 4.5;
-		}
+		float offsetMultiplier = CalculateShootingOffset(shootAngle);
 
 		//changing projectile spawn
 		PxVec3 shootingPosition = shotCarEntity->collisionBox->getGlobalPose().p;
@@ -912,6 +893,33 @@ void SharedDataSystem::resetSharedDataSystem() {
 glm::vec3 SharedDataSystem::ConvertPXVec3ToGLM(PxVec3 vec3) {
 	
 	return glm::vec3(vec3.x, vec3.y, vec3.z);
+}
+
+float SharedDataSystem::CalculateShootingOffset(float shootAngle) {
+
+	//offset to be determined based on shoot angle
+	float offsetMultiplier;
+	
+	//45 deg range with left and right in center
+	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
+		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
+		(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
+		offsetMultiplier = 2.5;
+	}
+	//front
+	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
+		offsetMultiplier = 5.2;
+	}
+	//back
+	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
+		offsetMultiplier = 3;
+	}
+	//other
+	else {
+		offsetMultiplier = 3.5;
+	}
+
+	return offsetMultiplier;
 }
 
 void SharedDataSystem::InitSharedDataSystem() {
