@@ -402,10 +402,16 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			
 			//if the camera is clipping
 			if (distance < dataSys->CAMERA_CLIP_DISTANCE) {
-
+				//alpha * currentCamPos + (1 - alpha) * lookAtPoint
+				//glm::vec3 camB4Clip = camera.Position;
+				//glm::vec3 camAfterClip = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+				//for (float interpolateRate = 0.f; interpolateRate < 1.f; interpolateRate += 0.1f)
+				//{
+				//	camera.Position = interpolateRate * camB4Clip + (1 - interpolateRate) * camAfterClip;
+				//}
 				camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+
 			}
-			
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 		}
