@@ -4,7 +4,8 @@
 //void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadCubemap(std::vector<std::string> faces);
-bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight);
+bool checkCollision(glm::vec3 cameraPos, PxVec2 bottomLeft, PxVec2 topRight); 
+bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 map);
 
 std::map<char, Character> Characters_gaegu;
 float skyboxVertices[] = {
@@ -398,25 +399,36 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
 			{
-				bool collision = checkCollision(camera.Position, dataSys->carInfoList[0].shootDir, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
+				bool collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
 				if (collision)
 				{
 					//std::cout << "Is colliding with obstacle: " << collision << std::endl;
 					//offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f); // Adjusted offset
-					collisionDetected = true;
+					//collisionDetected = true;
+					offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
 					break; // Exit loop early since collision detected
 				}
-			}
 
+			}
+			auto something = dataSys->entityList[0].collisionBox;
+
+			auto pp = something->getWorldBounds().getDimensions();
+
+			bool mapCollision = checkCollisionMap(camera.Position, pp);
+			
+			if(mapCollision) {
+				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
+			}
+			
 			//const float transitionSpeed = 0.1f; // Adjust the speed of transition
 
-			//glm::vec3 targetOffset = offsetFromPlayer;
+			//glm::vec3 targetOffset = glm::vec3(0.0f, 2.0f, 5.0f);
 
-			if (collisionDetected) {
-				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
-				//offsetFromPlayer = glm::mix(glm::vec3(0.0f, 8.0f, 20.0f), glm::vec3(0.0f, 2.0f, 5.0f), transitionSpeed);
-				//targetOffset = glm::vec3(0.0f, 5.0f, 5.0f);
-			}
+			//if (collisionDetected) {
+			//	offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
+			//	//offsetFromPlayer = glm::mix(offsetFromPlayer, targetOffset, transitionSpeed);
+			//	//targetOffset = glm::vec3(0.0f, 5.0f, 5.0f);
+			//}
 
 			//offsetFromPlayer = glm::mix(offsetFromPlayer, targetOffset, transitionSpeed);
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
@@ -424,7 +436,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 		}
-
 
 
 		// rendering player car
@@ -760,7 +771,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP5, 0);
 				}
 			}
-
 		}
 		else if (dataSys->inGameMenu) {
 			if (dataSys->ingameOptionIndex == 0) {
@@ -943,9 +953,10 @@ void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	}
 }
 
-bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight) {
-	// Ignore the y-coordinate of the camera position
-	glm::vec2 cameraPos2D(cameraPos.x, cameraPos.z);
+bool checkCollision(glm::vec3 cameraPos, PxVec2 bottomLeft, PxVec2 topRight) {
+	glm::vec3 bottomLeftVec3 = glm::vec3(bottomLeft.x, 8.0f, bottomLeft.y);
+	glm::vec3 topRightVec3 = glm::vec3(topRight.x, 8.0f, topRight.y);
+	//glm::vec3 shootDirVec3 = glm::vec3(shootDir.x, shootDir.y, shootDir.z);
 
 	// Debugging prints
 	//std::cout << "Camera Position: (" << cameraPos.x << ", " << cameraPos.z << ")" << std::endl;
@@ -954,11 +965,30 @@ bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxV
 
 	// Check if camera position is within the bounding box
 	bool insideBox =
-		cameraPos2D.x >= bottomLeft.x && cameraPos2D.x <= topRight.x &&
-		cameraPos2D.y >= bottomLeft.y && cameraPos2D.y <= topRight.y;
+	cameraPos.x >= bottomLeftVec3.x && cameraPos.x <= topRightVec3.x &&
+	//cameraPos.y >= bottomLeftVec3.y && cameraPos.y <= topRightVec3.y &&
+	cameraPos.z >= bottomLeftVec3.z && cameraPos.z <= topRightVec3.z;
 
 	// Debugging print for result
 	//std::cout << "Inside Bounding Box: " << (insideBox ? "Yes" : "No") << std::endl;
 
 	return insideBox;
+}
+
+bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 mapDimensions) {
+	int width = mapDimensions.x / 2;
+	int depth = mapDimensions.z / 2;
+
+	// Define the dimensions of the box and the buffer
+	float boxWidth = width;
+	float boxDepth = depth;
+	float buffer = 10.0f; // Buffer size
+
+	// Check if the camera position satisfies the specified conditions
+	bool betweenBoxes =
+		(cameraPos.x < -boxWidth + buffer || cameraPos.x > boxWidth - buffer) || // Camera position is outside the box in the x-direction within the buffer
+		(cameraPos.z < -boxDepth + buffer || cameraPos.z > boxDepth - buffer);    // Camera position is outside the box in the z-direction within the buffer
+
+
+	return betweenBoxes;
 }
