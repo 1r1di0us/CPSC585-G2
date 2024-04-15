@@ -389,8 +389,8 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 			// Original view
-			glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-			bool collisionDetected = false;
+			bool collision;
+
 			if (!dataSys->carInfoList[0].isAlive) {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
@@ -399,44 +399,24 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
 			{
-				bool collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
+				collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
 				if (collision)
 				{
-					//std::cout << "Is colliding with obstacle: " << collision << std::endl;
-					//offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f); // Adjusted offset
-					//collisionDetected = true;
-					offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
 					break; // Exit loop early since collision detected
 				}
-
 			}
+
 			auto something = dataSys->entityList[0].collisionBox;
-
-			auto pp = something->getWorldBounds().getDimensions();
-
-			bool mapCollision = checkCollisionMap(camera.Position, pp);
+			auto map = something->getWorldBounds().getDimensions();
+			bool mapCollision = checkCollisionMap(camera.Position, map);
 			
-			if(mapCollision) {
-				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
+			if(mapCollision || collision) {
+				camera.Position = playerPos + dataSys->getCamRotMat() * clipOffset; //we rotate camera with getCamRotMat
 			}
 			
-			//const float transitionSpeed = 0.1f; // Adjust the speed of transition
-
-			//glm::vec3 targetOffset = glm::vec3(0.0f, 2.0f, 5.0f);
-
-			//if (collisionDetected) {
-			//	offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f);
-			//	//offsetFromPlayer = glm::mix(offsetFromPlayer, targetOffset, transitionSpeed);
-			//	//targetOffset = glm::vec3(0.0f, 5.0f, 5.0f);
-			//}
-
-			//offsetFromPlayer = glm::mix(offsetFromPlayer, targetOffset, transitionSpeed);
-			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
-
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 		}
-
 
 		// rendering player car
 		shader.use();
@@ -988,7 +968,6 @@ bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 mapDimensions) {
 	bool betweenBoxes =
 		(cameraPos.x < -boxWidth + buffer || cameraPos.x > boxWidth - buffer) || // Camera position is outside the box in the x-direction within the buffer
 		(cameraPos.z < -boxDepth + buffer || cameraPos.z > boxDepth - buffer);    // Camera position is outside the box in the z-direction within the buffer
-
 
 	return betweenBoxes;
 }

@@ -78,9 +78,9 @@ public:
 	//OBJModel particleObj;
 	unsigned int cubemapTexture;
 	
-	// text positions
-	std::pair<float, float> timeTextPos, ammoTextPos, scoreTextPos, parryTextPos;
-
+	// camera offsets
+	glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+	glm::vec3 clipOffset = glm::vec3(0.0f, 2.0f, 3.0f);
 
 
 	// functions
