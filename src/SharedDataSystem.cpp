@@ -163,6 +163,7 @@ PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquar
 					spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
 					spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
 					foundPoint = true;
+					break;
 				}
 			}
 		}

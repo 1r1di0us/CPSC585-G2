@@ -145,13 +145,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec2(19.0f, 25.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
                 aiSys1 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox)); //call the constructors
                 aiSys2 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox));
                 aiSys3 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox));
