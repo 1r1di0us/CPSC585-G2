@@ -22,8 +22,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 std::vector<PxContactPairHeader> SharedDataSystem::contactPairs;
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 //system creation and other important variables
 SharedDataSystem dataSys;
@@ -40,7 +40,7 @@ AiSystem aiSys3;
 AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 50.0f;
+const double TIMELIMIT = 100.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -53,6 +53,8 @@ std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 std::chrono::high_resolution_clock::time_point paused;
+const double RESULTS_BUFFER = 2.0f;
+std::chrono::duration<double> resultsLockLeft = std::chrono::duration<double>(RESULTS_BUFFER);
 
 std::string menuMusic = "assets/Music/Cianwood City Remix.wav";
 std::string gameMusic = "assets/Music/Miror B Remix.wav";
@@ -62,11 +64,17 @@ int gameMusicChannelId;
 
 int main() {
 
+    //initializing time variables
+    startTime = std::chrono::high_resolution_clock::now();
+    currentTime = startTime;
+    lastTime = std::chrono::high_resolution_clock::now();
+    previousIterationTime = lastTime;
+
     //seeding the random number gen to be used throughout the game
-    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
+    std::srand(static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count()));
 
     //y axis rotation in radians
-    float angle = PxTwoPi;
+    float angle = PxPi;
     PxQuat carRotateQuat(angle, PxVec3(0.0f, 1.0f, 0.0f));
 
     //fake constructor (real one didnt like me)
@@ -83,12 +91,12 @@ int main() {
     soundSys.AddToSoundDict("Heaven", "assets/Music/HeavenShort.wav");
     soundSys.LoadSound("assets/Music/ArmourDing.wav", false);
     soundSys.AddToSoundDict("Armour", "assets/Music/ArmourDing.wav");
-
-    //initializing time variables
-    startTime = std::chrono::high_resolution_clock::now();
-    currentTime = startTime;
-    lastTime = std::chrono::high_resolution_clock::now();
-    previousIterationTime = lastTime;
+    soundSys.LoadSound("assets/Music/PowerUp.wav", false);
+    soundSys.AddToSoundDict("PowerUp", "assets/Music/PowerUp.wav");
+    soundSys.LoadSound("assets/Music/Reload.wav", false);
+    soundSys.AddToSoundDict("Reload", "assets/Music/Reload.wav");
+    soundSys.LoadSound("assets/Music/CarCrash.wav", false);
+    soundSys.AddToSoundDict("CarCrash", "assets/Music/CarCrash.wav");
 
     GLFWwindow* window;
     window = renderingSystem.getWindow();
@@ -111,6 +119,7 @@ int main() {
             inputSys.InputToMenu();
             lastTime = std::chrono::high_resolution_clock::now();
             totalTimeLeft = std::chrono::duration<double>(TIMELIMIT);
+            resultsLockLeft = std::chrono::duration<double>(RESULTS_BUFFER);
             previousIterationTime = lastTime;
             
             if (dataSys.resultsMusicPlaying) {
@@ -136,13 +145,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec2(19.0f, 21.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
                 aiSys1 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox)); //call the constructors
                 aiSys2 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox));
                 aiSys3 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox));
@@ -165,7 +174,14 @@ int main() {
                 dataSys.resultsMusicPlaying = true;
             }
 
-            inputSys.InputToResults();
+            currentTime = std::chrono::high_resolution_clock::now();
+            gameTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime);
+            resultsLockLeft = resultsLockLeft - gameTimePassed;
+            lastTime = currentTime;
+            
+            if (resultsLockLeft <= durationZero) {
+                inputSys.InputToResults();
+            }
         }
         else if (dataSys.inGameMenu) {
             inputSys.InputToGameMenu();
@@ -223,13 +239,22 @@ int main() {
             //shoot
             case 1:
                 if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox)) {
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), PxVec3{ 0, 0, 0 }));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        PxVec3{ 0, 0, 0 },
+                        0.0
+                    });
                 }
                 break;
             //parry
             case 2:
                 if (dataSys.Parry(dataSys.carInfoList[0].entity->collisionBox)) {
-                    //play audio cue + visual indicator
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Parry"),
+                        PxVec3{ 0, 0, 0 },
+                        0.0
+                    });
+                    //play visual indicator
                 }
                 break;
             default:
@@ -239,28 +264,44 @@ int main() {
             if (aiSys1.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys2.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys3.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys4.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 

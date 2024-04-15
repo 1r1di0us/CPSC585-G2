@@ -144,6 +144,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	player4Texture = generateTexture("assets/Textures/player4.jpg", true);
 	player5Texture = generateTexture("assets/Textures/player5.jpg", true);
 	playerInvincibleTexture = generateTexture("assets/Textures/playerInvincible.jpg", true);
+	shieldTexture = generateTexture("assets/Textures/shield.jpg", true);
 
 	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
@@ -278,16 +279,11 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			//scoreboard
 			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 
 			std::string parry = "Parry Available";
 			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
 				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-			}
-			else
-			{
-				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
 			}
 
 			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
@@ -308,7 +304,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 				float yOffset = i * 30;
 				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.0f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.25f, color, Characters_gaegu);
 			}
 
 			//displays active powerups (temp until VFX)
@@ -324,21 +320,21 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			//player has armour
 			if (dataSys->carInfoList[0].hasArmour) {
 				message = "ARMOUR ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 				
 			//player has projectile size powerup
 			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
 				message = "PROJECTILE SIZE INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
 			//player has projectile speed powerup
 			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
 				message = "PROJECTILE SPEED INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
 				y -= 20.0f;
 			}
 
@@ -448,6 +444,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
 		}
+		else if (dataSys->carInfoList[0].hasArmour) {
+			glBindTexture(GL_TEXTURE_2D, shieldTexture);
+		}
 		else {
 			dataSys->carInfoList[0].parryParticles = false;
 			glActiveTexture(GL_TEXTURE0);
@@ -468,13 +467,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
 		float angle = atan2(shootDir.x, shootDir.z);
 
-		//fuck this code
-		glm::vec3 tankHeadOffset = glm::vec3(0);
-		tankHeadOffset.x = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-		tankHeadOffset.z = dataSys->carInfoList[0].entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-		tankHeadOffset *= 1.3;
-
-		tankHeadModel = glm::translate(tankHeadModel, playerPos + tankHeadOffset);
+		tankHeadModel = glm::translate(tankHeadModel, playerPos + dataSys->ConvertPXVec3ToGLM(dataSys->TurretOffsetVector(&dataSys->carInfoList[0])));
 		tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 		tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		shader.setMat4("model", tankHeadModel);
@@ -529,6 +522,10 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 							glActiveTexture(GL_TEXTURE0);
 							glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
 						}
+						else if (carInfo->hasArmour) {
+							glActiveTexture(GL_TEXTURE0);
+							glBindTexture(GL_TEXTURE_2D, shieldTexture);
+						}
 						//different colors for different cars
 						else if (carInfo->entity->name == "car2") {
 							glActiveTexture(GL_TEXTURE0);
@@ -561,13 +558,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						glm::vec3 shootDir = glm::normalize(glm::vec3(carInfo->shootDir.x, carInfo->shootDir.y, carInfo->shootDir.z));
 						float angle = atan2(shootDir.x, shootDir.z);
 
-						//fuck this code
-						glm::vec3 tankHeadOffset = glm::vec3(0);
-						tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-						tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-						tankHeadOffset *= 1.3;
-
-						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos() + tankHeadOffset);
+						tankHeadModel = glm::translate(tankHeadModel, dataSys->entityList[i].transform->getPos() + dataSys->ConvertPXVec3ToGLM(dataSys->TurretOffsetVector(carInfo)));
 						tankHeadModel = glm::rotate(tankHeadModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
 						tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);

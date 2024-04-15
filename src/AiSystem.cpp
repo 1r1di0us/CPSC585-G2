@@ -12,7 +12,7 @@ AiSystem::AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar) {
 	coolDownTimer = 0;
 	reverseTimer = 0;
 	lockOnTime = 0;
-	navMesh = new NavMesh(dataSys		);
+	navMesh = new NavMesh(dataSys);
 	pathFinder = new PathFinder(navMesh);
 	moveLocation = PxVec3(-100, -100, -100);
 	moveNode = nullptr;
@@ -27,13 +27,13 @@ AiSystem::AiSystem(SharedDataSystem* dataSys, EngineDriveVehicle* aiCar) {
 	centerNodes.emplace_back(navMesh->nodes->at(469)); //[15][19] nice
 
 	edgeNodes.emplace_back(navMesh->nodes->at(62)); //[2][2]
-	edgeNodes.emplace_back(navMesh->nodes->at(165)); //[5][15]
+	edgeNodes.emplace_back(navMesh->nodes->at(105)); //[3][15]
 	edgeNodes.emplace_back(navMesh->nodes->at(87)); //[2][27]
-	edgeNodes.emplace_back(navMesh->nodes->at(444)); //[14][24]
+	edgeNodes.emplace_back(navMesh->nodes->at(446)); //[14][26]
 	edgeNodes.emplace_back(navMesh->nodes->at(837)); //[27][27]
-	edgeNodes.emplace_back(navMesh->nodes->at(734)); //[24][14]
+	edgeNodes.emplace_back(navMesh->nodes->at(794)); //[26][14]
 	edgeNodes.emplace_back(navMesh->nodes->at(812)); //[27][2]
-	edgeNodes.emplace_back(navMesh->nodes->at(455)); //[15][5]
+	edgeNodes.emplace_back(navMesh->nodes->at(453)); //[15][3]
 }
 
 bool AiSystem::update(std::chrono::duration<double> deltaTime) {
@@ -59,8 +59,13 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	else {
 		coolDownTimer -= deltaTime.count();
 	}
+
+	PxVec3 carDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
 	if (reverseTimer < deltaTime.count() && reverseTimer > 0) { //positive reverse timer is the time until we decide to reverse
 		reverseTimer = -1.0; //negative reverse timer is the time we actually reverse
+		PxVec3 myDir = -carDir * 10;
+		myDir.y = 0;
+		dataSys->GetRigidDynamicFromVehicle(aiCar)->setLinearVelocity(myDir);
 		aiCar->mTransmissionCommandState.targetGear = 0;
 	}
 	else if (reverseTimer > deltaTime.count()) {
@@ -68,6 +73,9 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	}
 	else if (reverseTimer > -deltaTime.count() && reverseTimer < 0) {
 		reverseTimer = 0.0;
+		PxVec3 myDir = carDir * 10;
+		myDir.y = 0;
+		dataSys->GetRigidDynamicFromVehicle(aiCar)->setLinearVelocity(myDir);
 		aiCar->mTransmissionCommandState.targetGear = 2; //set back in first gear
 	}
 	else if (reverseTimer < -deltaTime.count()) {
@@ -422,7 +430,7 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 				int prevNode;
 				if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
 				else nextNode = nodeIterator + 1;
-				if (nodeIterator == 0) prevNode = (int)edgeNodes.size();
+				if (nodeIterator == 0) prevNode = (int)edgeNodes.size() - 1; // ai crash probably occcured because of this :^     )
 				else prevNode = nodeIterator - 1;
 				if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
 					(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {

@@ -241,11 +241,11 @@ void SoundSystem::AddToSoundDict(std::string name, std::string location) {
 }
 
 void SoundSystem::PlayAllSounds() {
-    for (std::pair <std::string, PxVec3> soundPair : dataSys->SoundsToPlay) {
+    for (SoundInfo info : dataSys->SoundsToPlay) {
         for (std::pair <std::string, std::string> dictPair : SoundDict) {
-            if (soundPair.first == dictPair.first) {
-                FMOD_VECTOR location = FMOD_VECTOR{ soundPair.second.x/15, soundPair.second.y/15, soundPair.second.z/15 };
-                PlaySound(dictPair.second, location, dataSys->SfxVolume);
+            if (info.soundName == dictPair.first) {
+                FMOD_VECTOR location = FMOD_VECTOR{ info.position.x/15, info.position.y/15, info.position.z/15 };
+                PlaySound(dictPair.second, location, info.volume + dataSys->SfxVolume);
             }
         }
     }

@@ -45,6 +45,8 @@ private:
 	bool menuUpPressed = false;
 	bool menuDownPressed = false;
 
+	bool backwards = false;
+
 	//mouse related things
 	//bool initMouse = false;
 	//double xpos, ypos, prevx, prevy, initx, inity;
