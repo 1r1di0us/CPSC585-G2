@@ -4,6 +4,8 @@
 //void processInput(GLFWwindow* window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 unsigned int loadCubemap(std::vector<std::string> faces);
+bool checkCollision(glm::vec3 cameraPos, PxVec2 bottomLeft, PxVec2 topRight); 
+bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 map);
 
 std::map<char, Character> Characters_gaegu;
 float skyboxVertices[] = {
@@ -51,6 +53,17 @@ float skyboxVertices[] = {
 	 1.0f, -1.0f,  1.0f
 };
 
+float transparentVertices[] = {
+	// positions          // texture Coords
+   -1.0f,  1.0f, 0.0f,    0.0f, 1.0f, // top-left
+   -1.0f, -1.0f, 0.0f,    0.0f, 0.0f, // bottom-left
+	1.0f, -1.0f, 0.0f,    1.0f, 0.0f, // bottom-right
+
+   -1.0f,  1.0f, 0.0f,    0.0f, 1.0f, // top-left
+	1.0f, -1.0f, 0.0f,    1.0f, 0.0f, // bottom-right
+	1.0f,  1.0f, 0.0f,    1.0f, 1.0f  // top-right
+};
+
 
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion);
 glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quaternion) {
@@ -77,7 +90,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
+	//glfwWindowHint(GLFW_DECORATED, GLFW_TRUE); // Enable window decorations (title bar, border)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	
 	primaryMonitor = glfwGetPrimaryMonitor();
@@ -105,7 +118,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
 	// fullscreen fullscreen
 	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", get, NULL);
-	window = glfwCreateWindow(monitorWidth, monitorHeight, "Commander Paperchild Scrapyard Challenge", primaryMonitor, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Commander Paperchild Scrapyard Challenge", NULL, NULL);
 
 
 	if (window == NULL)
@@ -121,24 +134,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return;
 	}
-	glViewport(0, 0, monitorWidth, monitorHeight);
-
-	// get all the relative text positions
-	//auto timePair = convertToPixels(0.0125f, 0.94f);
-	//timeTextPos.first = timePair.first;
-	//timeTextPos.second = timePair.second;
-
-	//auto ammoPair = convertToPixels(0.0125f, 0.04f);
-	//ammoTextPos.first = ammoPair.first;
-	//ammoTextPos.second = ammoPair.second;
-
-	//auto scorePair = convertToPixels(0.7625f, 0.94f);
-	//scoreTextPos.first = scorePair.first;
-	//scoreTextPos.second = scorePair.second;
-
-	//auto parryPair = convertToPixels(0.0125f, 0.08f);
-	//parryTextPos.first = parryPair.first;
-	//parryTextPos.second = parryPair.second;
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
 	stbi_set_flip_vertically_on_load(true); // to vertically flip the image
 
@@ -174,6 +170,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	controlsMenu = generateTexture("assets/Textures/UI/controlsMenu.jpg", true);
 	pauseMenuContinue = generateTexture("assets/Textures/UI/pauseMenuContinue.jpg", true);
 	pauseMenuQuit = generateTexture("assets/Textures/UI/pauseMenuQuit.jpg", true);
+	hud = generateTexture("assets/Textures/UI/simple_hud.png", false);
 
 	//results
 	resultsP1 = generateTexture("assets/Textures/UI/resultsP1.jpg", true);
@@ -235,6 +232,8 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	textShader.use();
 	glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(textProjection));
 
+	hudShader = Shader("src/shaders/vertex_shader_blend.txt", "src/shaders/fragment_shader_blend.txt");
+	
 	Characters_gaegu = initFont("./assets/Fonts/Candy Beans.otf");
 	initTextVAO(&textVAO, &textVBO);
 
@@ -247,6 +246,20 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	particleExplosionTexture = generateTexture("assets/Textures/fire.jpg", true);
 	particleSmokeTexture = generateTexture("assets/Textures/playerInvincible.jpg", true);
     //particleShader = Shader("src/shaders/vertex_shader.txt", "src/shaders/fragment_shader.txt");
+
+
+	//hud initialization
+	glGenVertexArrays(1, &transparentVAO);
+	glGenBuffers(1, &transparentVBO);
+	glBindVertexArray(transparentVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), transparentVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glBindVertexArray(0);
+
 }
 
 
@@ -282,97 +295,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::vec3 white = glm::vec3(1.0f);
 		glm::vec3 black = glm::vec3(0.0f);
 
-		// text only if the player is alive
-		if (dataSys->carInfoList[0].isAlive) {
-
-			// Convert timeLeftInSeconds to string
-			std::string timeLeftStr = "Time Left: " + std::to_string(timeLeftInSeconds);
-			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f/800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			//ammo count
-			std::string ammoCount = "Ammo: " + std::to_string(dataSys->carInfoList[0].ammoCount);
-			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f / 800.0f * monitorWidth, 30.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			//scoreboard
-			std::string score = "Score:";
-			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-
-			std::string parry = "Parry Available";
-			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
-				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-			}
-			else
-			{
-				std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
-				RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
-			}
-
-			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
-				if (i == 0) {
-					color = red;
-				}
-				else if (i == 1) {
-					color = blue;
-				}
-				else if (i == 2) {
-					color = green;
-				}
-				else if (i == 3) {
-					color = yellow;
-				}
-				else if (i == 4) {
-					color = pink;
-				}
-				float yOffset = i * 30;
-				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
-				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f/800.f) * monitorWidth, ((540.0f - yOffset)/600.f * monitorHeight), 1.0f, color, Characters_gaegu);
-			}
-
-			//displays active powerups (temp until VFX)
-			color = yellow;
-
-			//coordinate vars
-			//NEEDS TO EVENTUALLY BE BASED ON SCREEN SIZE
-			float x = 5.0f/800.0f * monitorWidth;
-			float y = 545.0f/600.0f * monitorHeight;
-
-			std::string message;
-			
-			//player has armour
-			if (dataSys->carInfoList[0].hasArmour) {
-				message = "ARMOUR ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
-				y -= 20.0f;
-			}
-				
-			//player has projectile size powerup
-			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
-				message = "PROJECTILE SIZE INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
-				y -= 20.0f;
-			}
-
-			//player has projectile speed powerup
-			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
-				message = "PROJECTILE SPEED INCREASE ACTIVE";
-				RenderText(textShader, textVAO, textVBO, message, x, y, 0.5f, color, Characters_gaegu);
-				y -= 20.0f;
-			}
-
-		}
-		else {
-			color = black;
-			// death text
-			textShader.use();
-			std::string deathText1 = "You died!";
-			std::string deathText2 = "Welcome to heaven!";
-			std::string deathTimer = "Respawn in: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].respawnTimeLeft));
-			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f/800.0f * monitorWidth, 500.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f/800.0f * monitorWidth, 90.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
-			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f/800.0f * monitorWidth, 50.0f/600.0f * monitorHeight, 1.0f, color, Characters_gaegu);
-			
-		}
-
 		// activate shader
 		shader.use();
 
@@ -395,6 +317,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::quat playerRot = dataSys->carInfoList[0].entity->transform->rot;
 		//std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
+		// Check for collision with obstacles
+		bool collisionDetected = false;
+
 		if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
 			// Bird's eye view
 			glm::vec3 cameraPosition = glm::vec3(0.0f, 200.0f, 0.0f);
@@ -405,14 +330,35 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 			// Original view
-			glm::vec3 offsetFromPlayer;
-			if (dataSys->carInfoList[0].isAlive) {
-				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-			}
-			else {
+			bool collision;
+
+			if (!dataSys->carInfoList[0].isAlive) {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
+			else {
+				offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
+			}
+
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
+
+			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
+			{
+				collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
+				if (collision)
+				{
+					collisionDetected = true;
+					break; // Exit loop early since collision detected
+				}
+			}
+
+			auto something = dataSys->entityList[0].collisionBox;
+			auto map = something->getWorldBounds().getDimensions();
+			bool mapCollision = checkCollisionMap(camera.Position, map);
+			
+			if(mapCollision || collisionDetected) {
+				camera.Position = playerPos + dataSys->getCamRotMat() * clipOffset; //we rotate camera with getCamRotMat
+			}
+			
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
 			view = glm::lookAt(camera.Position, lookAtPoint, camera.Up);
 		}
@@ -467,22 +413,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			dataSys->carInfoList[0].shotBullet = false;
 		}
 
-		//glm::vec3 frontRight = glm::vec3(-1.245f, 0.321f, 2.563f);
-		//glm::vec3 frontLeft = glm::vec3(1.245f, 0.321f, 2.563f);
-		//glm::vec3 backRight = glm::vec3(-1.245f, 0.321f, 0.1f);
-		//glm::vec3 backLeft = glm::vec3(1.245f, 0.321f, 0.1f);
-
-		//glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::rotate(wheelModel, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
-		//wheelModel = glm::translate(wheelModel, backRight);
-		//shader.setMat4("model", wheelModel);
-		//tankWheel.Draw(shader);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::translate(wheelModel, backLeft);
-		//printf("wheel location: %f, %f, %f\n", dataSys->carInfoList[0].carWheelInfo.backRightPos.x, dataSys->carInfoList[0].carWheelInfo.backRightPos.y, dataSys->carInfoList[0].carWheelInfo.backRightPos.z);
-		//shader.setMat4("model", wheelModel);
-		//tankWheel.Draw(shader);
-
 		// tank head
 		glm::mat4 tankHeadModel = glm::mat4(1.0f);
 		glm::vec3 shootDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].shootDir.x, dataSys->carInfoList[0].shootDir.y, dataSys->carInfoList[0].shootDir.z));
@@ -493,30 +423,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 		shader.setMat4("model", tankHeadModel);
 		tankHead.Draw(shader);
-
-		//// front wheels
-		//glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.x,
-		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.y,
-		//	dataSys->carInfoList[0].carWheelInfo.wheelForwardDir.z));
-		// front wheels
-		//glm::vec3 wheelDir = glm::normalize(glm::vec3(dataSys->carInfoList[0].wheelForwardDir.x, dataSys->carInfoList[0].wheelForwardDir.y, dataSys->carInfoList[0].wheelForwardDir.z));
-
-		//angle = atan2(wheelDir.x, wheelDir.z);
-		//glm::mat4 wheelModel = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-		//wheelModel = glm::translate(wheelModel, playerPos);
-		//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
-
-		//shader.setMat4("model", tankHeadModel);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//std::cout << dataSys->carInfoList[0].carWheelInfo.frontRightPos.x << std::endl;
-		//glm::vec3 wheelGlobal = glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontRightPos.x, dataSys->carInfoList[0].carWheelInfo.frontRightPos.y, dataSys->carInfoList[0].carWheelInfo.frontRightPos.z));
-		//shader.setMat4("model", wheelModel);
-		////tankWheel.Draw(shader);
-		//wheelModel = glm::translate(glm::mat4(1.0f), playerPos);
-		//wheelModel = glm::translate(wheelModel, glm::normalize(glm::vec3(dataSys->carInfoList[0].carWheelInfo.frontLeftPos.x, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.y, dataSys->carInfoList[0].carWheelInfo.frontLeftPos.z)));
-		//shader.setMat4("model", wheelModel);
-		////tankWheel.Draw(shader);
-
 
 		// if player is alive, draw the scene
 		if (dataSys->carInfoList[0].isAlive) {
@@ -541,7 +447,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					projectile.Draw(shader);
 
 				}
-
 			}
 
 			//rendering all other entities starting at the size of the static list + 1 (+1 isnt needed cause of index 0) (BW added +1, caused rendering issues)
@@ -598,10 +503,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						model = applyQuaternionToMatrix(model, dataSys->entityList[i].transform->getRot());
 						shader.setMat4("model", model);
 						tankBody.Draw(shader);
-						//tankWheel.Draw(shader);
-						//tankWheel.Draw(shader);
-
-						//NOTE: does car have shields?
 
 						// tank head
 						glm::mat4 tankHeadModel = glm::mat4(1.0f);
@@ -613,18 +514,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						tankHeadModel = glm::rotate(tankHeadModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 						shader.setMat4("model", tankHeadModel);
 						tankHead.Draw(shader);
-
-						// front wheels
-						glm::mat4 tankWheelRight = glm::mat4(1.0f);
-						glm::mat4 tankWheelLeft = glm::mat4(1.0f);
-						glm::vec3 wheelDir = glm::normalize(glm::vec3(carInfo->wheelForwardDir.x, carInfo->wheelForwardDir.y, carInfo->wheelForwardDir.z));
-						angle = atan2(wheelDir.x, wheelDir.z);
-						glm::mat4 wheelModel = glm::translate(glm::mat4(1.0f), dataSys->entityList[i].transform->getPos());
-						//wheelModel = glm::rotate(wheelModel, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // the tank head model needs to be rotated
-						wheelModel = glm::rotate(wheelModel, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-						shader.setMat4("model", tankHeadModel);
-						//tankWheel.Draw(shader);
-						//tankWheel.Draw(shader);
 
 						// Render smoke
 						if (carInfo->shotBullet) {
@@ -745,6 +634,122 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			particleRender(deltaTime, model);
 		}
 
+
+		hudShader.use();
+		hudShader.setInt("texture1", 0);
+		glDisable(GL_DEPTH_TEST);
+		projection = glm::mat4(1.0f);
+		projection = glm::ortho(0.0f, float(SCR_WIDTH), 0.0f, float(SCR_HEIGHT), -1.0f, 1.0f);
+		view = glm::mat4(1.0f);
+		//hudShader.setMat4("projection", projection);
+		//hudShader.setMat4("view", view);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, hud);
+
+		glBindVertexArray(transparentVAO);
+
+		//model = glm::mat4(1.0f);
+		//hudShader.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glEnable(GL_DEPTH_TEST);
+
+		projection = glm::mat4(1.0f);
+		projection = glm::perspective(glm::radians(45.0f), (float)monitorWidth / (float)monitorHeight, 0.1f, 300.0f);
+		shader.setMat4("projection", projection);
+
+		// text only if the player is alive
+		if (dataSys->carInfoList[0].isAlive) {
+
+			// Convert timeLeftInSeconds to string
+			std::string timeLeftStr = std::to_string(timeLeftInSeconds);
+			RenderText(textShader, textVAO, textVBO, timeLeftStr, 10.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			//ammo count
+			std::string ammoCount = std::to_string(dataSys->carInfoList[0].ammoCount);
+			RenderText(textShader, textVAO, textVBO, ammoCount, 10.0f / 800.0f * monitorWidth, 30.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			//scoreboard
+			std::string score = "Score:";
+			RenderText(textShader, textVAO, textVBO, score, 610.0f / 800.0f * monitorWidth, 570.0f / 600.0f * monitorHeight, 1.5f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+
+			std::string parry = "Parry Available";
+			if (dataSys->carInfoList[0].parryCooldownTimeLeft < 0) {
+				RenderText(textShader, textVAO, textVBO, parry, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			}
+			//else
+			//{
+			//	std::string parryTime = "Parry Cooldown: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].parryCooldownTimeLeft));
+			//	RenderText(textShader, textVAO, textVBO, parryTime, 10.0f / 800.0f * monitorWidth, 60.0f / 600.0f * monitorHeight, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), Characters_gaegu);
+			//}
+
+			for (int i = 0; i < dataSys->carInfoList.size(); i++) {
+				if (i == 0) {
+					color = red;
+				}
+				else if (i == 1) {
+					color = blue;
+				}
+				else if (i == 2) {
+					color = green;
+				}
+				else if (i == 3) {
+					color = yellow;
+				}
+				else if (i == 4) {
+					color = pink;
+				}
+				float yOffset = i * 30;
+				std::string playerScore = "Player " + std::to_string(i + 1) + ": " + std::to_string(dataSys->carInfoList[i].score);
+				RenderText(textShader, textVAO, textVBO, playerScore, (610.0f / 800.f) * monitorWidth, ((540.0f - yOffset) / 600.f * monitorHeight), 1.0f, color, Characters_gaegu);
+			}
+
+			//displays active powerups (temp until VFX)
+			color = yellow;
+
+			//coordinate vars
+			//NEEDS TO EVENTUALLY BE BASED ON SCREEN SIZE
+			float x = 5.0f / 800.0f * monitorWidth;
+			float y = 545.0f / 600.0f * monitorHeight;
+
+			std::string message;
+
+			//player has armour
+			if (dataSys->carInfoList[0].hasArmour) {
+				message = "ARMOUR ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
+				y -= 20.0f;
+			}
+
+			//player has projectile size powerup
+			if (dataSys->carInfoList[0].projectileSizeActiveTimeLeft > 0) {
+				message = "PROJECTILE SIZE INCREASE ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
+				y -= 20.0f;
+			}
+
+			//player has projectile speed powerup
+			if (dataSys->carInfoList[0].projectileSpeedActiveTimeLeft > 0) {
+				message = "PROJECTILE SPEED INCREASE ACTIVE";
+				RenderText(textShader, textVAO, textVBO, message, x, y, 0.75f, color, Characters_gaegu);
+				y -= 20.0f;
+			}
+
+		}
+		else {
+			color = black;
+			// death text
+			textShader.use();
+			std::string deathText1 = "You died!";
+			std::string deathText2 = "Welcome to heaven!";
+			std::string deathTimer = "Respawn in: " + std::to_string(static_cast<int>(dataSys->carInfoList[0].respawnTimeLeft));
+			RenderText(textShader, textVAO, textVBO, deathText1, 350.0f / 800.0f * monitorWidth, 500.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathText2, 310.0f / 800.0f * monitorWidth, 90.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
+			RenderText(textShader, textVAO, textVBO, deathTimer, 330.0f / 800.0f * monitorWidth, 50.0f / 600.0f * monitorHeight, 1.5f, color, Characters_gaegu);
+
+		}
+
+
 		// skybox rendering, needs to be at the end of rendering
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_FALSE);
@@ -802,7 +807,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 					glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resultsP5, 0);
 				}
 			}
-
 		}
 		else if (dataSys->inGameMenu) {
 			if (dataSys->ingameOptionIndex == 0) {
@@ -820,48 +824,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 	// swap buffers and poll IO events
 	glfwSwapBuffers(window);
 	glfwPollEvents();
-}
-
-void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
-	glGenVertexArrays(1, VAO);
-	glGenBuffers(1, VBO);
-
-	glBindVertexArray(*VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-
-	// Calculate total size needed for vertex attributes
-	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2) +
-		model.normals.size() * sizeof(glm::vec3);
-
-	// Allocate buffer memory
-	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
-
-	// Copy vertex data
-	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
-
-	// Copy texture coordinate data
-	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
-		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
-
-	// Copy normal data
-	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2),
-		model.normals.size() * sizeof(glm::vec3), model.normals.data());
-
-	// Vertex positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// Texture coordinates
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
-	glEnableVertexAttribArray(1);
-
-	// Normals
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
-		model.textureCoordinates.size() * sizeof(glm::vec2)));
-	glEnableVertexAttribArray(2);
 }
 
 
@@ -1007,19 +969,51 @@ std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRa
 	return std::make_pair(pixelX, pixelY);
 }
 
-// Function to toggle fullscreen mode
 void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	if (dataSys->useWindowFullscreen) {
-		// Switch to windowed fullscreen mode
-		glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
-		glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
+		// Switch to fullscreen mode
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		if (mode != nullptr) {
+			glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+			// Adjust viewport to match window size
+			int width, height;
+			glfwGetFramebufferSize(window, &width, &height);
+			glViewport(0, 0, width, height);
+		}
 	}
 	else {
-		// Switch to regular fullscreen mode
-		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
+		// Switch to windowed mode with a size of 800 x 600
+		glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
+		glfwSetWindowMonitor(window, NULL, 0, 20, SCR_WIDTH, SCR_HEIGHT, GLFW_DONT_CARE);
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	}
-	// Adjust viewport to match window size
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
+}
+
+bool checkCollision(glm::vec3 cameraPos, PxVec2 bottomLeft, PxVec2 topRight) {
+	glm::vec3 bottomLeftVec3 = glm::vec3(bottomLeft.x, 8.0f, bottomLeft.y);
+	glm::vec3 topRightVec3 = glm::vec3(topRight.x, 8.0f, topRight.y);
+
+	// Check if camera position is within the bounding box
+	bool insideBox =
+	cameraPos.x >= bottomLeftVec3.x && cameraPos.x <= topRightVec3.x &&
+	cameraPos.z >= bottomLeftVec3.z && cameraPos.z <= topRightVec3.z;
+
+	return insideBox;
+}
+
+bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 mapDimensions) {
+	int width = mapDimensions.x / 2;
+	int depth = mapDimensions.z / 2;
+
+	// Define the dimensions of the box and the buffer
+	float boxWidth = width;
+	float boxDepth = depth;
+	float buffer = 10.0f; // Buffer size
+
+	// Check if the camera position satisfies the specified conditions
+	bool betweenBoxes =
+		(cameraPos.x < -boxWidth + buffer || cameraPos.x > boxWidth - buffer) || // Camera position is outside the box in the x-direction within the buffer
+		(cameraPos.z < -boxDepth + buffer || cameraPos.z > boxDepth - buffer);    // Camera position is outside the box in the z-direction within the buffer
+
+	return betweenBoxes;
 }
