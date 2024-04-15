@@ -379,6 +379,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		glm::quat playerRot = dataSys->carInfoList[0].entity->transform->rot;
 		//std::cout << playerPos.x << ":" << playerPos.y << ":" << playerPos.z << std::endl;
 
+		// Check for collision with obstacles
+		bool collisionDetected = false;
+
 		if (dataSys->useBirdsEyeView >= 1 && dataSys->useBirdsEyeView < 3) {
 			// Bird's eye view
 			glm::vec3 cameraPosition = glm::vec3(0.0f, 200.0f, 0.0f);
@@ -402,6 +405,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
 				if (collision)
 				{
+					collisionDetected = true;
 					break; // Exit loop early since collision detected
 				}
 			}
@@ -410,7 +414,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			auto map = something->getWorldBounds().getDimensions();
 			bool mapCollision = checkCollisionMap(camera.Position, map);
 			
-			if(mapCollision || collision) {
+			if(mapCollision || collisionDetected) {
 				camera.Position = playerPos + dataSys->getCamRotMat() * clipOffset; //we rotate camera with getCamRotMat
 			}
 			

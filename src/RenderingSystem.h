@@ -81,6 +81,9 @@ public:
 	// camera offsets
 	glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
 	glm::vec3 clipOffset = glm::vec3(0.0f, 2.0f, 3.0f);
+	float transitionDuration = 2.0f; // Duration of transition in seconds
+	float elapsedTime = 0.0f;
+	bool isTransitioning = false; // Flag to track if transition is happening
 
 
 	// functions
