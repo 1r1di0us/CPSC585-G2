@@ -458,8 +458,8 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//playing a parry sound
 		SoundInfo si = {
 			std::string("Parry"),
-			shotCarEntity->collisionBox->getGlobalPose().p,
-			1.0
+			getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
+			0.0
 		};
 		SoundsToPlay.push_back(si);
 
@@ -580,7 +580,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 			//make a sound
 			SoundInfo si = {
 				std::string("Heaven"),
-				getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
 				0.0
 			};
 			SoundsToPlay.push_back(si);
@@ -589,7 +589,7 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 			//make a sound
 			SoundInfo si = {
 				std::string("Bwud"),
-				getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
 				0.0
 			};
 			SoundsToPlay.push_back(si);
@@ -619,7 +619,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("Reload"),
-				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
 				soundVol
 			});
 		break;
@@ -628,7 +628,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
-				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
 				soundVol
 			});
 		break;
@@ -637,7 +637,7 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
-				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
 				soundVol
 			});
 		break;
@@ -646,14 +646,14 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
-				getSoundRotMat()* carEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat(0.0)* carEntity->collisionBox->getGlobalPose().p,
 				soundVol
 			});
 		break;
 	case PowerupType::CARSPEED:
 		SoundsToPlay.push_back(SoundInfo {
 				std::string("PowerUp"),
-				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
 				soundVol
 			});
 		break;
@@ -979,5 +979,9 @@ PxMat33 SharedDataSystem::getRotMatPx(float angle) {
 }
 
 PxMat33 SharedDataSystem::getSoundRotMat() {
-	return PxMat33({ cos((float)M_PI - cameraAngle), 0, sin((float)M_PI - cameraAngle) }, { 0, 1, 0 }, { -sin((float)M_PI - cameraAngle), 0, -cos((float)M_PI - cameraAngle) });
+	return getSoundRotMat((float)M_PI);
+}
+
+PxMat33 SharedDataSystem::getSoundRotMat(float angle_change) {
+	return PxMat33({ cos(angle_change - cameraAngle), 0, sin(angle_change - cameraAngle) }, { 0, 1, 0 }, { -sin(angle_change - cameraAngle), 0, -cos(angle_change - cameraAngle) });
 }

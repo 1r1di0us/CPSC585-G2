@@ -239,7 +239,12 @@ int main() {
             //parry
             case 2:
                 if (dataSys.Parry(dataSys.carInfoList[0].entity->collisionBox)) {
-                    //play audio cue + visual indicator
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Parry"),
+                        PxVec3{ 0, 0, 0 },
+                        0.0
+                    });
+                    //play visual indicator
                 }
                 break;
             default:

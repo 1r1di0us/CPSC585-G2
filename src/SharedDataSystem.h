@@ -404,6 +404,7 @@ public:
 	glm::mat3 getCamRotMat();
 	PxMat33 getRotMatPx(float angle);
 	PxMat33 getSoundRotMat();
+	PxMat33 getSoundRotMat(float angle_change);
 
 	// Flags
 	bool inMenu = true;
