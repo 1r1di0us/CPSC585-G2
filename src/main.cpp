@@ -40,7 +40,7 @@ AiSystem aiSys3;
 AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 50.0f;
+const double TIMELIMIT = 100.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -64,8 +64,14 @@ int gameMusicChannelId;
 
 int main() {
 
+    //initializing time variables
+    startTime = std::chrono::high_resolution_clock::now();
+    currentTime = startTime;
+    lastTime = std::chrono::high_resolution_clock::now();
+    previousIterationTime = lastTime;
+
     //seeding the random number gen to be used throughout the game
-    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
+    std::srand(static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count()));
 
     //y axis rotation in radians
     float angle = PxTwoPi;
@@ -91,12 +97,6 @@ int main() {
     soundSys.AddToSoundDict("Reload", "assets/Music/Reload.wav");
     soundSys.LoadSound("assets/Music/CarCrash.wav", false);
     soundSys.AddToSoundDict("CarCrash", "assets/Music/CarCrash.wav");
-
-    //initializing time variables
-    startTime = std::chrono::high_resolution_clock::now();
-    currentTime = startTime;
-    lastTime = std::chrono::high_resolution_clock::now();
-    previousIterationTime = lastTime;
 
     GLFWwindow* window;
     window = renderingSystem.getWindow();
