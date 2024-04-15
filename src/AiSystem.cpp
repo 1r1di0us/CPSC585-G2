@@ -59,8 +59,13 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	else {
 		coolDownTimer -= deltaTime.count();
 	}
+
+	PxVec3 carDir = aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2();
 	if (reverseTimer < deltaTime.count() && reverseTimer > 0) { //positive reverse timer is the time until we decide to reverse
 		reverseTimer = -1.0; //negative reverse timer is the time we actually reverse
+		PxVec3 myDir = -carDir * 10;
+		myDir.y = 0;
+		dataSys->GetRigidDynamicFromVehicle(aiCar)->setLinearVelocity(myDir);
 		aiCar->mTransmissionCommandState.targetGear = 0;
 	}
 	else if (reverseTimer > deltaTime.count()) {
@@ -68,6 +73,9 @@ bool AiSystem::update(std::chrono::duration<double> deltaTime) {
 	}
 	else if (reverseTimer > -deltaTime.count() && reverseTimer < 0) {
 		reverseTimer = 0.0;
+		PxVec3 myDir = carDir * 10;
+		myDir.y = 0;
+		dataSys->GetRigidDynamicFromVehicle(aiCar)->setLinearVelocity(myDir);
 		aiCar->mTransmissionCommandState.targetGear = 2; //set back in first gear
 	}
 	else if (reverseTimer < -deltaTime.count()) {
@@ -422,9 +430,7 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 				int prevNode;
 				if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
 				else nextNode = nodeIterator + 1;
-				if (nodeIterator == 0) {
-					prevNode = (int)edgeNodes.size() - 1;
-				}
+				if (nodeIterator == 0) prevNode = (int)edgeNodes.size() - 1; // ai crash probably occcured because of this :^     )
 				else prevNode = nodeIterator - 1;
 				if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
 					(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {
