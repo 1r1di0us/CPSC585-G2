@@ -22,8 +22,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 std::vector<PxContactPairHeader> SharedDataSystem::contactPairs;
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 
 //system creation and other important variables
 SharedDataSystem dataSys;

@@ -160,6 +160,7 @@ RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 	player4Texture = generateTexture("assets/Textures/player4.jpg", true);
 	player5Texture = generateTexture("assets/Textures/player5.jpg", true);
 	playerInvincibleTexture = generateTexture("assets/Textures/playerInvincible.jpg", true);
+	shieldTexture = generateTexture("assets/Textures/shield.jpg", true);
 
 	//random
 	redTexture = generateTexture("assets/Textures/red.jpg", true);
@@ -448,6 +449,9 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 			glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
 		}
+		else if (dataSys->carInfoList[0].hasArmour) {
+			glBindTexture(GL_TEXTURE_2D, shieldTexture);
+		}
 		else {
 			dataSys->carInfoList[0].parryParticles = false;
 			glActiveTexture(GL_TEXTURE0);
@@ -569,6 +573,10 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 						if (carInfo->iFramesLeft > 0) {
 							glActiveTexture(GL_TEXTURE0);
 							glBindTexture(GL_TEXTURE_2D, playerInvincibleTexture);
+						}
+						else if (carInfo->hasArmour) {
+							glActiveTexture(GL_TEXTURE0);
+							glBindTexture(GL_TEXTURE_2D, shieldTexture);
 						}
 						//different colors for different cars
 						else if (carInfo->entity->name == "car2") {
