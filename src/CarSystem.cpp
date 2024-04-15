@@ -155,36 +155,13 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	float shootAngle = atan2(dot, det);
 
 	//offset to be determined based on shoot angle
-	float offsetMultiplier;
-
-	//45 deg range with left and right in center
-	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) || 
-		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
-		(shootAngle <= - M_PI + M_PI / 8 && shootAngle >= - M_PI)) {
-		offsetMultiplier = 2.5;
-	}
-	//front
-	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-		offsetMultiplier = 5.2;
-	}
-	//back
-	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 3;
-	}
-	//other
-	else {
-		offsetMultiplier = 3.5;
-	}
+	float offsetMultiplier = dataSys->CalculateShootingOffset(shootAngle);
 
 	//changing projectile spawn
 	PxVec3 shootingPosition = shootingCar->getGlobalPose().p;
 
-	//fuck this code
-	PxVec3 tankHeadOffset = PxVec3(0);
-	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-	tankHeadOffset *= 1.3;
-	shootingPosition += tankHeadOffset;
+	//offsets the shooting position by the turret location
+	shootingPosition += dataSys->TurretOffsetVector(carInfo);
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
