@@ -302,7 +302,7 @@ PxVec3 SharedDataSystem::TurretOffsetVector(CarInfo* carInfo) {
 	PxVec3 tankHeadOffset = PxVec3(0);
 	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
 	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-	tankHeadOffset *= 1.9;
+	tankHeadOffset *= 2.3;
 
 	return tankHeadOffset;
 }
@@ -946,19 +946,19 @@ float SharedDataSystem::CalculateShootingOffset(float shootAngle) {
 	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
 		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
 		(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
-		offsetMultiplier = 2.5;
+		offsetMultiplier = 2.2;
 	}
 	//front
 	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-		offsetMultiplier = 3;
+		offsetMultiplier = 2.5;
 	}
 	//back
 	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 3.5;
+		offsetMultiplier = 3.7;
 	}
 	//other
 	else {
-		offsetMultiplier = 3.5;
+		offsetMultiplier = 2.7;
 	}
 
 	return offsetMultiplier;
