@@ -53,6 +53,8 @@ std::chrono::duration<double> timeUntilPhysicsUpdate = PHYSICSUPDATESPEED;
 std::chrono::duration<double> deltaTime;
 std::chrono::duration<double> durationZero = std::chrono::duration<double>::zero();
 std::chrono::high_resolution_clock::time_point paused;
+const double RESULTS_BUFFER = 2.0f;
+std::chrono::duration<double> resultsLockLeft = std::chrono::duration<double>(RESULTS_BUFFER);
 
 std::string menuMusic = "assets/Music/Cianwood City Remix.wav";
 std::string gameMusic = "assets/Music/Miror B Remix.wav";
@@ -117,6 +119,7 @@ int main() {
             inputSys.InputToMenu();
             lastTime = std::chrono::high_resolution_clock::now();
             totalTimeLeft = std::chrono::duration<double>(TIMELIMIT);
+            resultsLockLeft = std::chrono::duration<double>(RESULTS_BUFFER);
             previousIterationTime = lastTime;
             
             if (dataSys.resultsMusicPlaying) {
@@ -171,7 +174,14 @@ int main() {
                 dataSys.resultsMusicPlaying = true;
             }
 
-            inputSys.InputToResults();
+            currentTime = std::chrono::high_resolution_clock::now();
+            gameTimePassed = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - lastTime);
+            resultsLockLeft = resultsLockLeft - gameTimePassed;
+            lastTime = currentTime;
+            
+            if (resultsLockLeft <= durationZero) {
+                inputSys.InputToResults();
+            }
         }
         else if (dataSys.inGameMenu) {
             inputSys.InputToGameMenu();
