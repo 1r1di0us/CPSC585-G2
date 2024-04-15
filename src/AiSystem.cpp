@@ -219,11 +219,11 @@ void AiSystem::aim_car(std::chrono::duration<double> deltaTime) {
 	//triple product to obtain the determinant of the 3x3 matrix (n, carDir, intentDir)
 	float angle = atan2(dot, det) - M_PI/2; //its off by 90 degrees and I forget why
 	//move shootDir slowly
-	if (angle > 0.5 * deltaTime.count()) { //enemies rotate turrets much slower
-		shootAngle -= 0.5 * deltaTime.count();
+	if (angle > 2 * deltaTime.count()) { //enemies rotate turrets much slower
+		shootAngle -= 2 * deltaTime.count();
 	}
-	else if (angle < -0.5 * deltaTime.count()) {
-		shootAngle += 0.5 * deltaTime.count();
+	else if (angle < -2 * deltaTime.count()) {
+		shootAngle += 2 * deltaTime.count();
 	}
 	else {
 		shootAngle -= angle;
