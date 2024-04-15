@@ -302,7 +302,7 @@ PxVec3 SharedDataSystem::TurretOffsetVector(CarInfo* carInfo) {
 	PxVec3 tankHeadOffset = PxVec3(0);
 	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
 	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-	tankHeadOffset *= 1.7;
+	tankHeadOffset *= 1.9;
 
 	return tankHeadOffset;
 }
