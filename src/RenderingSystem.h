@@ -74,13 +74,17 @@ public:
 	Shader shader;
 	Shader skyBoxShader;
 	Shader testShader; // testing it
+	Shader hudShader;
 	std::map<char, Character> Characters_gaegu;
 	//OBJModel particleObj;
 	unsigned int cubemapTexture;
 	
+	//hud
+	unsigned int transparentVAO, transparentVBO;
+
 	// camera offsets
 	glm::vec3 offsetFromPlayer = glm::vec3(0.0f, 8.0f, 20.0f);
-	glm::vec3 clipOffset = glm::vec3(0.0f, 2.0f, 3.0f);
+	glm::vec3 clipOffset = glm::vec3(0.0f, 2.0f, 4.0f);
 	float transitionDuration = 2.0f; // Duration of transition in seconds
 	float elapsedTime = 0.0f;
 	bool isTransitioning = false; // Flag to track if transition is happening
@@ -119,7 +123,7 @@ public:
 
 	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, playerInvincibleTexture, redTexture,
 		menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
-		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
+		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie, hud,
 		planeTexture, gunMetalTexture, parryTexture, ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, particleExplosionTexture, particleSmokeTexture;
 
 
