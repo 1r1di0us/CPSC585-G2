@@ -53,6 +53,12 @@ struct CarInfo{
 	bool hasArmour = false;
 };
 
+struct SoundInfo {
+	std::string soundName;
+	PxVec3 position;
+	float volume = 0.0;
+};
+
 //powerup types
 enum PowerupType {
 	AMMO,
@@ -403,7 +409,7 @@ public:
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
 	PxMat33 getRotMatPx(float angle);
-	PxMat33 getSoundRotMat();
+	PxMat33 getSoundRotMat(float angle_change = (float)M_PI);
 
 	// Flags
 	bool inMenu = true;
@@ -428,7 +434,7 @@ public:
 	bool resultsMusicPlaying = false;
 
 	// Audio
-	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	std::vector <SoundInfo> SoundsToPlay;
 	float MusicVolume = -30.0;
 	float SfxVolume = -20.0;
 
