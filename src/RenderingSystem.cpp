@@ -402,7 +402,7 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				bool collision = checkCollision(camera.Position, dataSys->carInfoList[0].shootDir, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
 				if (collision)
 				{
-					std::cout << "Is colliding with obstacle: " << collision << std::endl;
+					//std::cout << "Is colliding with obstacle: " << collision << std::endl;
 					//offsetFromPlayer = glm::vec3(0.0f, 2.0f, 5.0f); // Adjusted offset
 					collisionDetected = true;
 					break; // Exit loop early since collision detected
@@ -794,48 +794,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 	glfwPollEvents();
 }
 
-//void initOBJVAO(const OBJModel& model, unsigned int* VAO, unsigned int* VBO) {
-//	glGenVertexArrays(1, VAO);
-//	glGenBuffers(1, VBO);
-//
-//	glBindVertexArray(*VAO);
-//
-//	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-//
-//	// Calculate total size needed for vertex attributes
-//	size_t totalSize = model.vertices.size() * sizeof(glm::vec3) +
-//		model.textureCoordinates.size() * sizeof(glm::vec2) +
-//		model.normals.size() * sizeof(glm::vec3);
-//
-//	// Allocate buffer memory
-//	glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
-//
-//	// Copy vertex data
-//	glBufferSubData(GL_ARRAY_BUFFER, 0, model.vertices.size() * sizeof(glm::vec3), model.vertices.data());
-//
-//	// Copy texture coordinate data
-//	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3),
-//		model.textureCoordinates.size() * sizeof(glm::vec2), model.textureCoordinates.data());
-//
-//	// Copy normal data
-//	glBufferSubData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(glm::vec3) +
-//		model.textureCoordinates.size() * sizeof(glm::vec2),
-//		model.normals.size() * sizeof(glm::vec3), model.normals.data());
-//
-//	// Vertex positions
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-//	glEnableVertexAttribArray(0);
-//
-//	// Texture coordinates
-//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3)));
-//	glEnableVertexAttribArray(1);
-//
-//	// Normals
-//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(model.vertices.size() * sizeof(glm::vec3) +
-//		model.textureCoordinates.size() * sizeof(glm::vec2)));
-//	glEnableVertexAttribArray(2);
-//}
-
 
 void renderObject(const OBJModel& model, unsigned int* VAO) {
     glBindVertexArray(*VAO);
@@ -979,25 +937,6 @@ std::pair<float, float> RenderingSystem::convertToPixels(float xRatio, float yRa
 	return std::make_pair(pixelX, pixelY);
 }
 
-// Function to toggle fullscreen mode
-//void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
-//	if (dataSys->useWindowFullscreen) {
-//		// Switch to windowed fullscreen mode
-//		//glfwGetMonitorWorkarea(primaryMonitor, NULL, NULL, &monitorWidth, &monitorHeight);
-//		//glfwSetWindowMonitor(window, NULL, 0, 0, monitorWidth, monitorHeight, GLFW_DONT_CARE);
-//		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, monitorWidth, monitorHeight, monitorRefresh);
-//	}
-//	else {
-//		// Switch to regular fullscreen mode
-//		glfwSetWindowMonitor(window, primaryMonitor, 0, 0, SCR_WIDTH, SCR_HEIGHT, monitorRefresh);
-//	}
-//	// Adjust viewport to match window size
-//	int width, height;
-//	glfwGetFramebufferSize(window, &width, &height);
-//	glViewport(0, 0, width, height);
-//}
-// Function to toggle fullscreen mode
-// Function to toggle fullscreen mode
 void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	if (dataSys->useWindowFullscreen) {
 		// Switch to fullscreen mode
@@ -1018,31 +957,6 @@ void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	}
 }
 
-
-//bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight) {
-//	glm::vec2 bottomLeftVec2(bottomLeft.x, bottomLeft.y);
-//	glm::vec2 topRightVec2(topRight.x, topRight.y);
-//	glm::vec2 shootDirVec2(shootDir.x, shootDir.z);
-//
-//	std::cout << "shootdirx: " << shootDir.x << "shootdirz" << shootDir.z << std::endl;
-//	glm::vec2 cameraPosVec2(cameraPos.x, cameraPos.z);
-//
-//	// Calculate intersection points with each side of the bounding box
-//	glm::vec2 tMin = (bottomLeftVec2 - cameraPosVec2) / shootDirVec2;
-//	glm::vec2 tMax = (topRightVec2 - cameraPosVec2) / shootDirVec2;
-//
-//	// Calculate minimum and maximum t-values for intersection
-//	glm::vec2 t1 = glm::min(tMin, tMax);
-//	glm::vec2 t2 = glm::max(tMin, tMax);
-//
-//	// Find the maximum of minimums and minimum of maximums
-//	float tEnter = glm::max(glm::max(t1.x, t1.y), 0.0f);
-//	float tExit = glm::min(glm::min(t2.x, t2.y), 1.0f);
-//
-//	// Check if ray intersects the bounding box
-//	return tEnter < tExit;
-//}
-
 bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxVec2 topRight) {
 	// Ignore the y-coordinate of the camera position
 	glm::vec2 cameraPos2D(cameraPos.x, cameraPos.z);
@@ -1058,7 +972,7 @@ bool checkCollision(glm::vec3 cameraPos, PxVec3 shootDir, PxVec2 bottomLeft, PxV
 		cameraPos2D.y >= bottomLeft.y && cameraPos2D.y <= topRight.y;
 
 	// Debugging print for result
-	std::cout << "Inside Bounding Box: " << (insideBox ? "Yes" : "No") << std::endl;
+	//std::cout << "Inside Bounding Box: " << (insideBox ? "Yes" : "No") << std::endl;
 
 	return insideBox;
 }
