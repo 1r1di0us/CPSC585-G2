@@ -320,7 +320,7 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 		//if (playerCar->mTransmissionCommandState.targetGear == 0) playerCar->mTransmissionCommandState.targetGear = 2;
 
 		if (backwards == true) {
-			if (angle > -1 * M_PI / 4 && angle < 1 * M_PI / 4) {
+			if (angle > -2 * M_PI / 3 && angle < 2 * M_PI / 3) {
 				backwards = false;
 			}
 			else if (angle <= -M_PI + 1) {
@@ -363,7 +363,7 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 			}
 		}
 		else {
-			if (angle > 3 * M_PI / 4 || angle < -3 * M_PI / 4) {
+			if ((angle <= -M_PI + M_PI / 3 && angle >= -M_PI - M_PI / 3)) {
 				backwards = true;
 			}
 			else if (angle <= 1 && angle >= -1) {
@@ -417,10 +417,10 @@ int InputSystem::InputToMovement(std::chrono::duration<double> deltaTime) {
 
 	//camera shenanigans	
 	if (cl && !cr) {
-		dataSys->cameraAngle += 1.5 * deltaTime.count();
+		dataSys->cameraAngle += turnSpeed * deltaTime.count();
 	}
 	else if (cr && !cl) {
-		dataSys->cameraAngle -= 1.5 * deltaTime.count();
+		dataSys->cameraAngle -= turnSpeed * deltaTime.count();
 	}
 
 

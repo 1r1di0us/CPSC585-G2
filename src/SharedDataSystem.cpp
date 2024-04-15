@@ -454,10 +454,13 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 				shootingPosition.z + projectileBackwardVector.z * (projectileRadius + offsetMultiplier));
 
 		//dynamic setting of spawn height
-		projectileRadius < 2 ? spawnVec.y = 2 : spawnVec.y = projectileRadius + 0.1f;
+		projectileRadius < 1.4 ? spawnVec.y = 1.4 : spawnVec.y = projectileRadius;
+
+		auto pp = PxQuat(0.0f, projectileBackwardVector.getNormalized());
 
 		//setting the spawn position
-		projectileEntity->collisionBox->setGlobalPose(PxTransform(spawnVec, projectileEntity->collisionBox->getGlobalPose().q));
+		//projectileEntity->collisionBox->setGlobalPose(PxTransform(spawnVec, projectileEntity->collisionBox->getGlobalPose().q));
+		projectileEntity->collisionBox->setGlobalPose(PxTransform(spawnVec, pp));
 
 		//stoled from car shoot ahahah
 		projectileEntity->collisionBox->setLinearVelocity(SHOOT_FORCE * PxVec3(projectileBackwardVector.x, 0, projectileBackwardVector.z));
@@ -912,11 +915,11 @@ float SharedDataSystem::CalculateShootingOffset(float shootAngle) {
 	}
 	//back
 	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 3.7;
+		offsetMultiplier = 4;
 	}
 	//other
 	else {
-		offsetMultiplier = 2.7;
+		offsetMultiplier = 3;
 	}
 
 	return offsetMultiplier;

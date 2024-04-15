@@ -172,7 +172,7 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 		shootingCar->getGlobalPose().q);
 
 	//dynamic setting of spawn height
-	actualProjectileRadius < 2 ? spawnTransform.p.y = 2 : spawnTransform.p.y = actualProjectileRadius + 0.1f;
+	actualProjectileRadius < 1.4 ? spawnTransform.p.y = 1.4 : spawnTransform.p.y = actualProjectileRadius;
 
 	//define a projectile
 	physx::PxShape* shape = dataSys->gPhysics->createShape(physx::PxSphereGeometry(actualProjectileRadius), *dataSys->gMaterial);
