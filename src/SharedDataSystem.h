@@ -53,6 +53,12 @@ struct CarInfo{
 	bool hasArmour = false;
 };
 
+struct SoundInfo {
+	std::string soundName;
+	PxVec3 position;
+	float volume = 0.0;
+};
+
 //powerup types
 enum PowerupType {
 	AMMO,
@@ -150,12 +156,6 @@ private:
 	// Function to calculate the distance between two PhysX vectors
 	float DistanceBetweenPoints(const PxVec2& point1, const PxVec2& point2);
 
-	//function to get the x nearest points given a list of points
-	std::vector<PxVec2> GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType);
-
-	//finds the center of four points
-	PxVec2 FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList = {}, std::vector<PxVec2> generatedPointsList = {});
-
 	//populates the map square list with the points of the same type
 	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList);
 
@@ -236,7 +236,7 @@ public:
 	const float SHOOT_FORCE = 100;
 
 	//the projectile radius
-	const PxReal DEFAULT_PROJECTILE_RADIUS = 1.0f;
+	const PxReal DEFAULT_PROJECTILE_RADIUS = 0.7f;
 
 	//the length of the projectile size powerup
 	const float PROJECTILE_SIZE_POWERUP_DURATION = 4.0f;
@@ -249,9 +249,6 @@ public:
 
 	//the magnitude of the projectile speed multiplier
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
-
-	//adding a map entity that persists through games
-	Entity MAP;
 
 	//the GOAT list of entities
 	std::vector<Entity> entityList;
@@ -296,6 +293,9 @@ public:
 
 	//gets the list of dead cars to do shit to
 	std::vector<CarInfo*> GetListOfDeadCars();
+
+	//calculates the tank head offset
+	PxVec3 TurretOffsetVector(CarInfo* carInfo);
 
 	/*
 	* RESPAWN
@@ -363,6 +363,7 @@ public:
 	//collision logic functions
 	void CarProjectileCollisionLogic(PxActor* car, PxActor* projectile);
 	void CarPowerupCollisionLogic(PxActor* car, PxActor* powerup);
+	void CarCarCollisionLogic(PxActor* car1, PxActor* car2);
 	void ProjectileStaticCollisionLogic(PxActor* projectile);
 
 	//clean up any objects that could be collided with at the same time
@@ -387,6 +388,12 @@ public:
 	* GENERAL
 	*/
 
+	//converts a PxVec3 to a glm vec3
+	glm::vec3 ConvertPXVec3ToGLM(PxVec3 vec3);
+
+	//calculates the shooting offset based on car size
+	float CalculateShootingOffset(float shootAngle);
+
 	//fake constructor cause i couldnt get the real one to work
 	void InitSharedDataSystem();
 
@@ -396,7 +403,7 @@ public:
 	//makes the rotation matrix for the camera
 	glm::mat3 getCamRotMat();
 	PxMat33 getRotMatPx(float angle);
-	PxMat33 getSoundRotMat();
+	PxMat33 getSoundRotMat(float angle_change = (float)M_PI);
 
 	// Flags
 	bool inMenu = true;
@@ -421,7 +428,7 @@ public:
 	bool resultsMusicPlaying = false;
 
 	// Audio
-	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	std::vector <SoundInfo> SoundsToPlay;
 	float MusicVolume = -30.0;
 	float SfxVolume = -20.0;
 

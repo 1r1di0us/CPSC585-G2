@@ -71,6 +71,10 @@ PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 
 		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
 	}
+	//if a car collides with another car
+	else if (filterData0.word0 == COLLISION_FLAG_CHASSIS && filterData1.word0 == COLLISION_FLAG_CHASSIS) {
+		pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	}
 
 	return physx::PxFilterFlags();
 }

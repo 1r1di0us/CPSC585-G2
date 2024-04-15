@@ -33,53 +33,6 @@ float SharedDataSystem::DistanceBetweenPoints(const PxVec2& point1, const PxVec2
 	return (point1 - point2).magnitude();
 }
 
-std::vector<PxVec2> SharedDataSystem::GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType) {
-
-	//CHATGPT CODE
-	std::priority_queue<std::pair<float, PxVec2>, std::vector<std::pair<float, PxVec2>>, CompareDistance> minHeap;
-
-	for (const auto& point : pointsOfSameType) {
-		float distance = 0.0f;
-		for (const auto& p : pointList) {
-			distance += DistanceBetweenPoints(point, p);
-		}
-		minHeap.push({ distance, point });
-		if (minHeap.size() > numPointsToGet) {
-			minHeap.pop();
-		}
-	}
-
-	std::vector<PxVec2> result;
-	while (!minHeap.empty()) {
-		result.push_back(minHeap.top().second);
-		minHeap.pop();
-	}
-
-	return result;
-}
-
-PxVec2 SharedDataSystem::FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList, std::vector<PxVec2> generatedPointsList) {
-
-	//makes one combined vector out of two given in (can have diff number of elements in them)
-	std::vector<PxVec2> pointsList;
-	for (int i = 0; i < existingPointsList.size(); i++) {
-
-		pointsList.emplace_back(existingPointsList[i]);
-	}
-	for (int i = 0; i < generatedPointsList.size(); i++) {
-
-		pointsList.emplace_back(generatedPointsList[i]);
-	}
-
-	//calculating the random offset
-	float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
-
-	float centerX = (pointsList[0].x + pointsList[1].x + pointsList[2].x + pointsList[3].x) / 4.0f;
-	float centerY = (pointsList[0].y + pointsList[1].y + pointsList[2].y + pointsList[3].y) / 4.0f;
-
-	return PxVec2(centerX, centerY);
-}
-
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
 	//clear the data from the previous iteration
@@ -136,61 +89,45 @@ bool SharedDataSystem::IsSpawnPointValid(PxVec2 potentialSpawnPoint) {
 PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
 
 	PxVec2 spawnPoint;
-	bool foundPoint;
-	MapSquare* bestSquare;
+	MapSquare* bestSquare = &mapSquareList[0];
 
 	//for the case where it gets stuck infinite looping because the spawn square is invalid and cant choose another one cause random is outside of this loop
 	int minAcceptablePoints = 0;
 	int maxAcceptableLoops = 10;
 
+	//cheeky way to avoid errors while deleting elements while going through array
+	int numSquares = mapSquareList.size();
+
+	//do while
 	do {
 
-		foundPoint = false;
+		//if so it doesnt run too long
+		if (minAcceptablePoints < 3) {
 
-		//find the square with the least amount of points in it
-		//if the square has no points in it, find the center and return that
-		bestSquare = &mapSquareList[0];
+			//find the square that has the least amount of points in it
+			for (int i = 0; i < numSquares; i++) {
 
-		for (int i = 0; i < mapSquareList.size(); i++) {
-			if (mapSquareList[i].numPoints == minAcceptablePoints || mapSquareList[i].numPoints < bestSquare->numPoints) {
-				bestSquare = &mapSquareList[i];
-				if (bestSquare->numPoints == 0) {
+				//if we have a new best square
+				if (mapSquareList[i].numPoints <= bestSquare->numPoints) {
+					bestSquare = &mapSquareList[i];
+					
+					//if the best square is empty
+					if (bestSquare->numPoints <= minAcceptablePoints) {
 
-					//random offset
-					float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
+						//random offset
+						float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
 
-					//setting the coords
-					spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
-					spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
-					foundPoint = true;
+						//setting the coords
+						spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
+						spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
+						break;
+					}
 				}
-			}
-		}
-
-		if (!foundPoint) {
-
-			switch (bestSquare->numPoints) {
-			case 1:
-				//need to find 3 nearest points
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 2:
-				//need to find 2 nearest points
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 3:
-				//need to find nearest point
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 4:
-				//make square, return middle
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
-				break;
-			default:
-				//make a random point in the square and return that
-				spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
-				spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
-				break;
+				else {
+					mapSquareList.erase(mapSquareList.begin() + i);
+					i--;
+					numSquares--;
+				}
 			}
 
 			//if spawn point not found after 10 attempts
@@ -202,11 +139,20 @@ PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquar
 				minAcceptablePoints++;
 				//randomize the list again for good measure
 				RandomizeMapSquareList(mapSquareList);
+				//resets the best square after randomizing
+				bestSquare = &mapSquareList[0];
 			}
+
+		}
+		else {
+
+			//make a random point in the square and return that
+			spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
+			spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
 		}
 
 	//function to check the spawn point generated
-	} while (!IsSpawnPointValid(spawnPoint));
+	} while (!IsSpawnPointValid(spawnPoint) || !IsPointInBounds(spawnPoint));
 
 	return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
 }
@@ -295,6 +241,16 @@ std::vector<CarInfo*> SharedDataSystem::GetListOfDeadCars() {
 	}
 
 	return deadCarVec;
+}
+
+PxVec3 SharedDataSystem::TurretOffsetVector(CarInfo* carInfo) {
+
+	PxVec3 tankHeadOffset = PxVec3(0);
+	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
+	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
+	tankHeadOffset *= 2.3;
+
+	return tankHeadOffset;
 }
 
 PxVec3 SharedDataSystem::DetermineRespawnLocation(PhysicsType physType) {
@@ -456,7 +412,12 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	if (shotCarInfo->parryActiveTimeLeft > 0) {
 
 		//playing a parry sound
-		SoundsToPlay.push_back(std::make_pair(std::string("Parry"), shotCarEntity->collisionBox->getGlobalPose().p));
+		SoundInfo si = {
+			std::string("Parry"),
+			getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
+			0.0
+		};
+		SoundsToPlay.push_back(si);
 
 		//change ownership of the projectile
 		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
@@ -478,36 +439,12 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		float shootAngle = atan2(dot, det);
 
 		//offset to be determined based on shoot angle
-		float offsetMultiplier;
-
-		//45 deg range with left and right in center
-		if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
-			(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
-			(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
-			offsetMultiplier = 3.5;
-		}
-		//front
-		else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-			offsetMultiplier = 6.2;
-		}
-		//back
-		else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-			offsetMultiplier = 4;
-		}
-		//other
-		else {
-			offsetMultiplier = 4.5;
-		}
+		float offsetMultiplier = CalculateShootingOffset(shootAngle);
 
 		//changing projectile spawn
 		PxVec3 shootingPosition = shotCarEntity->collisionBox->getGlobalPose().p;
 
-		//fuck this code
-		PxVec3 tankHeadOffset = PxVec3(0);
-		tankHeadOffset.x = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-		tankHeadOffset.z = shotCarEntity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-		tankHeadOffset *= 1.3;
-		shootingPosition += tankHeadOffset;
+		shootingPosition += TurretOffsetVector(shotCarInfo);
 
 		//send the projectile back the way it came
 			//doing the offset based on the same math as the shooting math
@@ -537,7 +474,12 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		AddToCollatCache(projectileEntity);
 
-		SoundsToPlay.push_back(std::make_pair(std::string("Armour"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		SoundInfo si = {
+			std::string("Armour"),
+			getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+			0.0
+		};
+		SoundsToPlay.push_back(si);
 	}
 	//iframes?
 	else if (shotCarInfo->iFramesLeft > 0) {
@@ -568,11 +510,21 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//diff sounds depending on who was killed
 		if (shotCarEntity->name == carInfoList[0].entity->name) {
 			//make a sound
-			SoundsToPlay.push_back(std::make_pair(std::string("Heaven"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+			SoundInfo si = {
+				std::string("Heaven"),
+				getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
+				0.0
+			};
+			SoundsToPlay.push_back(si);
 		}
 		else {
 			//make a sound
-			SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+			SoundInfo si = {
+				std::string("Bwud"),
+				getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p,
+				0.0
+			};
+			SoundsToPlay.push_back(si);
 		}
 	
 	}
@@ -588,27 +540,66 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
 
 	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic after\n");
+	float soundVol = 0.0;
+	if (carEntity->name != carInfoList[0].entity->name) {
+		soundVol = -20.0;
+	}
+
+	CarInfo* carInfo;
 
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
 	case PowerupType::AMMO:
 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("Reload"),
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::ARMOUR:
 
 		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::PROJECTILESIZE:
 
-		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
+		//updating car info vars
+		carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
+		carInfo->ammoCount++;
+
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::PROJECTILESPEED:
 
-		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		//updating car info vars
+		carInfo = GetCarInfoStructFromEntity(carEntity);
+		carInfo->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
+		carInfo->ammoCount++;
+
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat(0.0)* carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::CARSPEED:
-
+		//NOT IMPLEMENTED
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat(0.0) * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	default:
 		printf("unknown powerup type\n");
@@ -617,6 +608,19 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 
 	AddToCollatCache(powerupEntity);
 
+}
+
+void SharedDataSystem::CarCarCollisionLogic(PxActor* car1, PxActor* car2) {
+
+	if (DEBUG_PRINTS) printf("CarCarCollisionLogic before\n");
+
+	//converting the actors to entities
+	std::shared_ptr<Entity> car1Entity = GetEntityFromRigidDynamic((PxRigidDynamic*)car1);
+	std::shared_ptr<Entity> car2Entity = GetEntityFromRigidDynamic((PxRigidDynamic*)car2);
+
+	if (DEBUG_PRINTS) printf("CarCarCollisionLogic after\n");
+
+	//SoundsToPlay.push_back(std::make_pair(std::string("CarCrash"), getSoundRotMat() * car1Entity->collisionBox->getGlobalPose().p));
 }
 
 void SharedDataSystem::ProjectileStaticCollisionLogic(PxActor* projectile) {
@@ -712,6 +716,9 @@ void SharedDataSystem::ResolveCollisions() {
 					break;
 				case PhysicsType::POWERUP:
 					CarPowerupCollisionLogic(actor1, actor2);
+					break;
+				case PhysicsType::CAR:
+					CarCarCollisionLogic(actor1, actor2);
 					break;
 				default:
 					break;
@@ -883,6 +890,38 @@ void SharedDataSystem::resetSharedDataSystem() {
 	}
 }
 
+glm::vec3 SharedDataSystem::ConvertPXVec3ToGLM(PxVec3 vec3) {
+	
+	return glm::vec3(vec3.x, vec3.y, vec3.z);
+}
+
+float SharedDataSystem::CalculateShootingOffset(float shootAngle) {
+
+	//offset to be determined based on shoot angle
+	float offsetMultiplier;
+	
+	//45 deg range with left and right in center
+	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) ||
+		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
+		(shootAngle <= -M_PI + M_PI / 8 && shootAngle >= -M_PI)) {
+		offsetMultiplier = 2.2;
+	}
+	//front
+	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
+		offsetMultiplier = 2.5;
+	}
+	//back
+	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
+		offsetMultiplier = 3.7;
+	}
+	//other
+	else {
+		offsetMultiplier = 2.7;
+	}
+
+	return offsetMultiplier;
+}
+
 void SharedDataSystem::InitSharedDataSystem() {
 
 	//generate the map squares for both cars and powerups
@@ -915,6 +954,6 @@ PxMat33 SharedDataSystem::getRotMatPx(float angle) {
 	return PxMat33({ cos(angle), 0, sin(angle) }, { 0, 1, 0 }, { -sin(angle), 0, -cos(angle) });
 }
 
-PxMat33 SharedDataSystem::getSoundRotMat() {
-	return PxMat33({ cos((float)M_PI - cameraAngle), 0, sin((float)M_PI - cameraAngle) }, { 0, 1, 0 }, { -sin((float)M_PI - cameraAngle), 0, -cos((float)M_PI - cameraAngle) });
+PxMat33 SharedDataSystem::getSoundRotMat(float angle_change) {
+	return PxMat33({ cos(angle_change - cameraAngle), 0, sin(angle_change - cameraAngle) }, { 0, 1, 0 }, { -sin(angle_change - cameraAngle), 0, -cos(angle_change - cameraAngle) });
 }

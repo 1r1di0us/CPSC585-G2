@@ -5,7 +5,7 @@ CarSystem::CarSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 }
 
-void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
+void CarSystem::SpawnNewCar(PxQuat spawnRotation) {
 
 	//every car has same name TODO: might change if need to sort by name
 	const char* name = "car";
@@ -28,7 +28,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform carTransform = PxTransform(PxVec3(spawnPosition.x, dataSys->CAR_SPAWN_HEIGHT, spawnPosition.y), spawnRotation);
+	//uses the respawn function to determine a starting point for the car
+	PxTransform carTransform = PxTransform(dataSys->DetermineRespawnLocation(PhysicsType::CAR), spawnRotation);
 	gVehicle->setUpActor(*dataSys->gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);
@@ -42,10 +43,11 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	PxU32 shapes = gVehicle->mPhysXState.physxActor.rigidBody->getNbShapes();
 	for (PxU32 i = 0; i < shapes; i++) {
 		PxShape* shape = NULL;
-		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
-
 		//the body of the vehicle is at i = 0
+		
+		gVehicle->mPhysXState.physxActor.rigidBody->getShapes(&shape, 1, i);
 		if (i == 0) {
+			//shape = dataSys->gPhysics->createShape(physx::PxCapsuleGeometry(0.5, 0.8), *dataSys->gMaterial);
 			PxBoxGeometry myChassis = PxBoxGeometry(1.2, 0.7, 1.8);
 			shape->setGeometry(myChassis);
 		}
@@ -153,36 +155,13 @@ bool CarSystem::Shoot(PxRigidDynamic* shootingCar) {
 	float shootAngle = atan2(dot, det);
 
 	//offset to be determined based on shoot angle
-	float offsetMultiplier;
-
-	//45 deg range with left and right in center
-	if ((shootAngle <= M_PI / 8 && shootAngle >= -M_PI / 8) || 
-		(shootAngle <= M_PI && shootAngle >= M_PI - M_PI / 8) ||
-		(shootAngle <= - M_PI + M_PI / 8 && shootAngle >= - M_PI)) {
-		offsetMultiplier = 2.5;
-	}
-	//front
-	else if (shootAngle <= M_PI_2 + M_PI / 8 && shootAngle >= M_PI_2 - M_PI / 8) {
-		offsetMultiplier = 5.2;
-	}
-	//back
-	else if ((shootAngle <= -M_PI_2 + M_PI / 8 && shootAngle >= -M_PI_2 - M_PI / 8)) {
-		offsetMultiplier = 3;
-	}
-	//other
-	else {
-		offsetMultiplier = 3.5;
-	}
+	float offsetMultiplier = dataSys->CalculateShootingOffset(shootAngle);
 
 	//changing projectile spawn
 	PxVec3 shootingPosition = shootingCar->getGlobalPose().p;
 
-	//fuck this code
-	PxVec3 tankHeadOffset = PxVec3(0);
-	tankHeadOffset.x = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().x;
-	tankHeadOffset.z = carInfo->entity->collisionBox->getGlobalPose().q.getBasisVector2().z;
-	tankHeadOffset *= 1.3;
-	shootingPosition += tankHeadOffset;
+	//offsets the shooting position by the turret location
+	shootingPosition += dataSys->TurretOffsetVector(carInfo);
 
 	//creating the projectile to shoot
 	//it is offset based on the radius of the projectile
