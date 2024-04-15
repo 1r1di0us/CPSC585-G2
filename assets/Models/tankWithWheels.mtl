@@ -1,7 +1,7 @@
 # Blender 4.1.0 MTL File: 'tankWithWheels.blend'
 # www.blender.org
 
-newmtl defaultMat
+newmtl defaultMat.001
 Ns 0.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
