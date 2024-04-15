@@ -85,6 +85,10 @@ public:
 	float elapsedTime = 0.0f;
 	bool isTransitioning = false; // Flag to track if transition is happening
 
+	//helper functions
+	
+	//determines how far away the camera is from the an object with corner coords given
+	float CamDistanceFromNearestClipSurface(glm::vec3 camPos);
 
 	// functions
 	RenderingSystem(SharedDataSystem* dataSys);

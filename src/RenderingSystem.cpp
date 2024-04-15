@@ -69,7 +69,6 @@ glm::mat4 applyQuaternionToMatrix(const glm::mat4& matrix, const glm::quat& quat
 	return rotatedMatrix;
 }
 
-
 // constructor
 RenderingSystem::RenderingSystem(SharedDataSystem* dataSys) {
 
@@ -392,30 +391,19 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 		}
 		else {
 			// Original view
-			bool collision;
+			float distanceFromObstacle;
 
 			if (!dataSys->carInfoList[0].isAlive) {
 				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 10.0f);
 			}
 
-			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
-
-			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
-			{
-				collision = checkCollision(camera.Position, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
-				if (collision)
-				{
-					collisionDetected = true;
-					break; // Exit loop early since collision detected
-				}
-			}
-
-			auto something = dataSys->entityList[0].collisionBox;
-			auto map = something->getWorldBounds().getDimensions();
-			bool mapCollision = checkCollisionMap(camera.Position, map);
+			//checks each obstacle and map for clipping
+			float distance = CamDistanceFromNearestClipSurface(camera.Position);
 			
-			if(mapCollision || collisionDetected) {
-				camera.Position = playerPos + dataSys->getCamRotMat() * clipOffset; //we rotate camera with getCamRotMat
+			//if the camera is clipping
+			if (distance < dataSys->CAMERA_CLIP_DISTANCE) {
+
+				camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 			}
 			
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
@@ -937,26 +925,65 @@ void RenderingSystem::toggleFullscreen(GLFWwindow* window) {
 	}
 }
 
-bool checkCollision(glm::vec3 cameraPos, PxVec2 bottomLeft, PxVec2 topRight) {
-	glm::vec3 bottomLeftVec3 = glm::vec3(bottomLeft.x, 8.0f, bottomLeft.y);
-	glm::vec3 topRightVec3 = glm::vec3(topRight.x, 8.0f, topRight.y);
-	//glm::vec3 shootDirVec3 = glm::vec3(shootDir.x, shootDir.y, shootDir.z);
+float RenderingSystem::CamDistanceFromNearestClipSurface(glm::vec3 cameraPos) {
 
-	// Debugging prints
-	//std::cout << "Camera Position: (" << cameraPos.x << ", " << cameraPos.z << ")" << std::endl;
-	//std::cout << "Bounding Box Bottom Left: (" << bottomLeft.x << ", " << bottomLeft.y << ")" << std::endl;
-	//std::cout << "Bounding Box Top Right: (" << topRight.x << ", " << topRight.y << ")" << std::endl;
+	//variables
+	float distance = FLT_MAX;
+	glm::vec2 bottomLeftVec2;
+	glm::vec2 topRightVec2;
 
-	// Check if camera position is within the bounding box
-	bool insideBox =
-	cameraPos.x >= bottomLeftVec3.x && cameraPos.x <= topRightVec3.x &&
-	//cameraPos.y >= bottomLeftVec3.y && cameraPos.y <= topRightVec3.y &&
-	cameraPos.z >= bottomLeftVec3.z && cameraPos.z <= topRightVec3.z;
+	//check against the map first (optimization)
+	PxVec3 mapDimensions = dataSys->entityList[0].collisionBox->getWorldBounds().getDimensions();
 
-	// Debugging print for result
-	//std::cout << "Inside Bounding Box: " << (insideBox ? "Yes" : "No") << std::endl;
+	int width = mapDimensions.x / 2;
+	int depth = mapDimensions.z / 2;
 
-	return insideBox;
+	// Define the dimensions of the box and the buffer
+	float boxWidth = width;
+	float boxDepth = depth;
+	float buffer = 10.0f; // Buffer size
+
+	//is the camera within the buffered box?
+	distance =
+		std::min(std::abs(cameraPos.x - (-boxWidth + buffer)),
+			std::min(std::abs(cameraPos.x - (boxWidth - buffer)),
+				std::min(std::abs(cameraPos.z - (-boxDepth + buffer)), std::abs(cameraPos.z - (boxDepth - buffer)))
+			));
+
+	//why bother checking the rest if the map is too close
+	if (distance < dataSys->CAMERA_CLIP_DISTANCE) {
+		return distance;
+	}
+
+	//for comparisons
+	float minDistanceOfObstacle;
+
+	//go through each obstacle EXCLUDING map
+	for (int i = 0; i < dataSys->obstacleMapSquareList.size(); i++) {
+
+		//setting the variables for math correctly
+		bottomLeftVec2 = glm::vec2(dataSys->obstacleMapSquareList[i].bottomLeft.x, dataSys->obstacleMapSquareList[i].bottomLeft.y);
+		topRightVec2 = glm::vec2(dataSys->obstacleMapSquareList[i].topRight.x, dataSys->obstacleMapSquareList[i].topRight.y);
+	
+		//finding the absolute min distance from all obstacles
+		minDistanceOfObstacle =
+			std::min(std::abs(cameraPos.x - bottomLeftVec2.x),
+				std::min(std::abs(cameraPos.x - topRightVec2.x),
+					std::min(std::abs(cameraPos.z - bottomLeftVec2.y), std::abs(cameraPos.z - topRightVec2.y))
+				));
+
+		if (minDistanceOfObstacle < distance) {
+			distance = minDistanceOfObstacle;
+			
+			//threshold of do something about it
+			if (distance < dataSys->CAMERA_CLIP_DISTANCE) {
+				return distance;
+			}
+		}
+
+	}
+
+	return distance;
 }
 
 bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 mapDimensions) {
@@ -970,8 +997,8 @@ bool checkCollisionMap(glm::vec3 cameraPos, PxVec3 mapDimensions) {
 
 	// Check if the camera position satisfies the specified conditions
 	bool betweenBoxes =
-		(cameraPos.x < -boxWidth + buffer || cameraPos.x > boxWidth - buffer) || // Camera position is outside the box in the x-direction within the buffer
-		(cameraPos.z < -boxDepth + buffer || cameraPos.z > boxDepth - buffer);    // Camera position is outside the box in the z-direction within the buffer
+		(cameraPos.x < (-boxWidth + buffer) || cameraPos.x > (boxWidth - buffer)) || // Camera position is outside the box in the x-direction within the buffer
+		(cameraPos.z < (-boxDepth + buffer) || cameraPos.z > (boxDepth - buffer));    // Camera position is outside the box in the z-direction within the buffer
 
 	return betweenBoxes;
 }

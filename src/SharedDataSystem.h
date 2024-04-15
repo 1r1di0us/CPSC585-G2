@@ -192,8 +192,8 @@ public:
 	const PxVec2 TOP_RIGHT_MAP_COORD = PxVec2(67, 67);
 	
 	//the approximate size of the map. rectangular
-	const PxReal MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
-	const PxReal MAPLENGTHZ = TOP_RIGHT_MAP_COORD.y - BOTTOM_LEFT_MAP_COORD.y;
+	const float MAPLENGTHX = TOP_RIGHT_MAP_COORD.x - BOTTOM_LEFT_MAP_COORD.x;
+	const float MAPLENGTHZ = TOP_RIGHT_MAP_COORD.y - BOTTOM_LEFT_MAP_COORD.y;
 
 	//the min distance cars can spawn from other cars
 	const PxReal CAR_MIN_SPAWN_DISTANCE = 15.0f;
@@ -249,6 +249,9 @@ public:
 
 	//the magnitude of the projectile speed multiplier
 	const float PROJECTILE_SPEED_POWERUP_STRENGTH = 2.0f;
+
+	//the min distance the camera will start to activate anti clip measures
+	const float CAMERA_CLIP_DISTANCE = 5.0f;
 
 	//adding a map entity that persists through games
 	Entity MAP;
