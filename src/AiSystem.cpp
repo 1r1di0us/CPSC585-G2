@@ -420,9 +420,9 @@ bool AiSystem::hiding_behaviour(bool fire, std::chrono::duration<double> deltaTi
 			else {
 				int nextNode;
 				int prevNode;
-				if (nodeIterator == (int)edgeNodes.size()) nextNode = 0;
+				if (nodeIterator + 1 == (int)edgeNodes.size()) nextNode = 0;
 				else nextNode = nodeIterator + 1;
-				if (nodeIterator == 0) prevNode = (int)edgeNodes.size();
+				if (nodeIterator == 0) prevNode = (int)edgeNodes.size() - 1;
 				else prevNode = nodeIterator - 1;
 				if ((edgeNodes[nextNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude() <=
 					(edgeNodes[prevNode]->centroid - (carPos + aiCar->mPhysXState.physxActor.rigidBody->getGlobalPose().q.getBasisVector2())).magnitude()) {
