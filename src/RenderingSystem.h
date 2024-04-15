@@ -62,8 +62,8 @@ private:
 
 public:
 	// settings
-	const unsigned int SCR_WIDTH = 800;
-	const unsigned int SCR_HEIGHT = 600;
+	const unsigned int SCR_WIDTH = 1920;
+	const unsigned int SCR_HEIGHT = 1080;
 
 	// variables
 	GLFWwindow* window;
@@ -114,7 +114,7 @@ public:
 	Shader particleShader;
 	void initParticlesVAO();
 
-	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, playerInvincibleTexture, redTexture,
+	unsigned int player1Texture, player2Texture, player3Texture, player4Texture, player5Texture, playerInvincibleTexture, shieldTexture, redTexture,
 		menuPlay, menuControls, menuQuit, controlsMenu, pauseMenuContinue, pauseMenuQuit,
 		resultsP1, resultsP2, resultsP3, resultsP4, resultsP5, resultsTie,
 		planeTexture, gunMetalTexture, parryTexture, ammoPowerupTexture, projectileSpeedPowerupTexture, projectileSizePowerupTexture, armourPowerupTexture, particleExplosionTexture, particleSmokeTexture;
