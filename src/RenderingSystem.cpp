@@ -396,7 +396,6 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 
-
 			for (size_t i = 0; i < dataSys->obstacleMapSquareList.size(); i++)
 			{
 				bool collision = checkCollision(camera.Position, dataSys->carInfoList[0].shootDir, dataSys->obstacleMapSquareList[i].bottomLeft, dataSys->obstacleMapSquareList[i].topRight);
@@ -409,13 +408,17 @@ void RenderingSystem::updateRenderer(Camera camera, std::chrono::duration<double
 				}
 			}
 
-			const float transitionSpeed = 0.1f; // Adjust the speed of transition
+			//const float transitionSpeed = 0.1f; // Adjust the speed of transition
+
+			//glm::vec3 targetOffset = offsetFromPlayer;
 
 			if (collisionDetected) {
-				offsetFromPlayer = glm::mix(glm::vec3(0.0f, 8.0f, 20.0f), glm::vec3(0.0f, 2.0f, 5.0f), transitionSpeed);
+				offsetFromPlayer = glm::vec3(0.0f, 2.0f, 7.0f);
+				//offsetFromPlayer = glm::mix(glm::vec3(0.0f, 8.0f, 20.0f), glm::vec3(0.0f, 2.0f, 5.0f), transitionSpeed);
+				//targetOffset = glm::vec3(0.0f, 5.0f, 5.0f);
 			}
 
-
+			//offsetFromPlayer = glm::mix(offsetFromPlayer, targetOffset, transitionSpeed);
 			camera.Position = playerPos + dataSys->getCamRotMat() * offsetFromPlayer; //we rotate camera with getCamRotMat
 
 			glm::vec3 lookAtPoint = playerPos + glm::vec3(0.0f, 1.0f, 0.0f);
