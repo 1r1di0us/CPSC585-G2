@@ -229,7 +229,11 @@ int main() {
             //shoot
             case 1:
                 if (carSys.Shoot(dataSys.carInfoList[0].entity->collisionBox)) {
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), PxVec3{ 0, 0, 0 }));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        PxVec3{ 0, 0, 0 },
+                        0.0
+                    });
                 }
                 break;
             //parry
@@ -245,28 +249,44 @@ int main() {
             if (aiSys1.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[1].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[1].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys2.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[2].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[2].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys3.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[3].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[3].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 
             if (aiSys4.update(deltaTime)) {
                 if (carSys.Shoot(dataSys.carInfoList[4].entity->collisionBox)) {
                     PxVec3 soundOrigin = dataSys.getSoundRotMat() * (dataSys.carInfoList[4].entity->collisionBox->getGlobalPose().p - dataSys.carInfoList[0].entity->collisionBox->getGlobalPose().p);
-                    dataSys.SoundsToPlay.push_back(std::make_pair(std::string("Thud"), soundOrigin));
+                    dataSys.SoundsToPlay.push_back(SoundInfo{
+                        std::string("Thud"),
+                        soundOrigin,
+                        0.0
+                    });
                 }
             }
 

@@ -456,7 +456,12 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 	if (shotCarInfo->parryActiveTimeLeft > 0) {
 
 		//playing a parry sound
-		SoundsToPlay.push_back(std::make_pair(std::string("Parry"), shotCarEntity->collisionBox->getGlobalPose().p));
+		SoundInfo si = {
+			std::string("Parry"),
+			shotCarEntity->collisionBox->getGlobalPose().p,
+			1.0
+		};
+		SoundsToPlay.push_back(si);
 
 		//change ownership of the projectile
 		for (int i = 0; i < carProjectileRigidDynamicDict[shootingCarRigidDynamic].size(); i++) {
@@ -537,7 +542,12 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 
 		AddToCollatCache(projectileEntity);
 
-		SoundsToPlay.push_back(std::make_pair(std::string("Armour"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+		SoundInfo si = {
+			std::string("Armour"),
+			getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+			0.0
+		};
+		SoundsToPlay.push_back(si);
 	}
 	//iframes?
 	else if (shotCarInfo->iFramesLeft > 0) {
@@ -568,11 +578,21 @@ void SharedDataSystem::CarProjectileCollisionLogic(PxActor* car, PxActor* projec
 		//diff sounds depending on who was killed
 		if (shotCarEntity->name == carInfoList[0].entity->name) {
 			//make a sound
-			SoundsToPlay.push_back(std::make_pair(std::string("Heaven"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+			SoundInfo si = {
+				std::string("Heaven"),
+				getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+				0.0
+			};
+			SoundsToPlay.push_back(si);
 		}
 		else {
 			//make a sound
-			SoundsToPlay.push_back(std::make_pair(std::string("Bwud"), getSoundRotMat() * shotCarEntity->collisionBox->getGlobalPose().p));
+			SoundInfo si = {
+				std::string("Bwud"),
+				getSoundRotMat()* shotCarEntity->collisionBox->getGlobalPose().p,
+				0.0
+			};
+			SoundsToPlay.push_back(si);
 		}
 	
 	}
@@ -588,38 +608,59 @@ void SharedDataSystem::CarPowerupCollisionLogic(PxActor* car, PxActor* powerup) 
 	std::shared_ptr<Entity> powerupEntity = GetEntityFromRigidDynamic((PxRigidDynamic*)powerup);
 
 	if (DEBUG_PRINTS) printf("CarPowerupCollisionLogic after\n");
-
+	float soundVol = 0.0;
+	if (carEntity->name != carInfoList[0].entity->name) {
+		soundVol = -20.0;
+	}
 	//gives the car the powerups effect
 	switch (GetPowerupInfoStructFromEntity(powerupEntity)->powerupType) {
 	case PowerupType::AMMO:
 
 		GetCarInfoStructFromEntity(carEntity)->ammoCount += NUMBER_AMMO_GIVEN_PER_POWERUP;
-		SoundsToPlay.push_back(std::make_pair(std::string("Reload"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("Reload"),
+				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::ARMOUR:
 
 		GetCarInfoStructFromEntity(carEntity)->hasArmour = true;
-		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::PROJECTILESIZE:
 
 		GetCarInfoStructFromEntity(carEntity)->projectileSizeActiveTimeLeft = PROJECTILE_SIZE_POWERUP_DURATION;
-		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::PROJECTILESPEED:
 
 		GetCarInfoStructFromEntity(carEntity)->projectileSpeedActiveTimeLeft = PROJECTILE_SPEED_POWERUP_DURATION;
-		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat()* carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	case PowerupType::CARSPEED:
-
-		SoundsToPlay.push_back(std::make_pair(std::string("PowerUp"), getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p));
+		SoundsToPlay.push_back(SoundInfo {
+				std::string("PowerUp"),
+				getSoundRotMat() * carEntity->collisionBox->getGlobalPose().p,
+				soundVol
+			});
 		break;
 	default:
 		printf("unknown powerup type\n");
 		break;
 	}
-
 
 	AddToCollatCache(powerupEntity);
 

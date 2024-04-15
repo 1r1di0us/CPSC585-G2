@@ -53,6 +53,12 @@ struct CarInfo{
 	bool hasArmour = false;
 };
 
+struct SoundInfo {
+	std::string soundName;
+	PxVec3 position;
+	float volume = 0.0;
+};
+
 //powerup types
 enum PowerupType {
 	AMMO,
@@ -422,7 +428,7 @@ public:
 	bool resultsMusicPlaying = false;
 
 	// Audio
-	std::vector <std::pair <std::string, PxVec3> > SoundsToPlay;	
+	std::vector <SoundInfo> SoundsToPlay;
 	float MusicVolume = -30.0;
 	float SfxVolume = -20.0;
 
