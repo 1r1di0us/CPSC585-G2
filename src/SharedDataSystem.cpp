@@ -33,53 +33,6 @@ float SharedDataSystem::DistanceBetweenPoints(const PxVec2& point1, const PxVec2
 	return (point1 - point2).magnitude();
 }
 
-std::vector<PxVec2> SharedDataSystem::GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType) {
-
-	//CHATGPT CODE
-	std::priority_queue<std::pair<float, PxVec2>, std::vector<std::pair<float, PxVec2>>, CompareDistance> minHeap;
-
-	for (const auto& point : pointsOfSameType) {
-		float distance = 0.0f;
-		for (const auto& p : pointList) {
-			distance += DistanceBetweenPoints(point, p);
-		}
-		minHeap.push({ distance, point });
-		if (minHeap.size() > numPointsToGet) {
-			minHeap.pop();
-		}
-	}
-
-	std::vector<PxVec2> result;
-	while (!minHeap.empty()) {
-		result.push_back(minHeap.top().second);
-		minHeap.pop();
-	}
-
-	return result;
-}
-
-PxVec2 SharedDataSystem::FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList, std::vector<PxVec2> generatedPointsList) {
-
-	//makes one combined vector out of two given in (can have diff number of elements in them)
-	std::vector<PxVec2> pointsList;
-	for (int i = 0; i < existingPointsList.size(); i++) {
-
-		pointsList.emplace_back(existingPointsList[i]);
-	}
-	for (int i = 0; i < generatedPointsList.size(); i++) {
-
-		pointsList.emplace_back(generatedPointsList[i]);
-	}
-
-	//calculating the random offset
-	float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
-
-	float centerX = (pointsList[0].x + pointsList[1].x + pointsList[2].x + pointsList[3].x) / 4.0f;
-	float centerY = (pointsList[0].y + pointsList[1].y + pointsList[2].y + pointsList[3].y) / 4.0f;
-
-	return PxVec2(centerX, centerY);
-}
-
 void SharedDataSystem::PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList) {
 
 	//clear the data from the previous iteration
@@ -136,61 +89,45 @@ bool SharedDataSystem::IsSpawnPointValid(PxVec2 potentialSpawnPoint) {
 PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquareList, std::vector<PxVec2> pointsOfSameType, PxReal minDistance, PxReal spawnHeight) {
 
 	PxVec2 spawnPoint;
-	bool foundPoint;
-	MapSquare* bestSquare;
+	MapSquare* bestSquare = &mapSquareList[0];
 
 	//for the case where it gets stuck infinite looping because the spawn square is invalid and cant choose another one cause random is outside of this loop
 	int minAcceptablePoints = 0;
 	int maxAcceptableLoops = 10;
 
+	//cheeky way to avoid errors while deleting elements while going through array
+	int numSquares = mapSquareList.size();
+
+	//do while
 	do {
 
-		foundPoint = false;
+		//if so it doesnt run too long
+		if (minAcceptablePoints < 3) {
 
-		//find the square with the least amount of points in it
-		//if the square has no points in it, find the center and return that
-		bestSquare = &mapSquareList[0];
+			//find the square that has the least amount of points in it
+			for (int i = 0; i < numSquares; i++) {
 
-		for (int i = 0; i < mapSquareList.size(); i++) {
-			if (mapSquareList[i].numPoints <= minAcceptablePoints || mapSquareList[i].numPoints < bestSquare->numPoints) {
-				bestSquare = &mapSquareList[i];
-				if (bestSquare->numPoints == 0) {
+				//if we have a new best square
+				if (mapSquareList[i].numPoints <= bestSquare->numPoints) {
+					bestSquare = &mapSquareList[i];
+					
+					//if the best square is empty
+					if (bestSquare->numPoints <= minAcceptablePoints) {
 
-					//random offset
-					float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
+						//random offset
+						float randomOffset = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * minDistance - minDistance / 2.0;
 
-					//setting the coords
-					spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
-					spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
-					foundPoint = true;
+						//setting the coords
+						spawnPoint.x = ((bestSquare->topRight.x + bestSquare->bottomLeft.x) / 2) + (randomOffset);
+						spawnPoint.y = ((bestSquare->topRight.y + bestSquare->bottomLeft.y) / 2) + (randomOffset);
+						break;
+					}
 				}
-			}
-		}
-
-		if (!foundPoint) {
-
-			switch (bestSquare->numPoints) {
-			case 1:
-				//need to find 3 nearest points
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 3, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 2:
-				//need to find 2 nearest points
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 2, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 3:
-				//need to find nearest point
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, GetXNearestPoints(bestSquare->pointsInIt, 1, pointsOfSameType), bestSquare->pointsInIt);
-				break;
-			case 4:
-				//make square, return middle
-				spawnPoint = FindCenterOfFourPointsWithRandomOffset(minDistance, bestSquare->pointsInIt);
-				break;
-			default:
-				//make a random point in the square and return that
-				spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
-				spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
-				break;
+				else {
+					mapSquareList.erase(mapSquareList.begin() + i);
+					i--;
+					numSquares--;
+				}
 			}
 
 			//if spawn point not found after 10 attempts
@@ -202,11 +139,20 @@ PxVec3 SharedDataSystem::GenerateValidSpawnPoint(std::vector<MapSquare> mapSquar
 				minAcceptablePoints++;
 				//randomize the list again for good measure
 				RandomizeMapSquareList(mapSquareList);
+				//resets the best square after randomizing
+				bestSquare = &mapSquareList[0];
 			}
+
+		}
+		else {
+
+			//make a random point in the square and return that
+			spawnPoint.x = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHX;
+			spawnPoint.y = std::rand() / static_cast<double>(RAND_MAX) * MAPLENGTHZ;
 		}
 
 	//function to check the spawn point generated
-	} while (!IsSpawnPointValid(spawnPoint));
+	} while (!IsSpawnPointValid(spawnPoint) || !IsPointInBounds(spawnPoint));
 
 	return PxVec3(spawnPoint.x, spawnHeight, spawnPoint.y);
 }

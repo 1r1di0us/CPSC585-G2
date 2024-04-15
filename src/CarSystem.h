@@ -49,7 +49,7 @@ public:
 	CarSystem(SharedDataSystem* dataSys);
 
 	//spawns a new car at given position and rotation
-	void SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation);
+	void SpawnNewCar(PxQuat spawnRotation);
 
 	//respawn all dead cars
 	void RespawnAllCars();

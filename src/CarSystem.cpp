@@ -5,7 +5,7 @@ CarSystem::CarSystem(SharedDataSystem* dataSys) {
 	this->dataSys = dataSys;
 }
 
-void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
+void CarSystem::SpawnNewCar(PxQuat spawnRotation) {
 
 	//every car has same name TODO: might change if need to sort by name
 	const char* name = "car";
@@ -28,7 +28,8 @@ void CarSystem::SpawnNewCar(PxVec2 spawnPosition, PxQuat spawnRotation) {
 	}
 
 	//Apply a start pose to the physx actor and add it to the physx scene.
-	PxTransform carTransform = PxTransform(PxVec3(spawnPosition.x, dataSys->CAR_SPAWN_HEIGHT, spawnPosition.y), spawnRotation);
+	//uses the respawn function to determine a starting point for the car
+	PxTransform carTransform = PxTransform(dataSys->DetermineRespawnLocation(PhysicsType::CAR), spawnRotation);
 	gVehicle->setUpActor(*dataSys->gScene, carTransform, name);
 
 	PxFilterData vehicleFilter(COLLISION_FLAG_CHASSIS, COLLISION_FLAG_CHASSIS_AGAINST, 0, 0);

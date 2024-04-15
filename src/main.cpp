@@ -40,7 +40,7 @@ AiSystem aiSys3;
 AiSystem aiSys4;
 
 //time related variables
-const double TIMELIMIT = 50.0f;
+const double TIMELIMIT = 100.0f;
 const std::chrono::duration<double> PHYSICSUPDATESPEED = std::chrono::duration<double>(dataSys.TIMESTEP);
 std::chrono::high_resolution_clock::time_point startTime;
 std::chrono::high_resolution_clock::time_point currentTime;
@@ -64,8 +64,14 @@ int gameMusicChannelId;
 
 int main() {
 
+    //initializing time variables
+    startTime = std::chrono::high_resolution_clock::now();
+    currentTime = startTime;
+    lastTime = std::chrono::high_resolution_clock::now();
+    previousIterationTime = lastTime;
+
     //seeding the random number gen to be used throughout the game
-    std::srand(static_cast<unsigned int>(PHYSICSUPDATESPEED.count()));
+    std::srand(static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count()));
 
     //y axis rotation in radians
     float angle = PxTwoPi;
@@ -91,12 +97,6 @@ int main() {
     soundSys.AddToSoundDict("Reload", "assets/Music/Reload.wav");
     soundSys.LoadSound("assets/Music/CarCrash.wav", false);
     soundSys.AddToSoundDict("CarCrash", "assets/Music/CarCrash.wav");
-
-    //initializing time variables
-    startTime = std::chrono::high_resolution_clock::now();
-    currentTime = startTime;
-    lastTime = std::chrono::high_resolution_clock::now();
-    previousIterationTime = lastTime;
 
     GLFWwindow* window;
     window = renderingSystem.getWindow();
@@ -145,13 +145,13 @@ int main() {
                 physicsSys.releaseActors();
 
                 //i have a list of cars (not entities) in the carsystem. can just pass that to physics system
-                carSys.SpawnNewCar(PxVec2(0.0f, 0.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
 
                 //spawning more cars (need min 4 cars for respawning to work)
-                carSys.SpawnNewCar(PxVec2(19.0f, 25.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, -19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(-19.0f, 19.0f), carRotateQuat);
-                carSys.SpawnNewCar(PxVec2(19.0f, -19.0f), carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
+                carSys.SpawnNewCar(carRotateQuat);
                 aiSys1 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[1].entity->collisionBox)); //call the constructors
                 aiSys2 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[2].entity->collisionBox));
                 aiSys3 = AiSystem(&dataSys, dataSys.GetVehicleFromRigidDynamic(dataSys.carInfoList[3].entity->collisionBox));

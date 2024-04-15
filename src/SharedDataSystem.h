@@ -156,12 +156,6 @@ private:
 	// Function to calculate the distance between two PhysX vectors
 	float DistanceBetweenPoints(const PxVec2& point1, const PxVec2& point2);
 
-	//function to get the x nearest points given a list of points
-	std::vector<PxVec2> GetXNearestPoints(std::vector<PxVec2> pointList, int numPointsToGet, std::vector<PxVec2> pointsOfSameType);
-
-	//finds the center of four points
-	PxVec2 FindCenterOfFourPointsWithRandomOffset(PxReal minDistance, std::vector<PxVec2> existingPointsList = {}, std::vector<PxVec2> generatedPointsList = {});
-
 	//populates the map square list with the points of the same type
 	void PopulateMapSquareList(std::vector<PxVec2> pointsOfSameType, std::vector<MapSquare>& mapSquareList);
 
