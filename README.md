@@ -1,6 +1,8 @@
 tank game!!!
 
+A childrens themed tank free for all.
 
+Developers:
 When starting up, the build folders created (Debug and Release) are missing some crucial components.
 They could not be uploaded to GitHub as they were too large.
 I have uploaded them to google drive in the correctly named folders.
